@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="4"
+        android:id="@+id/pop_4"
+        tools:ignore="HardcodedText"/>
+
+    <item android:title="5"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_5"/>
+
+    <item android:title="6"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_6"/>
+
+    <item android:title="7"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_7"/>
+
+    <item android:title="8"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_8"/>
+
+    <item android:title="9"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_9"/>
+
+    <item android:title="10"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_10"/>
+
+</menu>

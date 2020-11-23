@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Driver"
+        android:id="@+id/pop_driver"
+        tools:ignore="HardcodedText" />
+
+    <item android:title="Wood"
+        android:id="@+id/pop_wood"
+        tools:ignore="HardcodedText"/>
+
+    <item android:title="Hybrid"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_hybrid"/>
+
+    <item android:title="Iron"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_iron"/>
+
+    <item android:title="Wedge"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_wedge"/>
+
+    <item android:title="Putter"
+        tools:ignore="HardcodedText"
+        android:id="@+id/pop_putter"/>
+</menu>
