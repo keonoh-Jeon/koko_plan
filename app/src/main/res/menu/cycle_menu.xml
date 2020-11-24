@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="한번"
+        android:id="@+id/once"
+        tools:ignore="HardcodedText" />
+
+    <item android:title="매시"
+        android:id="@+id/everytime"
+        tools:ignore="HardcodedText" />
+
+    <item android:title="매일"
+        android:id="@+id/everyday"
+        tools:ignore="HardcodedText" />
+
+    <item android:title="매주"
+        android:id="@+id/everyweek"
+        tools:ignore="HardcodedText" />
+
+    <item android:title="매월"
+        android:id="@+id/everymonth"
+        tools:ignore="HardcodedText" />
+
+
+</menu>

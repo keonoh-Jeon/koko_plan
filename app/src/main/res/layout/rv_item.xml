@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#F1BABA"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="DisableBaselineAlignment">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:hint="목록"
+            android:singleLine="true"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:textColor="#83986A"
+            android:layout_weight="2"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText,NestedWeights" />
+
+        <EditText
+            android:id="@+id/tvContents"
+            android:text="기간"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:singleLine="true"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:textColor="#83986A"
+            android:textSize="15sp"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/tvCycle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:hint="시간/ 횟수"
+            android:singleLine="true"
+            android:gravity="center"
+            android:textColor="#4CAF50"
+            android:layout_weight="2"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/chitv_distance"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:hint="실행"
+            android:layout_weight="2"
+            android:singleLine="true"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="#3290BB"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/chitv_green"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:hint="실행율"
+            android:layout_weight="2"
+            android:singleLine="true"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="#FCB03F"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:text="Save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+
