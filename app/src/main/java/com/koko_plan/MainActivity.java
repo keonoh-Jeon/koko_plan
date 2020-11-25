@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                         //제목 입력, DB추가
                         if (!edittext.getText().toString().isEmpty()) {
                             new Thread(() -> {
-                                Memo memo = new Memo(edittext.getText().toString(),null);
+                                Memo memo = new Memo(edittext.getText().toString(),null, null, 0);
                                 db.memoDao().insert(memo);
                             }).start();
 

@@ -13,10 +13,13 @@ public class Memo {
     private String contents;
     private String cycle;
 
-    public Memo(String title, String contents){
+    private int time;
+
+    public Memo(String title, String contents, String cycle, int time){
         this.title = title;
         this.contents = contents;
         this.cycle = cycle;
+        this.time = time;
     }
 
     public int getId(){ return id; }
@@ -31,13 +34,17 @@ public class Memo {
     public String getCycle(){ return cycle; }
     public void setCycle(String cy){ this.cycle = cy; }
 
+    public int getTime(){ return time; }
+    public void setTime(int ti){ this.time = ti; }
+
     @Override
     public String toString(){
         return "RecordData{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
                 ", cycle='" + cycle + '\'' +
-                ", contents='" + contents + '\''
+                ", contents='" + contents + '\'' +
+                ", time='" + time + '\''
                 + '}';
     }
 }

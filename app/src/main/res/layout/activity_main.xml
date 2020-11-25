@@ -22,8 +22,6 @@
             android:layout_height="wrap_content"
             tools:ignore="HardcodedText" />
 
-
-
         <ScrollView
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"

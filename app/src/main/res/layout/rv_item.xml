@@ -43,7 +43,7 @@
             android:id="@+id/tvCycle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:hint="시간/ 횟수"
+            android:hint="구간"
             android:singleLine="true"
             android:gravity="center"
             android:textColor="#4CAF50"
@@ -52,11 +52,11 @@
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/chitv_distance"
+            android:id="@+id/tvTime"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:hint="실행"
-            android:layout_weight="2"
+            android:hint="횟수.시간"
+            android:layout_weight="3"
             android:singleLine="true"
             android:gravity="center"
             android:textStyle="bold"
