@@ -20,6 +20,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,7 +36,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private EditText mTodoEditText;
-    private TextView mResultTextView, tvcycle;
+    private TextView mResultTextView, tvcycle, tvPlayTime;
 
     private RecyclerAdapter adapter;
     private RecyclerView recyclerView;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             // title 입력 다이얼로그를 호출한다.
             // title 입력하여 리사이클러뷰 addItem
             final EditText edittext = new EditText(this);
+            edittext.setGravity(Gravity.CENTER);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("일정 추가");
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                         //제목 입력, DB추가
                         if (!edittext.getText().toString().isEmpty()) {
                             new Thread(() -> {
-                                Memo memo = new Memo(edittext.getText().toString(),null, null, 0);
+                                Memo memo = new Memo(edittext.getText().toString(), null, 0, 0);
                                 db.memoDao().insert(memo);
                             }).start();
 

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -35,8 +36,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private List<Memo> items = new ArrayList<>();
     private Context mContext;
     private MemoDatabase db;
-    private TextView tvCounttime;
-    private TextView tvTitle;
 
     public RecyclerAdapter(MemoDatabase db) {
         this.db = db;
@@ -77,8 +76,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 makedialogtitle(v, holder.getAdapterPosition());
             }
         });
-
-
+        /*v.findViewById(R.id.ivplaybtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                MySoundPlayer.play(MySoundPlayer.CLICK);
+                plusplaycount(v, holder.getAdapterPosition());
+            }
+        });*/
 
         return holder;
     }
@@ -114,11 +118,83 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         builder.show();
     }
 
+    /*@SuppressLint("SetTextI18n")
+    private void plusplaycount(View v, final int position){
+
+        final TextView tvplayCount = (TextView) v. findViewById(R.id.tvPlayCount);
+
+        int playcount = items.get(position).getPlaycount() + 1;
+        Log.e(TAG, "plusplaycount: 1번 실행" + playcount);
+
+        tvplayCount.setText(playcount+"");
+        new Thread(() -> {
+            items.get(position).setPlaycount(playcount);
+            db.memoDao().update(items.get(position));
+        }).start();
+    }*/
+
     @Override
     public void onBindViewHolder(RecyclerAdapter.ViewHolder viewHolder, int position) {
 
         viewHolder.onBind(items.get(position),position);
 
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView tvTitle;
+        private TextView tvCycle;
+        private TextView tvTime;
+        private Button btnSave;
+        private TextView tvplayCount;
+        private ImageView ivplaybtn;
+
+        private int index;
+
+        public ViewHolder(View view) {
+            super(view);
+
+            tvTitle = view.findViewById(R.id.tvTitle);
+            tvCycle = view.findViewById(R.id.tvCycle);
+            tvTime = view.findViewById(R.id.tvTime);
+            tvplayCount = view.findViewById(R.id.tvPlayCount);
+            ivplaybtn = view.findViewById(R.id.ivplaybtn);
+            btnSave = view.findViewById(R.id.btnSave);
+
+            ivplaybtn.setOnClickListener(v -> editPlayPluscount());
+
+        }
+        @SuppressLint("SetTextI18n")
+        public void onBind(Memo memo, int position){
+            index = position;
+            tvTitle.setText(memo.getTitle());
+            tvCycle.setText(memo.getCycle());
+            tvTime.setText(memo.getTime() + "");
+            tvplayCount.setText(memo.getPlaycount() + "");
+        }
+
+        /*public void editData(String contents){
+            new Thread(() -> {
+                items.get(index).setContents(contents);
+                db.memoDao().update(items.get(index));
+            }).start();
+            Toast.makeText(mContext,"저장완료", Toast.LENGTH_SHORT).show();
+        }*/
+
+        @SuppressLint("SetTextI18n")
+        public void editPlayPluscount(){
+            int playcount = items.get(index).getPlaycount() + 1;
+            tvplayCount.setText(playcount+"");
+            new Thread(() -> {
+                items.get(index).setPlaycount(playcount);
+                db.memoDao().update(items.get(index));
+            }).start();
+        }
+    }
+
+    public void setItem(List<Memo> data) {
+        items = data;
+        notifyDataSetChanged();
     }
 
     private void showPopupCountTime(View v, final int position){
@@ -257,46 +333,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         popup.show();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView tvContents;
-        private TextView tvCycle;
-        private TextView tvTime;
-        private Button btnSave;
-        private int index;
-
-        public ViewHolder(View view) {
-            super(view);
-
-            tvTitle = view.findViewById(R.id.tvTitle);
-            tvContents = view.findViewById(R.id.tvContents);
-            tvCycle = view.findViewById(R.id.tvCycle);
-            tvTime = view.findViewById(R.id.tvTime);
-            btnSave = view.findViewById(R.id.btnSave);
-            btnSave.setOnClickListener(v -> editData(tvContents.getText().toString()));
-
-        }
-        @SuppressLint("SetTextI18n")
-        public void onBind(Memo memo, int position){
-            index = position;
-            tvTitle.setText(memo.getTitle());
-            tvContents.setText(memo.getContents());
-            tvCycle.setText(memo.getCycle());
-            tvTime.setText(memo.getTime() + "");
-        }
-
-        public void editData(String contents){
-            new Thread(() -> {
-                items.get(index).setContents(contents);
-                db.memoDao().update(items.get(index));
-            }).start();
-            Toast.makeText(mContext,"저장완료", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void setItem(List<Memo> data) {
-        items = data;
-        notifyDataSetChanged();
-    }
 
 }

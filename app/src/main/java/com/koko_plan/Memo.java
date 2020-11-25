@@ -10,16 +10,16 @@ public class Memo {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
-    private String contents;
     private String cycle;
 
     private int time;
+    private int playcount;
 
-    public Memo(String title, String contents, String cycle, int time){
+    public Memo(String title, String cycle, int time, int playcount){
         this.title = title;
-        this.contents = contents;
         this.cycle = cycle;
         this.time = time;
+        this.playcount = playcount;
     }
 
     public int getId(){ return id; }
@@ -28,14 +28,14 @@ public class Memo {
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
 
-    public String getContents(){ return contents; }
-    public void setContents(String in){ this.contents = in; }
-
     public String getCycle(){ return cycle; }
     public void setCycle(String cy){ this.cycle = cy; }
 
     public int getTime(){ return time; }
     public void setTime(int ti){ this.time = ti; }
+
+    public int getPlaycount(){ return playcount; }
+    public void setPlaycount(int pl){ this.playcount = pl; }
 
     @Override
     public String toString(){
@@ -43,9 +43,9 @@ public class Memo {
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
                 ", cycle='" + cycle + '\'' +
-                ", contents='" + contents + '\'' +
-                ", time='" + time + '\''
-                + '}';
+                ", time='" + time + '\'' +
+                ", playcount='" + playcount + '\'' +
+                '}';
     }
 }
 
