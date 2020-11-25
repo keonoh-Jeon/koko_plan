@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.Build;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +26,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Message;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +152,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private TextView tvplayCount;
         private ImageView ivplaybtn;
 
+        private Button mStartBtn, mStopBtn, mRecordBtn, mPauseBtn;
+        private TextView mTimeTextView, mRecordTextView;
+        private Thread timeThread = null;
+        private Boolean isRunning = true;
+
         private int index;
 
         public ViewHolder(View view) {
@@ -163,7 +171,105 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             ivplaybtn.setOnClickListener(v -> editPlayPluscount());
 
+            mStartBtn = view.findViewById(R.id.btn_start);
+            mStopBtn = view.findViewById(R.id.btn_stop);
+            mRecordBtn = view.findViewById(R.id.btn_record);
+            mPauseBtn = view.findViewById(R.id.btn_pause);
+            mTimeTextView = view.findViewById(R.id.timeView);
+
+            mStartBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setVisibility(View.GONE);
+                    mStopBtn.setVisibility(View.VISIBLE);
+                    mRecordBtn.setVisibility(View.VISIBLE);
+                    mPauseBtn.setVisibility(View.VISIBLE);
+
+                    timeThread = new Thread(new timeThread());
+                    timeThread.start();
+                }
+            });
+
+            mStopBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setVisibility(View.GONE);
+                    mRecordBtn.setVisibility(View.GONE);
+                    mStartBtn.setVisibility(View.VISIBLE);
+                    mPauseBtn.setVisibility(View.GONE);
+                    mRecordTextView.setText("");
+                    timeThread.interrupt();
+                }
+            });
+
+            mRecordBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mRecordTextView.setText(mRecordTextView.getText() + mTimeTextView.getText().toString() + "\n");
+                }
+            });
+
+            mPauseBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isRunning = !isRunning;
+                    if (isRunning) {
+                        mPauseBtn.setText("일시정지");
+                    } else {
+                        mPauseBtn.setText("시작");
+                    }
+                }
+            });
+
         }
+
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                int mSec = msg.arg1 % 100;
+                int sec = (msg.arg1 / 100) % 60;
+                int min = (msg.arg1 / 100) / 60;
+                int hour = (msg.arg1 / 100) / 360;
+                //1000이 1초 1000*60 은 1분 1000*60*10은 10분 1000*60*60은 한시간
+
+                @SuppressLint("DefaultLocale") String result = String.format("%02d:%02d:%02d:%02d", hour, min, sec, mSec);
+                /*if (result.equals("00:01:15:00")) {
+                    Toast.makeText(MainActivity.this, "1분 15초가 지났습니다.", Toast.LENGTH_SHORT).show();
+                }*/
+                mTimeTextView.setText(result);
+            }
+        };
+
+        public class timeThread implements Runnable {
+            @Override
+            public void run() {
+                int i = 0;
+
+                while (true) {
+                    while (isRunning) { //일시정지를 누르면 멈춤
+                        Message msg = new Message();
+                        msg.arg1 = i++;
+                        handler.sendMessage(msg);
+
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            runOnUiThread(new Runnable(){
+                                @Override
+                                public void run() {
+                                    mTimeTextView.setText("");
+                                    mTimeTextView.setText("00:00:00:00");
+                                }
+                            });
+                            return; // 인터럽트 받을 경우 return
+                        }
+                    }
+                }
+            }
+        }
+
         @SuppressLint("SetTextI18n")
         public void onBind(Memo memo, int position){
             index = position;
@@ -192,6 +298,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
+    private void runOnUiThread(Runnable runnable) {
+    }
+
     public void setItem(List<Memo> data) {
         items = data;
         notifyDataSetChanged();
@@ -210,10 +319,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 switch (item.getItemId()){
                     case R.id.menucount:
-                        makedialog(v, position);
+                        makecountdialog(v, position);
                         break;
                     case R.id.menutime:
-
+                        maketimerdialog(v, position);
                         break;
                 }
                 return false;
@@ -241,7 +350,52 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     @SuppressLint("SetTextI18n")
-    private void makedialog(View v, final int position){
+    private void maketimerdialog(View v, final int position){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View di = inflater.inflate(R.layout.timerinput, null);
+
+        final TextView tvCounttime = (TextView) v. findViewById(R.id.tv_playresult);
+
+        final NumberPicker hourPicker = (NumberPicker) di.findViewById(R.id.picker_hour);
+        final NumberPicker minPicker = (NumberPicker) di.findViewById(R.id.picker_min);
+        final NumberPicker secPicker = (NumberPicker) di.findViewById(R.id.picker_sec);
+
+        hourPicker.setMinValue(0);
+        hourPicker.setMaxValue(99);
+        hourPicker.setValue(0);
+
+        minPicker.setMinValue(0);
+        minPicker.setMaxValue(99);
+        minPicker.setValue(0);
+
+        secPicker.setMinValue(0);
+        secPicker.setMaxValue(99);
+        secPicker.setValue(0);
+
+        builder.setTitle("목표 시간 입력");
+        builder.setMessage("하루의 목표 시간을 설정하세요");
+        builder.setView(di);
+
+        builder.setPositiveButton("입력",
+                (dialog, which) -> {
+                    //제목 입력, DB추가
+                    tvCounttime.setText(hourPicker.getValue()+ ":" + minPicker.getValue()+ ":" + secPicker.getValue());
+                    new Thread(() -> {
+                        /*items.get(position).setTime(numberPicker.getValue());
+                        db.memoDao().update(items.get(position));*/
+                    }).start();
+                });
+        builder.setNegativeButton("취소",
+                (dialog, which) -> {
+                    //취소버튼 클릭
+                });
+        builder.show();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void makecountdialog(View v, final int position){
 
         final TextView tvCounttime = (TextView) v. findViewById(R.id.tvTime);
 
