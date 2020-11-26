@@ -100,9 +100,8 @@ public class MainActivity extends AppCompatActivity {
                 adapter.setItem(data);
             }
         });
-
-
     }
+
 
     private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
@@ -117,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     }).start();
-
                 }else {
                     //오른쪽으로 밀었을때.
                 }

@@ -1,5 +1,9 @@
 package com.koko_plan;
 
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Message;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -12,7 +16,7 @@ public class Memo {
     private String title;
     private String cycle;
 
-    private int time;
+    private int time, hour, min, sec;
     private int playcount;
 
     public Memo(String title, String cycle, int time, int playcount){
@@ -34,6 +38,15 @@ public class Memo {
     public int getTime(){ return time; }
     public void setTime(int ti){ this.time = ti; }
 
+    public int getHour(){ return hour; }
+    public void setHour(int hour){ this.hour = hour; }
+
+    public int getMin(){ return min; }
+    public void setMin(int min){ this.min = min; }
+
+    public int getSec(){ return sec; }
+    public void setSec(int sec){ this.sec = sec; }
+
     public int getPlaycount(){ return playcount; }
     public void setPlaycount(int pl){ this.playcount = pl; }
 
@@ -47,5 +60,9 @@ public class Memo {
                 ", playcount='" + playcount + '\'' +
                 '}';
     }
+
+
+
+
 }
 
