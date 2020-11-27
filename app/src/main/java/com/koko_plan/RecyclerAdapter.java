@@ -30,11 +30,12 @@ import android.os.Handler;
 import android.os.Message;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
     private List<Memo> items = new ArrayList<>();
     private Context mContext;
@@ -50,6 +51,36 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return items.size();
     }
 
+    public void addItem(Memo memo){ items.add(memo); }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemSwipe(int position) {
+
+        items.remove(position);
+        notifyItemRemoved(position);
+
+        new Thread(() -> {
+//            db.memoDao().delete(items.get(position));
+
+        }).start();
+
+    }
+
     public List<Memo> getItems() {return items;}
 
     @NonNull
@@ -58,8 +89,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rv_item, viewGroup, false);
         mContext = viewGroup.getContext();
         final ViewHolder holder = new ViewHolder(v);
-        v.findViewById(R.id.tvCycle).setOnClickListener(new View.OnClickListener() {
 
+        v.findViewById(R.id.tvCycle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                MySoundPlayer.play(MySoundPlayer.CLICK);
@@ -156,6 +187,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             btnSave = view.findViewById(R.id.btnSave);
 
+            timeThread = new Thread(new timeThread());
+
 //            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
 
             mStartBtn = view.findViewById(R.id.btn_start);
@@ -178,7 +211,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     mRecordBtn.setVisibility(View.VISIBLE);
                     mPauseBtn.setVisibility(View.VISIBLE);
 
-                    timeThread = new Thread(new timeThread());
                     timeThread.start();
                 }
             });
@@ -264,8 +296,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         };
 
-
-
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
         public void onBind(Memo memo, int position){
             index = position;
@@ -305,8 +335,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     db.memoDao().update(items.get(index));
                 }).start();
             } else {
-                timeThread = new Thread(new timeThread());
                 timeThread.start();
+
             }
         }
     }

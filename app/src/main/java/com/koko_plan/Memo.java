@@ -1,11 +1,15 @@
 package com.koko_plan;
 
 import android.annotation.SuppressLint;
+import android.net.wifi.aware.DiscoverySession;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import static android.content.ContentValues.TAG;
 
 @Entity(tableName = "memoTable")
 public class Memo {
@@ -60,9 +64,5 @@ public class Memo {
                 ", playcount='" + playcount + '\'' +
                 '}';
     }
-
-
-
-
 }
 
