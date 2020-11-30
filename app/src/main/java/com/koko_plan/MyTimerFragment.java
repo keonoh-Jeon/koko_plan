@@ -1,12 +1,14 @@
 package com.koko_plan;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -15,23 +17,32 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import android.app.Fragment;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 
+@SuppressLint("ValidFragment")
 public class MyTimerFragment extends Fragment {
 
     Timer mTimer;
@@ -39,8 +50,66 @@ public class MyTimerFragment extends Fragment {
     private TextView mTextView;
     long mStartTime;
 
+    private MemoDatabase db;
+    private List<Memo> items = new ArrayList<>();
+
+    CustomAdapter ca;
+    private Context context;
+
+    class CustomAdapter extends BaseAdapter {
+
+        public void setItem(List<Memo> data) {
+            items = data;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+        @SuppressLint("ViewHolder")
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            Activity root = getActivity(); //이 클래스가 프레그먼트이기 때문에 액티비티 정보를 얻는다.
+            Toast.makeText(root,"getView" , Toast.LENGTH_SHORT).show();
+
+            //커스텀뷰에 있는 객체들 가져오기
+            convertView = getLayoutInflater().inflate(R.layout.fragment_main,null);
+            TextView tName = (TextView)convertView.findViewById(R.id.tvTitle);
+            /*TextView tDate = (TextView)convertView.findViewById(R.id.textView_date);
+            TextView tContent = (TextView)convertView.findViewById(R.id.textView_content);*/
+
+            tName.setText((CharSequence) items.get(position));
+            /*tDate.setText(dates.get(position));
+            tContent.setText(contents.get(position));*/
+            return convertView;
+        }
+    }
+
+
+
+    //제일 먼저 호출
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        displayTodos();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container,false);
         final TextView tvTitle = rootView.findViewById(R.id.tvTitle);
@@ -110,13 +179,16 @@ public class MyTimerFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // 데이터 저장
-        TextView textCounter = Objects.requireNonNull(getView()).findViewById(R.id.tvTitle);
-        String title = textCounter.getText().toString();
-        outState.putString("title", title);
-    }
+    //감사 리스트 호출 함수
+    public void displayTodos(){
 
+        db = MemoDatabase.getDatabase(context);
+
+        db.memoDao().getAll().observe((LifecycleOwner) this, new Observer<List<Memo>>() {
+            @Override
+            public void onChanged(List<Memo> data) {
+                ca.setItem(data);
+            }
+        });
+    }
 }

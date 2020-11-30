@@ -90,8 +90,6 @@ public class MainActivity extends AppCompatActivity {
                     });
             builder.show();*/
         btnPlus.setOnClickListener(this::buttonMethodAdd);
-
-        db = MemoDatabase.getDatabase(this);
     }
 
     public void buttonMethodAdd(View v){
