@@ -12,6 +12,10 @@ import androidx.room.PrimaryKey;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import android.animation.LayoutTransition;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,10 +24,12 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,10 +41,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private EditText mTodoEditText;
     private TextView mResultTextView, tvcycle, tvPlayTime;
 
-    private RecyclerAdapter adapter;
     private Paint p = new Paint();
 
     ItemTouchHelper helper;
@@ -48,12 +54,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        LinearLayout container = (LinearLayout)findViewById(R.id.container);
+        container.setLayoutTransition(new LayoutTransition());
+
         View btnPlus = findViewById(R.id.btnPlus);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_view);
+//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_view);
 
-        btnPlus.setOnClickListener(v -> {
-            // title 입력 다이얼로그를 호출한다.
+        /*// title 입력 다이얼로그를 호출한다.
             // title 입력하여 리사이클러뷰 addItem
             final EditText edittext = new EditText(this);
             edittext.setGravity(Gravity.CENTER);
@@ -79,28 +88,16 @@ public class MainActivity extends AppCompatActivity {
                     (dialog, which) -> {
                         //취소버튼 클릭
                     });
-            builder.show();
-
-        });
+            builder.show();*/
+        btnPlus.setOnClickListener(this::buttonMethodAdd);
 
         db = MemoDatabase.getDatabase(this);
-        recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new RecyclerAdapter(db);
-        recyclerView.setAdapter(adapter);
-
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper.attachToRecyclerView(recyclerView);
-
-        //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
-        db.memoDao().getAll().observe(this, new Observer<List<Memo>>() {
-            @Override
-            public void onChanged(List<Memo> data) {
-                adapter.setItem(data);
-            }
-        });
     }
 
+    public void buttonMethodAdd(View v){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction t = fm.beginTransaction();
+        t.add(R.id.container, new MyTimerFragment());
+        t.commit();
+    }
 }

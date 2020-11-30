@@ -4,9 +4,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:background="#F1BABA"
-    tools:ignore="MissingDefaultResource">
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="00:00:00"
+        android:textSize="30sp"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonStopDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Stop/Delete"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -80,16 +98,16 @@
                 tools:ignore="NestedWeights" />
 
             <TextView
-            android:id="@+id/tvCycle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:hint="구간"
-            android:singleLine="true"
-            android:gravity="center"
-            android:textColor="#4CAF50"
-            android:layout_weight="2"
-            android:textSize="15sp"
-            tools:ignore="HardcodedText" />
+                android:id="@+id/tvCycle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:hint="구간"
+                android:singleLine="true"
+                android:gravity="center"
+                android:textColor="#4CAF50"
+                android:layout_weight="2"
+                android:textSize="15sp"
+                tools:ignore="HardcodedText" />
 
 
             <TextView
