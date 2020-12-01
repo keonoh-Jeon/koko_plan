@@ -11,8 +11,8 @@ import androidx.room.PrimaryKey;
 
 import static android.content.ContentValues.TAG;
 
-@Entity(tableName = "memoTable")
-public class Memo {
+@Entity(tableName = "todoTable")
+public class Todo {
 
     //Room에서 자동으로 id를 할당
     @PrimaryKey(autoGenerate = true)
@@ -23,7 +23,8 @@ public class Memo {
     private int time, hour, min, sec;
     private int playcount;
 
-    public Memo(String title, String cycle, int time, int playcount){
+    public Todo(int id, String title, String cycle, int time, int playcount){
+        this.id = id;
         this.title = title;
         this.cycle = cycle;
         this.time = time;

@@ -6,11 +6,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Memo.class}, version = 1, exportSchema = false)
+@Database(entities = {Todo.class}, version = 1, exportSchema = false)
 public abstract class MemoDatabase extends RoomDatabase {
 
-    public abstract MemoDao memoDao();
-
+    public abstract TodoDao todoDao();
     private static volatile MemoDatabase INSTANCE;
 
     //싱글톤

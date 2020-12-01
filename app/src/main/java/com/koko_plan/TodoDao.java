@@ -10,21 +10,21 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface MemoDao {
+public interface TodoDao {
 
     @Insert
-    void insert(Memo memo);
+    void insert(Todo todo);
 
     @Update
-    void update(Memo memo);
+    void update(Todo todo);
 
     @Delete
-    void delete(Memo memo);
+    void delete(Todo todo);
 
-    @Query("SELECT * FROM memoTable")
-    LiveData<List<Memo>> getAll(); //LiveData
+    @Query("SELECT * FROM todoTable")
+    LiveData<List<Todo>> getAll(); //LiveData
 
-    @Query("DELETE FROM memoTable")
+    @Query("DELETE FROM todoTable")
     void deleteAll();
 
 }

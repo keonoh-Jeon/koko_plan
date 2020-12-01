@@ -6,8 +6,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,67 +47,22 @@ import static android.content.ContentValues.TAG;
 @SuppressLint("ValidFragment")
 public class MyTimerFragment extends Fragment {
 
+    TextView dateNow;
+
     Timer mTimer;
     Handler mHandler = new Handler();
     private TextView mTextView;
     long mStartTime;
 
-    private MemoDatabase db;
-    private List<Memo> items = new ArrayList<>();
-
-    CustomAdapter ca;
     private Context context;
-
-    class CustomAdapter extends BaseAdapter {
-
-        public void setItem(List<Memo> data) {
-            items = data;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return items.size();
-        }
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-        @SuppressLint("ViewHolder")
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            Activity root = getActivity(); //이 클래스가 프레그먼트이기 때문에 액티비티 정보를 얻는다.
-            Toast.makeText(root,"getView" , Toast.LENGTH_SHORT).show();
-
-            //커스텀뷰에 있는 객체들 가져오기
-            convertView = getLayoutInflater().inflate(R.layout.fragment_main,null);
-            TextView tName = (TextView)convertView.findViewById(R.id.tvTitle);
-            /*TextView tDate = (TextView)convertView.findViewById(R.id.textView_date);
-            TextView tContent = (TextView)convertView.findViewById(R.id.textView_content);*/
-
-            tName.setText((CharSequence) items.get(position));
-            /*tDate.setText(dates.get(position));
-            tContent.setText(contents.get(position));*/
-            return convertView;
-        }
-    }
-
-
 
     //제일 먼저 호출
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        displayTodos();
     }
+
 
     @Nullable
     @Override
@@ -113,9 +70,21 @@ public class MyTimerFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container,false);
         final TextView tvTitle = rootView.findViewById(R.id.tvTitle);
+        final TextView tvTime = rootView.findViewById(R.id.tvTime);
 
-        if(savedInstanceState != null){
-            tvTitle.setText(savedInstanceState.getString("title"));
+        // 현재시간을 msec 으로 구한다.
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+        Date date = new Date(now);
+        // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
+        // nowDate 변수에 값을 저장한다.
+        String formatDate = sdfNow.format(date);
+        Log.e(TAG, "onCreateView: "+ formatDate );
+
+        if(getArguments() != null){
+            tvTitle.setText(getArguments().getString("title"));
         }
 
         rootView.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
@@ -134,6 +103,20 @@ public class MyTimerFragment extends Fragment {
                          dialog.show(getFragmentManager(), "addDialog");
             }
         });
+
+        class DeviceEventReceiver extends BroadcastReceiver {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+
+                if (Intent.ACTION_TIME_CHANGED.equals(action)
+                        || Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
+                    // 시간이 변경된 경우 해야 될 작업을 한다.
+                    tvTime.setText(formatDate);
+                }
+            }
+        }
 
         return rootView;
     }
@@ -175,19 +158,6 @@ public class MyTimerFragment extends Fragment {
                 else{
                     MyTimerFragment.this.getFragmentManager().beginTransaction().remove(MyTimerFragment.this).commit();
                 }
-            }
-        });
-    }
-
-    //감사 리스트 호출 함수
-    public void displayTodos(){
-
-        db = MemoDatabase.getDatabase(context);
-
-        db.memoDao().getAll().observe((LifecycleOwner) this, new Observer<List<Memo>>() {
-            @Override
-            public void onChanged(List<Memo> data) {
-                ca.setItem(data);
             }
         });
     }
