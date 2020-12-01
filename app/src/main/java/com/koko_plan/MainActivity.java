@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvTitle, mResultTextView, tvcycle, tvPlayTime;
 
     private Paint p = new Paint();
-    private int size;
+    private int size, oldsize;
     public static MemoDatabase db;
     private List<Todo> items = new ArrayList<>();
 
@@ -69,14 +69,9 @@ public class MainActivity extends AppCompatActivity {
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
 
-        size = pref.getInt("size", size);
-        Log.e(TAG, "onCreate:  size" + size);
-
         db = MemoDatabase.getDatabase(this);
 
-        initfragment();
-
-        //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
+        /*//UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
         db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
             @SuppressLint("ApplySharedPref")
             @Override
@@ -84,45 +79,64 @@ public class MainActivity extends AppCompatActivity {
                 size = items.size();
                 editor.putInt("size", size);
                 editor.commit();
+
+                if (size == 0) {
+                    for (int i=0 ; i<size ; i++) {
+                        Fragment list = new MyTimerFragment();
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction t = fm.beginTransaction();
+                        //프레그먼트 매니저 상에 새 프레그먼트 추가
+                        t.add(R.id.container, list);
+                        t.commit();
+
+//            Log.d(TAG, "onChanged: size " + items.get(i));
+
+            *//*Bundle bundle = new Bundle();
+            bundle.putString("title", items.get(i).getTitle());
+            list.setArguments(bundle);*//*
+                    }
+                }
             }
-        });
+        });*/
 
         View btnPlus = findViewById(R.id.btnPlus);
         btnPlus.setOnClickListener(this::buttonMethodAdd);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
-    }
 
+        //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
+        db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
+            @SuppressLint("ApplySharedPref")
+            @Override
+            public void onChanged(List<Todo> items) {
+                size = items.size();
+                oldsize = pref.getInt("size", size);
+                if(oldsize == size) {
+                    for (int i=0 ; i<size ; i++) {
+                        Fragment list = new MyTimerFragment();
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction t = fm.beginTransaction();
+                        //프레그먼트 매니저 상에 새 프레그먼트 추가
+                        t.add(R.id.container, list);
+                        t.commit();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", items.get(i).getTitle());
+                        list.setArguments(bundle);
+                    }
+                }
+                editor.putInt("size", size);
+                editor.commit();
+            }
+        });
+    }
 
     protected void onResume() {
         super.onResume();
 
-    }
-
-    private void initfragment() {
-
-//        Log.e(TAG, "initfragment: " + items.get(0));
-
-        Log.e(TAG, "initfragment: " + size);
-
-        for (int i=0 ; i<size ; i++) {
-            Fragment list = new MyTimerFragment();
-            FragmentManager fm = getFragmentManager();
-            FragmentTransaction t = fm.beginTransaction();
-            //프레그먼트 매니저 상에 새 프레그먼트 추가
-            t.add(R.id.container, list);
-            t.commit();
-
-            Log.d(TAG, "onChanged: size " + items.get(i));
-
-            Bundle bundle = new Bundle();
-            bundle.putString("title", items.get(i).getTitle());
-            list.setArguments(bundle);
-        }
     }
 
     public void buttonMethodAdd(View v){
@@ -140,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     //제목 입력, DB추가(빈칸이 아니면...)
                     if (!edittext.getText().toString().isEmpty()) {
 
-                        /*//새로운 프레그 먼트 추가
+                        //새로운 프레그 먼트 추가
                         Fragment list = new MyTimerFragment();
                         FragmentManager fm = getFragmentManager();
                         FragmentTransaction t = fm.beginTransaction();
@@ -151,14 +165,13 @@ public class MainActivity extends AppCompatActivity {
                         //번들에 저장하여, 신규 프레그먼트로 값 전달
                         Bundle bundle = new Bundle();
                         bundle.putString("title", edittext.getText().toString());
-                        list.setArguments(bundle);*/
+                        list.setArguments(bundle);
 
                         //db에 신규일정 타이틀 저장
                         new Thread(() -> {
                             Todo memo = new Todo(0, edittext.getText().toString(), null, 0, 0);
                             db.todoDao().insert(memo);
                         }).start();
-
                     }
 
                 });
