@@ -7,18 +7,18 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 @Database(entities = {Todo.class}, version = 1, exportSchema = false)
-public abstract class MemoDatabase extends RoomDatabase {
+public abstract class TodoDatabase extends RoomDatabase {
 
     public abstract TodoDao todoDao();
-    private static volatile MemoDatabase INSTANCE;
+    private static volatile TodoDatabase INSTANCE;
 
     //싱글톤
-    public static MemoDatabase getDatabase(final Context context) {
+    public static TodoDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            synchronized (MemoDatabase.class) {
+            synchronized (TodoDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            MemoDatabase.class, "memo_database")
+                            TodoDatabase.class, "todo_database")
                             .build();
                 }
             }

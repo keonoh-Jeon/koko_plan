@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Paint p = new Paint();
 
-    private MemoDatabase db;
+    private TodoDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        db = MemoDatabase.getDatabase(this);
+        db = TodoDatabase.getDatabase(this);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -94,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
-        db.memoDao().getAll().observe(this, new Observer<List<Memo>>() {
+        db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
             @Override
-            public void onChanged(List<Memo> data) {
+            public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
             }
         });
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            db.memoDao().delete(adapter.getItems().get(position));
+                            db.todoDao().delete(adapter.getItems().get(position));
                         }
 
                     }).start();
