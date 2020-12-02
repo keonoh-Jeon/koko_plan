@@ -75,7 +75,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         notifyItemRemoved(position);
 
         new Thread(() -> {
-//            db.memoDao().delete(items.get(position));
+            db.todoDao().delete(items.get(position));
 
         }).start();
 
