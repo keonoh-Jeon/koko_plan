@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
                         //제목 입력, DB추가
                         if (!edittext.getText().toString().isEmpty()) {
                             new Thread(() -> {
-                                Memo memo = new Memo(edittext.getText().toString(), null, 0, 0);
-                                db.memoDao().insert(memo);
+                                Todo memo = new Todo(0, edittext.getText().toString(), null, 0, 0);
+                                db.todoDao().insert(memo);
                             }).start();
 
                         }
@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         db = MemoDatabase.getDatabase(this);
-
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
