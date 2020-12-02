@@ -41,6 +41,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private Context mContext;
     private TodoDatabase db;
     private boolean isRunning;
+    private TextView tvCycle;
 
     public RecyclerAdapter(TodoDatabase db) {
         this.db = db;
@@ -52,6 +53,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     public void addItem(Todo todo){ items.add(todo); }
+
+    public List<Todo> getItems() {return items;}
+
+    public void setItem(List<Todo> data) {
+        items = data;
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -78,10 +87,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             db.todoDao().delete(items.get(position));
 
         }).start();
-
     }
 
-    public List<Todo> getItems() {return items;}
 
     @NonNull
     @Override
@@ -111,46 +118,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 makedialogtitle(v, holder.getAdapterPosition());
             }
         });
-        /*v.findViewById(R.id.ivplaybtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                MySoundPlayer.play(MySoundPlayer.CLICK);
-                plusplaycount(v, holder.getAdapterPosition());
-            }
-        });*/
-
         return holder;
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void makedialogtitle(View v, final int position){
-
-        final TextView tvTitle = (TextView) v. findViewById(R.id.tvTitle);
-
-        final EditText edittext = new EditText(mContext);
-        edittext.setText(items.get(position).getTitle());
-        edittext.setGravity(Gravity.CENTER);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("일정 수정");
-        builder.setMessage("수정할 일정을 기입해주세요.");
-        builder.setView(edittext);
-
-        builder.setPositiveButton("입력",
-                (dialog, which) -> {
-                    //제목 입력, DB추가
-                    tvTitle.setText(edittext.getText().toString());
-                    new Thread(() -> {
-                        items.get(position).setTitle(edittext.getText().toString());
-                        db.todoDao().update(items.get(position));
-                    }).start();
-
-                });
-        builder.setNegativeButton("취소",
-                (dialog, which) -> {
-                    //취소버튼 클릭
-                });
-        builder.show();
     }
 
     @Override
@@ -193,7 +161,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             btnSave = view.findViewById(R.id.btnSave);
 
-            timeThread = new Thread(new timeThread());
 
 //            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
 
@@ -253,10 +220,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }
                 }
             });*/
-
-
-
-
         }
 
         private void startTimerTask()
@@ -291,56 +254,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         }
 
-
-
-        public class timeThread implements Runnable {
-
-            @Override
-            public void run() {
-                int i = 0;
-
-                while (true) {
-                    while (isRunning) { //일시정지를 누르면 멈춤
-                        Message msg = new Message();
-                        msg.arg1 = i--;
-                        handler.sendMessage(msg);
-
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            runOnUiThread(new Runnable(){
-                                @Override
-                                public void run() {
-                                    mTimeTextView.setText("");
-                                    mTimeTextView.setText("00:00:00:00");
-                                }
-                            });
-                            return; // 인터럽트 받을 경우 return
-                        }
-                    }
-                }
-            }
-        }
-
-        @SuppressLint("HandlerLeak")
-        Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                int mSec = msg.arg1 % 100;
-                int sec = (msg.arg1 / 100) % 60;
-                int min = (msg.arg1 / 100) / 60;
-                int hour = (msg.arg1 / 100) / 360;
-                //1000이 1초 1000*60 은 1분 1000*60*10은 10분 1000*60*60은 한시간
-
-                @SuppressLint("DefaultLocale") String result = String.format("%02d:%02d:%02d:%02d", hour, min, sec, mSec);
-                /*if (result.equals("00:01:15:00")) {
-                    Toast.makeText(MainActivity.this, "1분 15초가 지났습니다.", Toast.LENGTH_SHORT).show();
-                }*/
-                tvTime.setText(result);
-            }
-        };
-
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
         public void onBind(Todo memo, int position){
             index = position;
@@ -364,7 +277,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void itemdelete() {
-            timeThread.interrupt();
+            timerTask.cancel();
+            timerTask = null;
+
             new Thread(() -> {
                 db.todoDao().delete(items.get(index));
             }).start();
@@ -385,14 +300,38 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    private void makedialogtitle(View v, final int position){
 
+        final TextView tvTitle = (TextView) v. findViewById(R.id.tvTitle);
 
-    private void runOnUiThread(Runnable runnable) {
+        EditText edittext = new EditText(mContext);
+        edittext.setText(items.get(position).getTitle());
+        edittext.setGravity(Gravity.CENTER);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle("일정 수정");
+        builder.setMessage("수정할 일정을 기입해주세요.");
+        builder.setView(edittext);
+
+        builder.setPositiveButton("입력",
+                (dialog, which) -> {
+                    //제목 입력, DB추가
+                    tvTitle.setText(edittext.getText().toString());
+                    new Thread(() -> {
+                        items.get(position).setTitle(edittext.getText().toString());
+                        db.todoDao().update(items.get(position));
+                    }).start();
+
+                });
+        builder.setNegativeButton("취소",
+                (dialog, which) -> {
+                    //취소버튼 클릭
+                });
+        builder.show();
     }
 
-    public void setItem(List<Todo> data) {
-        items = data;
-        notifyDataSetChanged();
+    private void runOnUiThread(Runnable runnable) {
     }
 
     private void showPopupCountTime(View v, final int position){
@@ -535,7 +474,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     private void showPopupcycle(View v, final int position){
 
-        @SuppressLint("RestrictedApi") PopupMenu popup= new PopupMenu(mContext.getApplicationContext(), v);//v는 클릭된 뷰를 의미
+        @SuppressLint("RestrictedApi")
+        PopupMenu popup= new PopupMenu(mContext.getApplicationContext(), v);//v는 클릭된 뷰를 의미
         popup.getMenuInflater().inflate(R.menu.cycle_menu, popup.getMenu());
 
         final TextView cycle = (TextView) v.findViewById(R.id.tvCycle);

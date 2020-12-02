@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         View btnPlus = findViewById(R.id.btnPlus);
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
@@ -57,12 +58,12 @@ public class MainActivity extends AppCompatActivity {
         btnPlus.setOnClickListener(v -> {
             // title 입력 다이얼로그를 호출한다.
             // title 입력하여 리사이클러뷰 addItem
-            final EditText edittext = new EditText(this);
+            EditText edittext = new EditText(this);
             edittext.setGravity(Gravity.CENTER);
+            edittext.setHint("새로운 습관을 추가해주세요.");
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("일정 추가");
-            builder.setMessage("새로운 일정을 추가해주세요.");
+            builder.setTitle("습관 추가");
             builder.setView(edittext);
 
             builder.setPositiveButton("입력",
@@ -73,16 +74,13 @@ public class MainActivity extends AppCompatActivity {
                                 Todo memo = new Todo(0, edittext.getText().toString(), null, 0, 0);
                                 db.todoDao().insert(memo);
                             }).start();
-
                         }
-
                     });
             builder.setNegativeButton("취소",
                     (dialog, which) -> {
                         //취소버튼 클릭
                     });
             builder.show();
-
         });
 
 
