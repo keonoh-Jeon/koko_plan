@@ -18,16 +18,17 @@ public class Todo {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
-    private String cycle;
-
-    private int time, hour, min, sec;
+    private int count;
+    private int hour, min, sec;
     private int playcount;
 
-    public Todo(int id, String title, String cycle, int time, int playcount){
+    public Todo(int id, String title, int count, int hour, int min, int sec, int playcount){
         this.id = id;
         this.title = title;
-        this.cycle = cycle;
-        this.time = time;
+        this.count = count;
+        this.hour = hour;
+        this.min = min;
+        this.sec = sec;
         this.playcount = playcount;
     }
 
@@ -37,11 +38,8 @@ public class Todo {
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
 
-    public String getCycle(){ return cycle; }
-    public void setCycle(String cy){ this.cycle = cy; }
-
-    public int getTime(){ return time; }
-    public void setTime(int ti){ this.time = ti; }
+    public int getCount(){ return count; }
+    public void setCount(int count){ this.count = count; }
 
     public int getHour(){ return hour; }
     public void setHour(int hour){ this.hour = hour; }
@@ -54,16 +52,5 @@ public class Todo {
 
     public int getPlaycount(){ return playcount; }
     public void setPlaycount(int pl){ this.playcount = pl; }
-
-    @Override
-    public String toString(){
-        return "RecordData{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", cycle='" + cycle + '\'' +
-                ", time='" + time + '\'' +
-                ", playcount='" + playcount + '\'' +
-                '}';
-    }
 }
 

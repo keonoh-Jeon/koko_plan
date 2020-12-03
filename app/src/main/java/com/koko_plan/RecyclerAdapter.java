@@ -97,7 +97,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         mContext = viewGroup.getContext();
         final ViewHolder holder = new ViewHolder(v);
 
-        v.findViewById(R.id.tvCycle).setOnClickListener(new View.OnClickListener() {
+        v.findViewById(R.id.tv_count).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                MySoundPlayer.play(MySoundPlayer.CLICK);
@@ -132,7 +132,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private final View v_item;
         private TextView tvTitle;
-        private TextView tvCycle;
+        private TextView tvCount;
         private TextView tvTime;
         private Button btnSave;
         private TextView tvplayCount;
@@ -152,15 +152,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             super(view);
 
             tvTitle = view.findViewById(R.id.tvTitle);
-            tvCycle = view.findViewById(R.id.tvCycle);
+            tvCount = view.findViewById(R.id.tv_count);
             tvTime = view.findViewById(R.id.tvTime);
             ivbtnreset = view.findViewById(R.id.ivbnt_reset);
 
-            TimerTask timerTask;
-            Timer timer = new Timer();
-
             btnSave = view.findViewById(R.id.btnSave);
-
 
 //            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
 
@@ -248,22 +244,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             if(timerTask != null)
             {
-                tvTime.setText("60 초");
+                tvTime.setText(" 초");
                 timerTask.cancel();
                 timerTask = null;
             }
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
-        public void onBind(Todo memo, int position){
+        public void onBind(Todo todo, int position){
             index = position;
-            tvTitle.setText(memo.getTitle());
-            tvCycle.setText(memo.getCycle());
-
-            if(memo.getTime()==0){
-                tvTime.setText(String.format("%02d:%02d:%02d", memo.getHour(),memo.getMin(),memo.getSec()));
+            tvTitle.setText(todo.getTitle());
+            if(todo.getCount()==0){
+                tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
             } else {
-                tvTime.setText(memo.getTime()+ "");
+                tvCount.setText(String.format("%d", todo.getCount()));
             }
         }
 
@@ -287,11 +281,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPlayMinuscount() {
-            if (items.get(index).getTime() > 0) {
-                int playcount = items.get(index).getTime() - 1;
+            if (items.get(index).getCount() > 0) {
+                int playcount = items.get(index).getCount() - 1;
                 tvTime.setText(playcount + "");
                 new Thread(() -> {
-                    items.get(index).setTime(playcount);
+                    items.get(index).setCount(playcount);
                     db.todoDao().update(items.get(index));
                 }).start();
             } else {
@@ -461,7 +455,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     //제목 입력, DB추가
                     textView.setText(numberPicker.getValue()+" ");
                         new Thread(() -> {
-                            items.get(position).setTime(numberPicker.getValue());;
+                            items.get(position).setCount(numberPicker.getValue());;
                             db.todoDao().update(items.get(position));
                         }).start();
                 });
@@ -478,7 +472,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         PopupMenu popup= new PopupMenu(mContext.getApplicationContext(), v);//v는 클릭된 뷰를 의미
         popup.getMenuInflater().inflate(R.menu.cycle_menu, popup.getMenu());
 
-        final TextView cycle = (TextView) v.findViewById(R.id.tvCycle);
+        final TextView tvCount = (TextView) v.findViewById(R.id.tv_count);
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @SuppressLint("SetTextI18n")
@@ -487,19 +481,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 switch (item.getItemId()){
                     case R.id.once:
-                        editcycle("한번");
+                        editcycle(1);
                         break;
                     case R.id.everytime:
-                        editcycle("매시");
+                        editcycle(2);
                         break;
                     case R.id.everyday:
-                        editcycle("매일");
+                        editcycle(3);
                         break;
                     case R.id.everyweek:
-                        editcycle("매주");
+                        editcycle(4);
                         break;
                     case R.id.everymonth:
-                        editcycle("매월");
+                        editcycle(5);
                         break;
                     default:
                         break;
@@ -507,10 +501,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 return false;
             }
 
-            public void editcycle(String s){
-                cycle.setText(s);
+            public void editcycle(int s){
+                tvCount.setText(s);
                 new Thread(() -> {
-                    items.get(position).setCycle(s);
+                    items.get(position).setCount(s);
                     db.todoDao().update(items.get(position));
                 }).start();
                 Toast.makeText(mContext,"저장완료", Toast.LENGTH_SHORT).show();

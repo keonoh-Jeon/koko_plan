@@ -6,35 +6,28 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Database;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.melnykov.fab.FloatingActionButton;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private EditText mTodoEditText;
     private TextView mResultTextView, tvcycle, tvPlayTime;
 
@@ -44,52 +37,38 @@ public class MainActivity extends AppCompatActivity {
 
     private TodoDatabase db;
 
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+    private View btnPlus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View btnPlus = findViewById(R.id.btnPlus);
+        db = TodoDatabase.getDatabase(this);
+
+        btnPlus = findViewById(R.id.btnPlus);
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
-
-        initSwipe();
-
-        btnPlus.setOnClickListener(v -> {
-            // title 입력 다이얼로그를 호출한다.
-            // title 입력하여 리사이클러뷰 addItem
-            EditText edittext = new EditText(this);
-            edittext.setGravity(Gravity.CENTER);
-            edittext.setHint("새로운 습관을 추가해주세요.");
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("습관 추가");
-            builder.setView(edittext);
-
-            builder.setPositiveButton("입력",
-                    (dialog, which) -> {
-                        //제목 입력, DB추가
-                        if (!edittext.getText().toString().isEmpty()) {
-                            new Thread(() -> {
-                                Todo memo = new Todo(0, edittext.getText().toString(), null, 0, 0);
-                                db.todoDao().insert(memo);
-                            }).start();
-                        }
-                    });
-            builder.setNegativeButton("취소",
-                    (dialog, which) -> {
-                        //취소버튼 클릭
-                    });
-            builder.show();
-        });
-
-
-        db = TodoDatabase.getDatabase(this);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new RecyclerAdapter(db);
         recyclerView.setAdapter(adapter);
+
+        initSwipe();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        btnPlus.setOnClickListener(v -> {
+            myStartActivity(EditHabbit.class);
+        });
 
         //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
         db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
@@ -98,6 +77,38 @@ public class MainActivity extends AppCompatActivity {
                 adapter.setItem(data);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //EditHabbit에서 돌아와서 처리
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+
+                String habbittitle = data.getStringExtra("habbittitle");
+                int count = data.getIntExtra("count", 0);
+                int hour = data.getIntExtra("hour", 0);
+                int min = data.getIntExtra("min", 0);
+                int sec = data.getIntExtra("sec", 0);
+
+                @SuppressLint("DefaultLocale")
+                String totalsec = String.format("%2d:%2d:%2d", hour, min, sec);
+
+                new Thread(() -> {
+                    Todo memo = new Todo(0, habbittitle, count, hour, min, sec, 0);
+                    db.todoDao().insert(memo);
+                }).start();
+            }
+        }
+    }
+
+    private void myStartActivity(Class c) {
+        Intent intent = new Intent(this, c);
+
+        startActivityForResult(intent, 1);
+        overridePendingTransition(0, 0);
     }
 
 
@@ -158,5 +169,4 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
-
 }

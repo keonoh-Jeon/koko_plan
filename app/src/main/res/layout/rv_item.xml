@@ -33,6 +33,7 @@
                 tools:ignore="HardcodedText,NestedWeights" />
 
             <TextView
+                android:id="@+id/tv_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -79,8 +80,7 @@
                 android:src="@drawable/refreshbtn"
                 tools:ignore="NestedWeights" />
 
-            <TextView
-            android:id="@+id/tvCycle"
+            <ImageView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:hint="구간"
