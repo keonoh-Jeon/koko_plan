@@ -18,18 +18,21 @@ public class Todo {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
-    private int count;
+    private int curcount, count;
+    private int totalsec;
     private int hour, min, sec;
-    private int playcount;
+    private boolean isrunning;
 
-    public Todo(int id, String title, int count, int hour, int min, int sec, int playcount){
+    public Todo(int id, String title, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
         this.id = id;
         this.title = title;
         this.count = count;
+        this.curcount = curcount;
         this.hour = hour;
         this.min = min;
         this.sec = sec;
-        this.playcount = playcount;
+        this.totalsec = totalsec;
+        this.isrunning = isrunning;
     }
 
     public int getId(){ return id; }
@@ -37,6 +40,9 @@ public class Todo {
 
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
+
+    public int getCurcount(){ return curcount; }
+    public void setCurcount(int curcount){ this.curcount = curcount; }
 
     public int getCount(){ return count; }
     public void setCount(int count){ this.count = count; }
@@ -50,7 +56,10 @@ public class Todo {
     public int getSec(){ return sec; }
     public void setSec(int sec){ this.sec = sec; }
 
-    public int getPlaycount(){ return playcount; }
-    public void setPlaycount(int pl){ this.playcount = pl; }
+    public int getTotalsec(){ return totalsec; }
+    public void setTotalsec(int totalsec){ this.totalsec = totalsec; }
+
+    public boolean getIsrunning(){ return isrunning; }
+    public void setIsrunning(boolean isrunning){ this.isrunning = isrunning; }
 }
 

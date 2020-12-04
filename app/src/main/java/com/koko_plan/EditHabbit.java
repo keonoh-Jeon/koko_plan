@@ -78,19 +78,16 @@ public class EditHabbit extends AppCompatActivity {
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int id) {
-                RadioButton select = (RadioButton)findViewById(id);
-                Log.d(TAG, "onCheckedChanged: " + id);
                 switch (id) {
-                    case 1:
+                    case R.id.rbtn_count:
                         counter.setVisibility(View.VISIBLE);
                         time.setVisibility(View.INVISIBLE);
                         break;
-                    case 2:
-                        time.setVisibility(View.VISIBLE);
+                    case R.id.rbtn_time:
                         counter.setVisibility(View.INVISIBLE);
+                        time.setVisibility(View.VISIBLE);
                         break;
                 }
-                
 //                editText.setText(select.getText());
             }
         });
@@ -103,6 +100,7 @@ public class EditHabbit extends AppCompatActivity {
         int hour = hourPicker.getValue();
         int min = minPicker.getValue();
         int sec = secPicker.getValue();
+        boolean isrunning = false;
 
         Intent intent = new Intent();
 
@@ -111,6 +109,7 @@ public class EditHabbit extends AppCompatActivity {
         intent.putExtra("hour", hour);
         intent.putExtra("min", min);
         intent.putExtra("sec", sec);
+        intent.putExtra("isrunning", isrunning);
 
         setResult(RESULT_OK, intent);
 

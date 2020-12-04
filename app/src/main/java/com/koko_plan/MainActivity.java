@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         initSwipe();
-
     }
 
     @Override
@@ -92,13 +91,16 @@ public class MainActivity extends AppCompatActivity {
                 int hour = data.getIntExtra("hour", 0);
                 int min = data.getIntExtra("min", 0);
                 int sec = data.getIntExtra("sec", 0);
+                boolean isrunning = data.getBooleanExtra("isrunning", false);
+                Log.d(TAG, "onActivityResult: " + isrunning);
 
                 @SuppressLint("DefaultLocale")
-                String totalsec = String.format("%2d:%2d:%2d", hour, min, sec);
+                int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo memo = new Todo(0, habbittitle, count, hour, min, sec, 0);
-                    db.todoDao().insert(memo);
+                    Todo todo = new Todo(0, habbittitle, 0, count, hour, min, sec, totalsec, isrunning);
+                    Log.e(TAG, "onActivityResult: " + todo);
+                    db.todoDao().insert(todo);
                 }).start();
             }
         }
@@ -111,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e(TAG, "onPause: ");
+    }
 
     private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
@@ -131,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             db.todoDao().delete(adapter.getItems().get(position));
                         }
-
                     }).start();
                 }else {
                     //오른쪽으로 밀었을때.

@@ -50,6 +50,7 @@
 
 
         <RadioButton
+            android:id="@+id/rbtn_count"
             android:text="횟수"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -58,6 +59,7 @@
 
 
         <RadioButton
+            android:id="@+id/rbtn_time"
             android:text="시간"
             android:layout_width="0dp"
             android:layout_weight="1"
