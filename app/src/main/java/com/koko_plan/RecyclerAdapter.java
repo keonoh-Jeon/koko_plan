@@ -47,6 +47,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private int lastsec;
+
     public RecyclerAdapter(TodoDatabase db) {
         this.db = db;
     }
@@ -234,12 +236,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             stopTimerTask();
             timerTask = new TimerTask()
             {
-                int count = 0;
+                int count = items.get(index).getCurcount();
 
                 @Override
                 public void run()
                 {
                     count++;
+                    lastsec = count;
 
                     /*new Thread(() -> {
                         items.get(index).setTotalsec(count);
@@ -254,7 +257,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         @SuppressLint({"SetTextI18n", "DefaultLocale"})
                         @Override
                         public void run() {
-                            tvCurTime.setText(String.format("%2d:%2d:%2d", hour, minute, second));
+                            if(items.get(index).getIsrunning()){
+                                tvCurTime.setText(String.format("%2d:%2d:%2d", hour, minute, second));
+
+                            }
                         }
                     });
                 }
@@ -285,8 +291,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(todo.getCount() == 0){
                 if(!items.get(index).getIsrunning()){
                     ivPlay.setVisibility(View.VISIBLE);
+                    ivPause.setVisibility(View.GONE);
                 } else {
                     ivPause.setVisibility(View.VISIBLE);
+                    ivPlay.setVisibility(View.GONE);
                 }
                 ivStop.setVisibility(View.VISIBLE);
                 ivPlus.setVisibility(View.GONE);
@@ -346,20 +354,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 ivPlay.setVisibility(View.GONE);
             }
             isRunning = !isRunning;
+            int select = items.get(index).getId()-1;
+            Log.e(TAG, "editPlay------ "+ select );
+
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);
                 db.todoDao().update(items.get(index));
-            }).start();
 
-            /*for(int i=0; i<items.size(); i++){
-                if(items.get(index).getIsrunning()){
-                    new Thread(() -> {
-                        isRunning = !isRunning;
-                        items.get(index).setIsrunning(isRunning);
-                        db.todoDao().update(items.get(index));
-                    }).start();
+                for(int i=0; i<select; i++){
+                    items.get(i).setIsrunning(!isRunning);
+                    db.todoDao().update(items.get(i));
                 }
-            }*/
+
+                for(int i = select+1; i <items.size() ; i++){
+                    items.get(i).setIsrunning(!isRunning);
+                    db.todoDao().update(items.get(i));
+                }
+
+            }).start();
         }
 
         @SuppressLint("SetTextI18n")
@@ -374,6 +386,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             } else {
                     if(timerTask != null)
                     {
+                        new Thread(() -> {
+                            items.get(index).setCurcount(lastsec);
+                            db.todoDao().update(items.get(index));
+                        }).start();
+
                         timerTask.cancel();
                         timerTask = null;
                     }

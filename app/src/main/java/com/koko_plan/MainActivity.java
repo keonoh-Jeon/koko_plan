@@ -23,6 +23,8 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private View btnPlus;
+
+    long now = System.currentTimeMillis();
+    // 현재시간을 date 변수에 저장한다.
+    Date date = new Date(now);
+    // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
+    SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    String formatDate = sdfNow.format(date);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +125,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.e(TAG, "onPause: ");
+        Log.e(TAG, "onPause: " + formatDate);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Log.e(TAG, "onPause: " + formatDate);
     }
 
     private void initSwipe() {
