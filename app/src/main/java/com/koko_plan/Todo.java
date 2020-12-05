@@ -18,14 +18,15 @@ public class Todo {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
-    private int curcount, count;
+    private int curtime, curcount, count;
     private int totalsec;
     private int hour, min, sec;
     private boolean isrunning;
 
-    public Todo(int id, String title, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
+    public Todo(int id, String title, int curtime, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
         this.id = id;
         this.title = title;
+        this.curtime = curtime;
         this.count = count;
         this.curcount = curcount;
         this.hour = hour;
@@ -40,6 +41,9 @@ public class Todo {
 
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
+
+    public int getCurtime(){ return curtime; }
+    public void setCurtime(int curtime){ this.curtime = curtime; }
 
     public int getCurcount(){ return curcount; }
     public void setCurcount(int curcount){ this.curcount = curcount; }

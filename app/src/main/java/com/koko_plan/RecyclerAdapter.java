@@ -35,6 +35,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
+import static com.koko_plan.MainActivity.editor;
+import static com.koko_plan.MainActivity.lastsec;
+import static com.koko_plan.MainActivity.pref;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -43,11 +46,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private TodoDatabase db;
     private boolean isRunning;
     private TextView tvCycle;
-
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
-
-    private int lastsec;
 
     public RecyclerAdapter(TodoDatabase db) {
         this.db = db;
@@ -150,10 +148,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private Thread timeThread = null;
         private Boolean isRunning = true;
 
+        private int index;
+
         TimerTask timerTask;
         Timer timer = new Timer();
-
-        private int index;
 
         @SuppressLint("SetTextI18n")
         public ViewHolder(View view) {
@@ -162,7 +160,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             tvTitle = view.findViewById(R.id.tvTitle);
             tvCount = view.findViewById(R.id.tv_count);
             tvCurTime = view.findViewById(R.id.tv_curtime);
-            tvCurTime.setText("00:00:00");
+            tvCurTime.setText("0");
             tvTime = view.findViewById(R.id.tvTime);
 
             ivPlus = view.findViewById(R.id.iv_plus);
@@ -236,18 +234,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             stopTimerTask();
             timerTask = new TimerTask()
             {
-                int count = items.get(index).getCurcount();
-
+                int count = items.get(index).getCurtime();
                 @Override
                 public void run()
                 {
                     count++;
                     lastsec = count;
-
-                    /*new Thread(() -> {
-                        items.get(index).setTotalsec(count);
-                        db.todoDao().update(items.get(index));
-                    }).start();*/
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;
@@ -259,7 +251,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         public void run() {
                             if(items.get(index).getIsrunning()){
                                 tvCurTime.setText(String.format("%2d:%2d:%2d", hour, minute, second));
-
                             }
                         }
                     });
@@ -273,7 +264,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             if(timerTask != null)
             {
-                tvCurTime.setText("00:00:00");
                 timerTask.cancel();
                 timerTask = null;
             }
@@ -307,8 +297,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 ivPlay.setVisibility(View.GONE);
             }
 
+
+            if(todo.getHour()>0 | todo.getMin()>0 | todo.getSec()>0 && todo.getCurtime()==0) tvCurTime.setText("00:00:00");
+
             if(todo.getIsrunning()) {
                 startTimerTask();
+            } else {
+                if(timerTask != null)
+                {
+                    timerTask.cancel();
+                    timerTask = null;
+                }
             }
         }
 
@@ -355,18 +354,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
             isRunning = !isRunning;
             int select = items.get(index).getId()-1;
-            Log.e(TAG, "editPlay------ "+ select );
 
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);
                 db.todoDao().update(items.get(index));
 
                 for(int i=0; i<select; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
 
                 for(int i = select+1; i <items.size() ; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
@@ -376,18 +376,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPause() {
-            if (items.get(index).getCount() > 0) {
-                int playcount = items.get(index).getCount() - 1;
-                tvTime.setText(playcount + "");
-                new Thread(() -> {
-                    items.get(index).setCount(playcount);
-                    db.todoDao().update(items.get(index));
-                }).start();
-            } else {
+
                     if(timerTask != null)
                     {
                         new Thread(() -> {
-                            items.get(index).setCurcount(lastsec);
+                            items.get(index).setCurtime(lastsec);
                             db.todoDao().update(items.get(index));
                         }).start();
 
@@ -396,7 +389,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }
                 ivPlay.setVisibility(View.VISIBLE);
                 ivPause.setVisibility(View.GONE);
-            }
+
             isRunning = !isRunning;
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);

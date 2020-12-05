@@ -39,17 +39,16 @@ public class MainActivity extends AppCompatActivity {
 
     private TodoDatabase db;
 
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
+    public static SharedPreferences pref;
+    public static SharedPreferences.Editor editor;
+
     private View btnPlus;
+    private long stoptime;
+    private SimpleDateFormat sdfNow;
 
-    long now = System.currentTimeMillis();
-    // 현재시간을 date 변수에 저장한다.
-    Date date = new Date(now);
-    // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
-    SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    String formatDate = sdfNow.format(date);
+    public static int lastsec;
 
+    @SuppressLint({"CommitPrefEdits", "SimpleDateFormat"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -57,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         db = TodoDatabase.getDatabase(this);
+
+        pref = getSharedPreferences("pref", MODE_PRIVATE);
+        editor = pref.edit();
+
+        sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         btnPlus = findViewById(R.id.btnPlus);
 
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo todo = new Todo(0, habbittitle, 0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(0, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
                     Log.e(TAG, "onActivityResult: " + todo);
                     db.todoDao().insert(todo);
                 }).start();
@@ -125,13 +129,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.e(TAG, "onPause: " + formatDate);
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+        Date date = new Date(now);
+        // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String formatDate = sdfNow.format(date);
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        Log.e(TAG, "onPause: " + formatDate);
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+
+        stoptime = pref.getLong("stoptime", 0);
+
+        Log.e(TAG, "onPostResume: " + (now-stoptime)/1000);
+
+        /*int timegap = Integer.parseInt(resumetime) - Integer.parseInt(stoptime);
+        Log.e(TAG, "onPostResume: "+  timegap );*/
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        long now = System.currentTimeMillis();
+
+        Log.e(TAG, "lastsec: " + lastsec);
+
+        editor.putLong("stoptime", now);
+        editor.apply();
+
     }
 
     private void initSwipe() {
