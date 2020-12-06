@@ -27,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static com.koko_plan.RecyclerAdapter.items;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private long stoptime;
     private SimpleDateFormat sdfNow;
 
-    public static int lastsec;
+    public static int lastsec, timegap;
 
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat"})
     @Override
@@ -105,14 +107,12 @@ public class MainActivity extends AppCompatActivity {
                 int min = data.getIntExtra("min", 0);
                 int sec = data.getIntExtra("sec", 0);
                 boolean isrunning = data.getBooleanExtra("isrunning", false);
-                Log.d(TAG, "onActivityResult: " + isrunning);
 
                 @SuppressLint("DefaultLocale")
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
                     Todo todo = new Todo(0, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
-                    Log.e(TAG, "onActivityResult: " + todo);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -136,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String formatDate = sdfNow.format(date);
+
+
+
     }
 
     @Override
@@ -146,10 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
         stoptime = pref.getLong("stoptime", 0);
 
-        Log.e(TAG, "onPostResume: " + (now-stoptime)/1000);
-
-        /*int timegap = Integer.parseInt(resumetime) - Integer.parseInt(stoptime);
-        Log.e(TAG, "onPostResume: "+  timegap );*/
+        timegap = (int) ((now-stoptime)/1000);
 
     }
 
@@ -158,11 +158,17 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         long now = System.currentTimeMillis();
 
-        Log.e(TAG, "lastsec: " + lastsec);
+        new Thread(() -> {
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                if(items.get(i).getIsrunning()) {
+                    items.get(i).setCurtime(lastsec);
+                    db.todoDao().update(adapter.getItems().get(i));
+                }
+            }
+        }).start();
 
         editor.putLong("stoptime", now);
         editor.apply();
-
     }
 
     private void initSwipe() {

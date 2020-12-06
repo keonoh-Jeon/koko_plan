@@ -38,10 +38,11 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.MainActivity.editor;
 import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
+import static com.koko_plan.MainActivity.timegap;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
-    private List<Todo> items = new ArrayList<>();
+    public static List<Todo> items = new ArrayList<>();
     private Context mContext;
     private TodoDatabase db;
     private boolean isRunning;
@@ -234,7 +235,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             stopTimerTask();
             timerTask = new TimerTask()
             {
-                int count = items.get(index).getCurtime();
+                int count = items.get(index).getCurtime() + timegap;
                 @Override
                 public void run()
                 {
@@ -273,6 +274,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void onBind(Todo todo, int position){
             index = position;
             tvTitle.setText(todo.getTitle());
+
             if(todo.getCount()==0){
                 tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
             } else {
@@ -297,8 +299,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 ivPlay.setVisibility(View.GONE);
             }
 
-
-            if(todo.getHour()>0 | todo.getMin()>0 | todo.getSec()>0 && todo.getCurtime()==0) tvCurTime.setText("00:00:00");
+            if(todo.getCount() > 0) {
+                tvCurTime.setText(""+todo.getCurcount());
+            } else {
+                if (todo.getCurtime() > 0) {
+                    int curtime = todo.getCurtime();
+                    int hour = curtime / 60 / 60;
+                    int min = curtime / 60 % 60;
+                    int sec = curtime % 60;
+                    tvCurTime.setText(String.format("%2d:%2d:%2d", hour, min, sec));
+                } else {
+                    tvCurTime.setText("00:00:00");
+                }
+            }
 
             if(todo.getIsrunning()) {
                 startTimerTask();
@@ -326,6 +339,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 timerTask.cancel();
                 timerTask = null;
             }
+
             new Thread(() -> {
                 db.todoDao().delete(items.get(index));
             }).start();
@@ -352,9 +366,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             } else {
                 ivPlay.setVisibility(View.GONE);
             }
-            isRunning = !isRunning;
+
             int select = items.get(index).getId()-1;
 
+            isRunning = !isRunning;
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);
                 db.todoDao().update(items.get(index));
@@ -372,6 +387,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
 
             }).start();
+
+
         }
 
         @SuppressLint("SetTextI18n")
@@ -533,7 +550,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                     @SuppressLint("DefaultLocale") String result = String.format("%02d:%02d:%02d", hourPicker.getValue(), minPicker.getValue(), secPicker.getValue());
                     //제목 입력, DB추가
-                    Log.e(TAG, "maketimerdialog: "+ result);
                     textView.setText(result);
                     new Thread(() -> {
                         items.get(position).setHour(hourPicker.getValue());
