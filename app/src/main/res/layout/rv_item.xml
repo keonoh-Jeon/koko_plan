@@ -138,9 +138,7 @@
                 android:textSize="15sp"
                 tools:ignore="HardcodedText" />
 
-
         </LinearLayout>
-
 
     </LinearLayout>
 

@@ -32,8 +32,6 @@ import static com.koko_plan.RecyclerAdapter.items;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private EditText mTodoEditText;
-    private TextView mResultTextView, tvcycle, tvPlayTime;
 
     private RecyclerAdapter adapter;
     private RecyclerView recyclerView;
@@ -46,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
     private View btnPlus;
     private long stoptime;
-    private SimpleDateFormat sdfNow;
 
-    public static int lastsec, timegap;
+    public static int lastsec;
+    private int timegap;
 
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat"})
     @Override
@@ -61,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
-
-        sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         btnPlus = findViewById(R.id.btnPlus);
 
@@ -112,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo todo = new Todo(0, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo((items.size()+1), habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -130,33 +126,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         long now = System.currentTimeMillis();
-        // 현재시간을 date 변수에 저장한다.
-        Date date = new Date(now);
-        // 시간을 나타냇 포맷을 정한다 ( yyyy/MM/dd 같은 형태로 변형 가능 )
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        String formatDate = sdfNow.format(date);
-
-
-
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        long now = System.currentTimeMillis();
-        // 현재시간을 date 변수에 저장한다.
-
-        stoptime = pref.getLong("stoptime", 0);
-
-        timegap = (int) ((now-stoptime)/1000);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        long now = System.currentTimeMillis();
 
         new Thread(() -> {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
@@ -169,6 +138,34 @@ public class MainActivity extends AppCompatActivity {
 
         editor.putLong("stoptime", now);
         editor.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+        stoptime = pref.getLong("stoptime", 0);
+        if(stoptime != 0){
+            timegap = (int) ((now-stoptime)/1000);
+        } else {
+            timegap = 0;
+        }
+
+        for(int i=0 ; i < adapter.getItemCount() ; i++) {
+            if(items.get(i).getIsrunning()) {
+                editor.putInt( "timegap" , timegap);
+            } else {
+                editor.putInt( "timegap" , 0);
+            }
+            Log.e(TAG, "onResume: timegap " + timegap );
+            editor.apply();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     private void initSwipe() {

@@ -38,7 +38,6 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.MainActivity.editor;
 import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
-import static com.koko_plan.MainActivity.timegap;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -149,7 +148,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private Thread timeThread = null;
         private Boolean isRunning = true;
 
-        private int index;
+        private int index, gap;
 
         TimerTask timerTask;
         Timer timer = new Timer();
@@ -183,7 +182,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
 
             ivbdelete = view.findViewById(R.id.ivbnt_delete);
-            ivbdelete.setOnClickListener(v -> itemdelete());
+//            ivbdelete.setOnClickListener(v -> itemdelete());
 
             /*mStartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -232,14 +231,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
+            gap = pref.getInt("timegap", 0);
+
             stopTimerTask();
             timerTask = new TimerTask()
             {
-                int count = items.get(index).getCurtime() + timegap;
+                int count = items.get(index).getCurtime() + gap;
+
                 @Override
                 public void run()
                 {
                     count++;
+                    editor.putInt( "timegap" , 0);
+                    editor.apply();
                     lastsec = count;
 
                     long second = count % 60;
@@ -332,7 +336,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             Toast.makeText(mContext,"저장완료", Toast.LENGTH_SHORT).show();
         }*/
 
-        @SuppressLint("SetTextI18n")
+        /*@SuppressLint("SetTextI18n")
         public void itemdelete() {
             if(timerTask != null)
             {
@@ -340,10 +344,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 timerTask = null;
             }
 
+            int select = items.get(index).getId()-1;
+
             new Thread(() -> {
+                for(int i=0; i<select; i++){
+                    items.get(i).setId(i);
+                    db.todoDao().update(items.get(i));
+                }
+                for(int i = select+1; i <items.size() ; i++){
+                    items.get(i).setId(i-1);
+                    db.todoDao().update(items.get(i));
+                }
                 db.todoDao().delete(items.get(index));
             }).start();
-        }
+        }*/
 
         @SuppressLint("SetTextI18n")
         public void editStop() {
@@ -355,40 +369,39 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 new Thread(() -> {
                     items.get(index).setIsrunning(isRunning);
                     db.todoDao().update(items.get(index));
+
                 }).start();
         }
 
         @SuppressLint("SetTextI18n")
         public void editPlay() {
             if(isRunning = false){
+                editor.putInt( "timegap" , 0);
+                editor.apply();
                 startTimerTask();
                 ivPause.setVisibility(View.VISIBLE);
             } else {
                 ivPlay.setVisibility(View.GONE);
             }
 
-            int select = items.get(index).getId()-1;
-
             isRunning = !isRunning;
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);
                 db.todoDao().update(items.get(index));
 
-                for(int i=0; i<select; i++){
+                //나머지 항목 전부 일시 정지
+                for(int i=0; i<index; i++){
                     if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
-
-                for(int i = select+1; i <items.size() ; i++){
+                for(int i=(index+1); i <items.size() ; i++){
                     if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
 
             }).start();
-
-
         }
 
         @SuppressLint("SetTextI18n")
@@ -418,10 +431,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editPlus() {
                 int curcount = items.get(index).getCurcount() + 1;
             tvCurTime.setText(curcount + "");
-                new Thread(() -> {
-                    items.get(index).setCurcount(curcount);
-                    db.todoDao().update(items.get(index));
-                }).start();
+
+            new Thread(() -> {
+
+                //나머지 항목 전부 일시 정지
+                for(int i=0; i<index; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                    db.todoDao().update(items.get(i));
+                }
+                for(int i=(index+1); i <items.size() ; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                    db.todoDao().update(items.get(i));
+                }
+
+                items.get(index).setCurcount(curcount);
+                db.todoDao().update(items.get(index));
+
+            }).start();
         }
 
         @SuppressLint("SetTextI18n")
@@ -433,6 +459,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             tvCurTime.setText(curcount + "");
             int finalCurcount = curcount;
             new Thread(() -> {
+
+                for(int i=0; i<index; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                    db.todoDao().update(items.get(i));
+                }
+                for(int i=(index+1); i <items.size() ; i++){
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                    db.todoDao().update(items.get(i));
+                }
+
                 items.get(index).setCurcount(finalCurcount);
                 db.todoDao().update(items.get(index));
             }).start();
@@ -659,6 +695,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
         popup.show();
     }
-
-
 }
