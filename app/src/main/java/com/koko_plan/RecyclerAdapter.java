@@ -38,6 +38,7 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.MainActivity.editor;
 import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
+import static com.koko_plan.MainActivity.timegap;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -231,19 +232,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
-            gap = pref.getInt("timegap", 0);
+            Log.e(TAG, "startTimerTask: timegap"+ timegap );
 
             stopTimerTask();
             timerTask = new TimerTask()
             {
-                int count = items.get(index).getCurtime() + gap;
+                int count = items.get(index).getCurtime() + timegap;
 
                 @Override
                 public void run()
                 {
                     count++;
-                    editor.putInt( "timegap" , 0);
-                    editor.apply();
                     lastsec = count;
 
                     long second = count % 60;
@@ -375,9 +374,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPlay() {
+            timegap = 0;
             if(isRunning = false){
-                editor.putInt( "timegap" , 0);
-                editor.apply();
+
                 startTimerTask();
                 ivPause.setVisibility(View.VISIBLE);
             } else {

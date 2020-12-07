@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private View btnPlus;
     private long stoptime;
 
-    public static int lastsec;
-    private int timegap;
+    public static int lastsec, timegap;
 
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat"})
     @Override
@@ -147,20 +146,16 @@ public class MainActivity extends AppCompatActivity {
         // 현재시간을 date 변수에 저장한다.
         stoptime = pref.getLong("stoptime", 0);
         if(stoptime != 0){
-            timegap = (int) ((now-stoptime)/1000);
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                if(items.get(i).getIsrunning()) {
+                    timegap = (int) ((now-stoptime)/1000);
+                }
+            }
         } else {
             timegap = 0;
         }
 
-        for(int i=0 ; i < adapter.getItemCount() ; i++) {
-            if(items.get(i).getIsrunning()) {
-                editor.putInt( "timegap" , timegap);
-            } else {
-                editor.putInt( "timegap" , 0);
-            }
-            Log.e(TAG, "onResume: timegap " + timegap );
-            editor.apply();
-        }
+        Log.e(TAG, "onResume: timegap"+  timegap);
     }
 
     @Override
