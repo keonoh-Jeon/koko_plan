@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,8 @@ import static com.koko_plan.MainActivity.editor;
 import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
 import static com.koko_plan.MainActivity.timegap;
+import static com.koko_plan.MainActivity.totalprogress;
+import static com.koko_plan.MainActivity.tvTodayProgress;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -100,13 +103,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         mContext = viewGroup.getContext();
         final ViewHolder holder = new ViewHolder(v);
 
-        v.findViewById(R.id.tv_count).setOnClickListener(new View.OnClickListener() {
+        /*v.findViewById(R.id.tv_count).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                MySoundPlayer.play(MySoundPlayer.CLICK);
 //                showPopupcycle(v, holder.getAdapterPosition());
             }
-        });
+        });*/
         v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +141,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvTitle;
-        private TextView tvCount;
+        private TextView tvProgress;
         private TextView tvCurTime, tvTime;
         private Button btnSave;
         private TextView tvplayCount;
@@ -151,6 +154,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private int index, gap;
 
+        ProgressBar progressBar;
+
         TimerTask timerTask;
         Timer timer = new Timer();
 
@@ -159,7 +164,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             super(view);
 
             tvTitle = view.findViewById(R.id.tvTitle);
-            tvCount = view.findViewById(R.id.tv_count);
+            tvProgress = view.findViewById(R.id.tv_progress);
             tvCurTime = view.findViewById(R.id.tv_curtime);
             tvCurTime.setText("0");
             tvTime = view.findViewById(R.id.tvTime);
@@ -182,8 +187,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
 //            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
 
-            ivbdelete = view.findViewById(R.id.ivbnt_delete);
+//            ivbdelete = view.findViewById(R.id.ivbnt_delete);
 //            ivbdelete.setOnClickListener(v -> itemdelete());
+
+            progressBar = view.findViewById(R.id.progressBar);
 
             /*mStartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -249,12 +256,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     long minute = (count / 60) % 60;
                     long hour = (count / 3600) % 24;
 
+                    int progress = (int) ((double)count / ((double)items.get(index).getTotalsec()) *100.0);
+
+
                     tvTime.post(new Runnable() {
                         @SuppressLint({"SetTextI18n", "DefaultLocale"})
                         @Override
                         public void run() {
                             if(items.get(index).getIsrunning()){
-                                tvCurTime.setText(String.format("%2d:%2d:%2d", hour, minute, second));
+                                tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+                                tvProgress.setText(progress + " %");
+                                progressBar.setProgress(progress);
                             }
                         }
                     });
@@ -303,18 +315,39 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
 
             if(todo.getCount() > 0) {
+                int progress = (int) ((double)todo.getCurcount() / ((double)items.get(index).getCount()) *100.0);
                 tvCurTime.setText(""+todo.getCurcount());
+                tvProgress.setText(progress + " %");
+                progressBar.setProgress(progress);
+
+                /*totalprogress = progress;
+                totalprogress += totalprogress;
+                Log.d(TAG, "onBind: " + totalprogress);*/
+
             } else {
                 if (todo.getCurtime() > 0) {
                     int curtime = todo.getCurtime();
                     int hour = curtime / 60 / 60;
                     int min = curtime / 60 % 60;
                     int sec = curtime % 60;
-                    tvCurTime.setText(String.format("%2d:%2d:%2d", hour, min, sec));
+                    tvCurTime.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+
+                    int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
+                    tvProgress.setText(progress + " %");
+                    progressBar.setProgress(progress);
+
+//                    totalprogress += progress;
+//                    Log.d(TAG, "onBind: " + totalprogress);
+
                 } else {
                     tvCurTime.setText("00:00:00");
+                    int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
+                    tvProgress.setText(progress + " %");
+                    progressBar.setProgress(progress);
                 }
             }
+
+//            totalprogress = totalprogress/items.size();
 
             if(todo.getIsrunning()) {
                 startTimerTask();
@@ -360,6 +393,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editStop() {
+            if(isRunning = true) {
                 stopTimerTask();
                 ivPlay.setVisibility(View.VISIBLE);
                 ivPause.setVisibility(View.GONE);
@@ -367,9 +401,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 isRunning = !isRunning;
                 new Thread(() -> {
                     items.get(index).setIsrunning(isRunning);
+                    items.get(index).setCurtime(0);
                     db.todoDao().update(items.get(index));
 
                 }).start();
+            }
         }
 
         @SuppressLint("SetTextI18n")
@@ -399,13 +435,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
-
             }).start();
         }
 
         @SuppressLint("SetTextI18n")
         public void editPause() {
-
                     if(timerTask != null)
                     {
                         new Thread(() -> {
@@ -428,8 +462,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPlus() {
-                int curcount = items.get(index).getCurcount() + 1;
-            tvCurTime.setText(curcount + "");
+            timegap = 0;
+            int curcount = items.get(index).getCurcount() + 1;
 
             new Thread(() -> {
 
@@ -451,11 +485,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editMinus() {
+            timegap = 0;
             int curcount = items.get(index).getCurcount() ;
             if(curcount > 0) {
                 curcount = items.get(index).getCurcount() - 1;
             }
-            tvCurTime.setText(curcount + "");
+//            tvCurTime.setText(curcount + "");
             int finalCurcount = curcount;
             new Thread(() -> {
 
@@ -550,7 +585,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         DatePickerDialog alert = new DatePickerDialog(mContext,  mDateSetListener, cyear, cmonth, cday);
         alert.show();
     }
-
+//todo
     @SuppressLint("SetTextI18n")
     private void maketimerdialog(View v, final int position){
 
@@ -565,25 +600,27 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         final NumberPicker secPicker = (NumberPicker) di.findViewById(R.id.picker_sec);
 
         hourPicker.setMinValue(0);
-        hourPicker.setMaxValue(99);
+        hourPicker.setMaxValue(24);
         hourPicker.setValue(0);
 
         minPicker.setMinValue(0);
-        minPicker.setMaxValue(99);
+        minPicker.setMaxValue(60);
         minPicker.setValue(0);
 
         secPicker.setMinValue(0);
-        secPicker.setMaxValue(99);
+        secPicker.setMaxValue(60);
         secPicker.setValue(0);
 
-        builder.setTitle("목표 시간 입력");
-        builder.setMessage("하루의 목표 시간을 설정하세요");
+        builder.setTitle("수정 시간 입력");
+        builder.setMessage("하루의 목표 시간을 수정하세요");
         builder.setView(di);
 
         builder.setPositiveButton("입력",
                 (dialog, which) -> {
 
-                    @SuppressLint("DefaultLocale") String result = String.format("%02d:%02d:%02d", hourPicker.getValue(), minPicker.getValue(), secPicker.getValue());
+                    @SuppressLint("DefaultLocale")
+                    String result = String.format("%02d:%02d:%02d", hourPicker.getValue(), minPicker.getValue(), secPicker.getValue());
+                    int totalsec = hourPicker.getValue()*60*60+minPicker.getValue()*60+secPicker.getValue();
                     //제목 입력, DB추가
                     textView.setText(result);
                     new Thread(() -> {
@@ -591,7 +628,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         items.get(position).setMin(minPicker.getValue());
                         items.get(position).setSec(secPicker.getValue());
                         items.get(position).setCount(0);
-                        items.get(position).setIsrunning(true);
+                        items.get(position).setTotalsec(totalsec);
                         db.todoDao().update(items.get(position));
                     }).start();
                 });
@@ -609,22 +646,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         final TextView textView = v.findViewById(R.id.tvTime);
 
         numberPicker.setMinValue(1);
-        numberPicker.setMaxValue(1000);
+        numberPicker.setMaxValue(100);
         //현재값 설정 (dialog를 실행했을 때 시작지점)
         numberPicker.setValue(1);
-        //키보드 입력을 방지
-        numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-
             }
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("횟수 입력");
+        builder.setTitle("횟수 수정");
         builder.setMessage("하루에 몇번을 실행하실지요?");
         builder.setView(numberPicker);
 
@@ -637,7 +671,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             items.get(position).setMin(0);
                             items.get(position).setSec(0);
                             items.get(position).setCount(numberPicker.getValue());
-                            items.get(position).setIsrunning(false);
                             db.todoDao().update(items.get(position));
                         }).start();
                 });
@@ -648,7 +681,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         builder.show();
     }
 
-    private void showPopupcycle(View v, final int position){
+    /*private void showPopupcycle(View v, final int position){
 
         @SuppressLint("RestrictedApi")
         PopupMenu popup= new PopupMenu(mContext.getApplicationContext(), v);//v는 클릭된 뷰를 의미
@@ -693,5 +726,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         });
         popup.show();
-    }
+    }*/
 }

@@ -43,11 +43,12 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences.Editor editor;
 
     private View btnPlus;
-    private long stoptime;
 
-    public static int lastsec, timegap;
+    public static int lastsec, timegap, totalprogress;
 
-    @SuppressLint({"CommitPrefEdits", "SimpleDateFormat"})
+    public static TextView tvTodayProgress;
+
+    @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new RecyclerAdapter(db);
         recyclerView.setAdapter(adapter);
+
+        tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
         initSwipe();
     }
@@ -121,9 +124,58 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
+
+
     @Override
     protected void onPause() {
         super.onPause();
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    private void gettimegap(){
+
+    }
+
+
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+        long stoptime = pref.getLong("stoptime", 0);
+        int itemsize = pref.getInt("itemsize", 0);
+
+        Log.e(TAG, "RESUME stoptime: timegap"+  stoptime);
+        Log.e(TAG, "onResume:timegap "+ itemsize );
+        Log.e(TAG, "onResume:timegap "+ itemsize );
+
+        if(stoptime != 0){
+//todo
+            for(int i=0 ; i < itemsize ; i++) {
+                if(items.get(i).getIsrunning()) {
+                    timegap = (int) ((now-stoptime)/1000);
+                    Log.e(TAG, "onResume: timegap"+  timegap);
+                }
+            }
+        } else {
+            timegap = 0;
+            Log.e(TAG, "onResume: timegap"+  timegap);
+        }
+
+//        tvTodayProgress.setText("오늘의 실행율 : "+ totalprogress+" %");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "onStop: timegap" + "onPause" );
         long now = System.currentTimeMillis();
 
         new Thread(() -> {
@@ -136,31 +188,9 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
         editor.putLong("stoptime", now);
+        editor.putInt("itemsize", adapter.getItemCount());
         editor.apply();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        long now = System.currentTimeMillis();
-        // 현재시간을 date 변수에 저장한다.
-        stoptime = pref.getLong("stoptime", 0);
-        if(stoptime != 0){
-            for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                if(items.get(i).getIsrunning()) {
-                    timegap = (int) ((now-stoptime)/1000);
-                }
-            }
-        } else {
-            timegap = 0;
-        }
-
-        Log.e(TAG, "onResume: timegap"+  timegap);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     private void initSwipe() {

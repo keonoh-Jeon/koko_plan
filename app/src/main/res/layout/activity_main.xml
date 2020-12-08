@@ -16,39 +16,46 @@
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="오늘의 실행율"
+            android:id="@+id/tv_todayprogress"
+            android:text="today"
             android:layout_margin="10dp"
+            android:textSize="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText,SpUsage" />
 
         <ScrollView
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
+            android:layout_height="wrap_content"
             android:fillViewport="false">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_view"
                 android:layout_margin="10dp"
                 android:layout_height="match_parent"
-                android:layout_width="match_parent"/>
+                android:layout_width="match_parent"
+                tools:ignore="ScrollViewSize" />
 
         </ScrollView>
 
-
-
     </LinearLayout>
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/btnPlus"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_plus"
-        tools:ignore="RtlHardcoded" />
+        android:layout_gravity="bottom"
+        android:gravity="right"
+        tools:ignore="RtlHardcoded">
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/btnPlus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="15dp"
+            android:src="@drawable/ic_plus"
+            tools:ignore="RtlHardcoded" />
+
+    </LinearLayout>
 
 </FrameLayout>
