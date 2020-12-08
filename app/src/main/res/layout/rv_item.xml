@@ -70,7 +70,7 @@
                     android:singleLine="true"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:textColor="#3290BB"
+                    android:textColor="#353535"
                     android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
@@ -137,7 +137,7 @@
                     android:singleLine="true"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:textColor="#3290BB"
+                    android:textColor="#353535"
                     android:textSize="15sp"
                     tools:ignore="HardcodedText" />
 

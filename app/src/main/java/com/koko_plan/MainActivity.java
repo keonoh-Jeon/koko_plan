@@ -84,9 +84,11 @@ public class MainActivity extends AppCompatActivity {
 
         //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
         db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
+                tvTodayProgress.setText("오늘의 실행 : " + totalprogress+ "%");
             }
         });
     }
@@ -150,47 +152,31 @@ public class MainActivity extends AppCompatActivity {
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
-        int itemsize = pref.getInt("itemsize", 0);
-
-        Log.e(TAG, "RESUME stoptime: timegap"+  stoptime);
-        Log.e(TAG, "onResume:timegap "+ itemsize );
-        Log.e(TAG, "onResume:timegap "+ itemsize );
 
         if(stoptime != 0){
-//todo
-            for(int i=0 ; i < itemsize ; i++) {
-                if(items.get(i).getIsrunning()) {
-                    timegap = (int) ((now-stoptime)/1000);
-                    Log.e(TAG, "onResume: timegap"+  timegap);
-                }
-            }
+            timegap = (int) ((now-stoptime)/1000);
         } else {
             timegap = 0;
-            Log.e(TAG, "onResume: timegap"+  timegap);
         }
-
-//        tvTodayProgress.setText("오늘의 실행율 : "+ totalprogress+" %");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e(TAG, "onStop: timegap" + "onPause" );
         long now = System.currentTimeMillis();
 
         new Thread(() -> {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(items.get(i).getIsrunning()) {
                     items.get(i).setCurtime(lastsec);
+                    Log.e(TAG, "onStop: "+ lastsec);
                     db.todoDao().update(adapter.getItems().get(i));
+
+                    editor.putLong("stoptime", now);
+                    editor.apply();
                 }
             }
         }).start();
-
-        editor.putLong("stoptime", now);
-        editor.putInt("itemsize", adapter.getItemCount());
-        editor.apply();
-
     }
 
     private void initSwipe() {

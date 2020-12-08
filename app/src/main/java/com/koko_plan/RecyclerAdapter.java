@@ -250,6 +250,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 public void run()
                 {
                     count++;
+                    Log.e(TAG, "onStop run: "  +  count);
                     lastsec = count;
 
                     long second = count % 60;
@@ -257,7 +258,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     long hour = (count / 3600) % 24;
 
                     int progress = (int) ((double)count / ((double)items.get(index).getTotalsec()) *100.0);
-
 
                     tvTime.post(new Runnable() {
                         @SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -290,12 +290,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             index = position;
             tvTitle.setText(todo.getTitle());
 
-            if(todo.getCount()==0){
-                tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
-            } else {
-                tvTime.setText(String.format("%d", todo.getCount()));
-            }
             if(todo.getCount() == 0){
+                tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
                 if(!items.get(index).getIsrunning()){
                     ivPlay.setVisibility(View.VISIBLE);
                     ivPause.setVisibility(View.GONE);
@@ -312,6 +308,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 ivStop.setVisibility(View.GONE);
                 ivPause.setVisibility(View.GONE);
                 ivPlay.setVisibility(View.GONE);
+
+                tvTime.setText(String.format("%d", todo.getCount()));
             }
 
             if(todo.getCount() > 0) {
@@ -320,9 +318,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 tvProgress.setText(progress + " %");
                 progressBar.setProgress(progress);
 
-                /*totalprogress = progress;
-                totalprogress += totalprogress;
-                Log.d(TAG, "onBind: " + totalprogress);*/
+                totalprogress += progress;
 
             } else {
                 if (todo.getCurtime() > 0) {
@@ -346,6 +342,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     progressBar.setProgress(progress);
                 }
             }
+
+
+            Log.d(TAG, "onBind: " + totalprogress);
 
 //            totalprogress = totalprogress/items.size();
 
@@ -393,6 +392,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editStop() {
+
             if(isRunning = true) {
                 stopTimerTask();
                 ivPlay.setVisibility(View.VISIBLE);
@@ -403,7 +403,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     items.get(index).setIsrunning(isRunning);
                     items.get(index).setCurtime(0);
                     db.todoDao().update(items.get(index));
-
                 }).start();
             }
         }
@@ -412,7 +411,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editPlay() {
             timegap = 0;
             if(isRunning = false){
-
                 startTimerTask();
                 ivPause.setVisibility(View.VISIBLE);
             } else {
