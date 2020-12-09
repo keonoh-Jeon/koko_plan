@@ -68,32 +68,73 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         items = data;
         notifyDataSetChanged();
     }
-
+//todo
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(items, i, i + 1);
+                items.get(i).setId(i + 1);
+                int finalI = i;
+                new Thread(() -> {
+                    Log.e(TAG, "onItemMove: " +  finalI);
+                db.todoDao().update(items.get(finalI));
+                });
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
                 Collections.swap(items, i, i - 1);
+                items.get(i).setId(i - 1);
+                int finalI = i;
+                new Thread(() -> {
+                    Log.e(TAG, "onItemMove: " +  finalI);
+                    db.todoDao().update(items.get(finalI));
+                });
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+
+        /*new Thread(() -> {
+
+            if (fromPosition < toPosition) {
+                for (int i = fromPosition; i < toPosition; i++) {
+                    Collections.swap(items, i, i + 1);
+                    items.get(fromPosition).setId(i+1);
+                }
+            } else {
+                for (int i = fromPosition; i > toPosition; i--) {
+                    Collections.swap(items, i, i - 1);
+                    items.get(fromPosition).setId(i-1);
+                }
+            }
+
+
+
+            for(int i=0; i<index; i++){
+                if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                db.todoDao().update(items.get(i));
+            }
+            for(int i=(index+1); i <items.size() ; i++){
+                if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                db.todoDao().update(items.get(i));
+            }
+            items.get(index).setIsrunning(isRunning);
+            items.get(index).setCurtime(0);
+            db.todoDao().update(items.get(index));
+        }).start();*/
+
         return true;
     }
 
     @Override
     public void onItemSwipe(int position) {
 
-        items.remove(position);
+        /*items.remove(position);
         notifyItemRemoved(position);
 
         new Thread(() -> {
             db.todoDao().delete(items.get(position));
-
-        }).start();
+        }).start();*/
     }
 
     @NonNull
@@ -257,16 +298,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     long minute = (count / 60) % 60;
                     long hour = (count / 3600) % 24;
 
-                    int progress = (int) ((double)count / ((double)items.get(index).getTotalsec()) *100.0);
-
                     tvTime.post(new Runnable() {
                         @SuppressLint({"SetTextI18n", "DefaultLocale"})
                         @Override
                         public void run() {
                             if(items.get(index).getIsrunning()){
                                 tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
-                                tvProgress.setText(progress + " %");
-                                progressBar.setProgress(progress);
+                                tvProgress.setText((int) ((double)count / ((double)items.get(index).getTotalsec()) *100.0) + " %");
+                                progressBar.setProgress((int) ((double)count / ((double)items.get(index).getTotalsec()) *100.0));
                             }
                         }
                     });
@@ -276,10 +315,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
 
         @SuppressLint("SetTextI18n")
-        private void stopTimerTask()
+        public void stopTimerTask()
         {
             if(timerTask != null)
             {
+                Log.e(TAG, "run stopTimerTask: " + "스레드 중지");
                 timerTask.cancel();
                 timerTask = null;
             }
@@ -392,7 +432,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editStop() {
-
+            timegap = 0;
             if(isRunning = true) {
                 stopTimerTask();
                 ivPlay.setVisibility(View.VISIBLE);
@@ -400,6 +440,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 isRunning = !isRunning;
                 new Thread(() -> {
+                    for(int i=0; i<index; i++){
+                        if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                        db.todoDao().update(items.get(i));
+                    }
+                    for(int i=(index+1); i <items.size() ; i++){
+                        if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                        db.todoDao().update(items.get(i));
+                    }
                     items.get(index).setIsrunning(isRunning);
                     items.get(index).setCurtime(0);
                     db.todoDao().update(items.get(index));
@@ -411,12 +459,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editPlay() {
             timegap = 0;
             if(isRunning = false){
-                startTimerTask();
                 ivPause.setVisibility(View.VISIBLE);
             } else {
                 ivPlay.setVisibility(View.GONE);
             }
-
             isRunning = !isRunning;
             new Thread(() -> {
                 items.get(index).setIsrunning(isRunning);

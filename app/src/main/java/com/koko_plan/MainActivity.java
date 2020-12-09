@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static TextView tvTodayProgress;
 
+    ItemTouchHelper helper;
+
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
         initSwipe();
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper.attachToRecyclerView(recyclerView);
+
     }
 
     @Override
@@ -88,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
-                tvTodayProgress.setText("오늘의 실행 : " + totalprogress+ "%");
+//                tvTodayProgress.setText("오늘의 실행 : " + totalprogress+ "%");
             }
         });
     }
@@ -112,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo todo = new Todo((items.size()+1), habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(0, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -131,7 +139,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        /*if(items.size() > 0) {
+            new Thread(() -> {
+                db.todoDao().updateAll(adapter.getItems());
+            }).start();
+        }*/
     }
 
     @Override
@@ -142,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
     private void gettimegap(){
 
     }
-
-
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -192,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
                 int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
-
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
