@@ -28,27 +28,37 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center">
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <TextView
                     android:id="@+id/tvTitle"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="목록"
                     android:singleLine="true"
                     android:textStyle="bold"
                     android:textColor="#2196F3"
-                    android:layout_weight="2"
                     android:textSize="20sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="시간"
+                    android:singleLine="true"
+                    android:textColor="#2196F3"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText,NestedWeights" />
+
+                <TextView
                     android:id="@+id/tv_progress"
+                    android:layout_gravity="right"
                     android:gravity="right"
                     android:hint="진행율"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
@@ -58,7 +68,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="2">
+                android:layout_weight="1.5">
 
 
                 <TextView
@@ -83,7 +93,6 @@
                         android:id="@+id/iv_stop"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="5dp"
                         android:gravity="center"
                         android:src="@drawable/stop"/>
 
@@ -91,7 +100,6 @@
                         android:id="@+id/iv_minus"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="5dp"
                         android:gravity="center"
                         android:src="@drawable/minus"/>
 
@@ -106,7 +114,6 @@
                         android:id="@+id/iv_play"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="5dp"
                         android:gravity="center"
                         android:src="@drawable/play"/>
 
@@ -114,7 +121,6 @@
                         android:id="@+id/iv_pause"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="5dp"
                         android:gravity="center"
                         android:src="@drawable/pause"/>
 
@@ -122,17 +128,14 @@
                         android:id="@+id/iv_plus"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="5dp"
                         android:gravity="center"
                         android:src="@drawable/plus"/>
 
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/tvTime"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:hint="횟수.시간"
                     android:layout_weight="2"
                     android:singleLine="true"
                     android:gravity="center"

@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/tv_todayprogress"
-            android:text="today"
+            android:text="오늘의 실행율 : "
             android:layout_margin="10dp"
             android:textSize="20dp"
             android:layout_width="wrap_content"

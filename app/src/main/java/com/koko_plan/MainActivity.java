@@ -148,9 +148,10 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(items.get(i).getIsrunning()) {
-                    items.get(i).setCurtime(lastsec);
+                    items.get(i).setCurtime(lastsec-1);
                     db.todoDao().update(adapter.getItems().get(i));
                     editor.putLong("stoptime", now);
+                    editor.apply();
                 }
             }
         }).start();
@@ -174,8 +175,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
 
-
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -185,43 +184,48 @@ public class MainActivity extends AppCompatActivity {
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
-        int itemsize = pref.getInt("itemsize", 1);
+        int itemsize = pref.getInt("itemsize", 0);
 
         if(stoptime != 0){
-            timegap = (int) ((now-stoptime)/1000);
+            timegap = (int)((now-stoptime)/1000);
         } else {
             timegap = 0;
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        cur = 0;
-                        for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                            if(adapter.getItems().get(i).getCurtime()>0){
-                                int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
-                                cur += curtime;
-                                Log.e(TAG, "onRestart: "+ cur);
-                            } else {
-                                int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
-                                cur += count;
-                                Log.e(TAG, "onRestart: "+ cur );
+        if(itemsize > 0){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            cur = 0;
+                            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                                if(adapter.getItems().get(i).getCurtime()>0){
+                                    int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
+                                    cur += curtime;
+                                    Log.e(TAG, "onRestart: "+ cur);
+                                } else {
+                                    int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
+                                    cur += count;
+                                    Log.e(TAG, "onRestart: "+ cur );
+                                }
                             }
+                            tvTodayProgress.setText("오늘의 실행율 : " + cur/itemsize+ "%" );
                         }
-                        tvTodayProgress.setText("오늘의 실행율 : " + cur/itemsize+ "%" );
-                    }
-                });
-            }
-        }).start();
+                    });
+                }
+            }).start();
+        }
+
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
 
     }
 

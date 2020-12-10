@@ -257,8 +257,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
-            Log.e(TAG, "startTimerTask: timegap"+ timegap );
-
             stopTimerTask();
             timerTask = new TimerTask()
             {
@@ -268,7 +266,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 public void run()
                 {
                     count++;
-                    Log.e(TAG, "onStop run: "  +  items.get(index).getCurtime());
                     lastsec = count;
 
                     long second = count % 60;
@@ -296,7 +293,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             if(timerTask != null)
             {
-                Log.e(TAG, "run stopTimerTask: " + "스레드 중지");
                 timerTask.cancel();
                 timerTask = null;
             }
@@ -446,12 +442,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
                 for(int i=(index+1); i <items.size() ; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec);
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
                     items.get(i).setIsrunning(!isRunning);
                     db.todoDao().update(items.get(i));
                 }
@@ -460,18 +456,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPause() {
-                    if(timerTask != null)
-                    {
-                        new Thread(() -> {
-                            items.get(index).setCurtime(lastsec);
-                            db.todoDao().update(items.get(index));
-                        }).start();
+            timegap = 0;
+            if(timerTask != null)
+            {
+                new Thread(() -> {
+                    items.get(index).setCurtime(lastsec);
+                    db.todoDao().update(items.get(index));
+                }).start();
 
-                        timerTask.cancel();
-                        timerTask = null;
-                    }
-                ivPlay.setVisibility(View.VISIBLE);
-                ivPause.setVisibility(View.GONE);
+                timerTask.cancel();
+                timerTask = null;
+            }
+
+            ivPlay.setVisibility(View.VISIBLE);
+            ivPause.setVisibility(View.GONE);
 
             isRunning = !isRunning;
             new Thread(() -> {
