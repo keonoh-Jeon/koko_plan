@@ -41,7 +41,6 @@ import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
 import static com.koko_plan.MainActivity.timegap;
 import static com.koko_plan.MainActivity.totalprogress;
-import static com.koko_plan.MainActivity.tvTodayProgress;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -74,22 +73,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(items, i, i + 1);
-                items.get(i).setId(i + 1);
-                int finalI = i;
-                new Thread(() -> {
-                    Log.e(TAG, "onItemMove: " +  finalI);
-                db.todoDao().update(items.get(finalI));
-                });
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
                 Collections.swap(items, i, i - 1);
-                items.get(i).setId(i - 1);
-                int finalI = i;
-                new Thread(() -> {
-                    Log.e(TAG, "onItemMove: " +  finalI);
-                    db.todoDao().update(items.get(finalI));
-                });
             }
         }
         notifyItemMoved(fromPosition, toPosition);
@@ -97,30 +84,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         /*new Thread(() -> {
 
             if (fromPosition < toPosition) {
-                for (int i = fromPosition; i < toPosition; i++) {
-                    Collections.swap(items, i, i + 1);
-                    items.get(fromPosition).setId(i+1);
-                }
+
+                items.get(fromPosition).setId(1);
+                db.todoDao().update(items.get(fromPosition));
+                *//*items.get(toPosition).setId(fromPosition);
+                db.todoDao().update(items.get(toPosition));*//*
+
+                Log.e(TAG, "onItemMove: "+ fromPosition + "/" + items.size() + "/" + toPosition);
+
             } else {
                 for (int i = fromPosition; i > toPosition; i--) {
-                    Collections.swap(items, i, i - 1);
-                    items.get(fromPosition).setId(i-1);
+                    items.get(fromPosition).setId(i - 1);
+                    db.todoDao().update(items.get(i));
                 }
             }
-
-
-
-            for(int i=0; i<index; i++){
-                if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                db.todoDao().update(items.get(i));
-            }
-            for(int i=(index+1); i <items.size() ; i++){
-                if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                db.todoDao().update(items.get(i));
-            }
-            items.get(index).setIsrunning(isRunning);
-            items.get(index).setCurtime(0);
-            db.todoDao().update(items.get(index));
         }).start();*/
 
         return true;
@@ -291,7 +268,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 public void run()
                 {
                     count++;
-                    Log.e(TAG, "onStop run: "  +  count);
+                    Log.e(TAG, "onStop run: "  +  items.get(index).getCurtime());
                     lastsec = count;
 
                     long second = count % 60;
@@ -382,7 +359,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     progressBar.setProgress(progress);
                 }
             }
-
 
             Log.d(TAG, "onBind: " + totalprogress);
 
@@ -507,7 +483,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void editPlus() {
             timegap = 0;
-            int curcount = items.get(index).getCurcount() + 1;
+            int curcount = items.get(index).getCurcount();
+            if(items.get(index).getCurcount()<items.get(index).getCount()){
+                curcount = curcount + 1;
+            } else {
+                curcount = 0;
+            }
+            int cur = curcount;
 
             new Thread(() -> {
 
@@ -521,7 +503,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     db.todoDao().update(items.get(i));
                 }
 
-                items.get(index).setCurcount(curcount);
+                items.get(index).setCurcount(cur);
                 db.todoDao().update(items.get(index));
 
             }).start();

@@ -15,7 +15,7 @@ import static android.content.ContentValues.TAG;
 public class Todo {
 
     //Room에서 자동으로 id를 할당
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private int id;
     private String title;
     private int curtime, curcount, count;

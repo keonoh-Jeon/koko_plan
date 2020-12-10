@@ -28,8 +28,5 @@ public interface TodoDao {
     @Query("DELETE FROM todoTable")
     void deleteAll();
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateAll(List<Todo> todo);
-
 }
 

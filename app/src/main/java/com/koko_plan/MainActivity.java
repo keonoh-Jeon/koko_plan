@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
 import static com.koko_plan.RecyclerAdapter.items;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static int lastsec, timegap, totalprogress;
 
-    public static TextView tvTodayProgress;
+    private TextView tvTodayProgress;
+
+    int cur;
 
     ItemTouchHelper helper;
 
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo todo = new Todo(0, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(items.size()+1, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -134,24 +137,44 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-
-
     @Override
     protected void onPause() {
         super.onPause();
-        /*if(items.size() > 0) {
+
+        resetId();
+
+        long now = System.currentTimeMillis();
+
+        new Thread(() -> {
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                if(items.get(i).getIsrunning()) {
+                    items.get(i).setCurtime(lastsec);
+                    db.todoDao().update(adapter.getItems().get(i));
+                    editor.putLong("stoptime", now);
+                }
+            }
+        }).start();
+
+        editor.putInt("itemsize", adapter.getItemCount());
+        editor.apply();
+    }
+
+    private void resetId() {
+        if(items.size() > 0) {
             new Thread(() -> {
-                db.todoDao().updateAll(adapter.getItems());
+                for(int i=0; i < items.size() ; i++){
+                    adapter.getItems().get(i).setId(i+1);
+                    db.todoDao().update(adapter.getItems().get(i));
+                }
             }).start();
-        }*/
+        }
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-    }
 
-    private void gettimegap(){
+
 
     }
 
@@ -162,31 +185,44 @@ public class MainActivity extends AppCompatActivity {
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
+        int itemsize = pref.getInt("itemsize", 1);
 
         if(stoptime != 0){
             timegap = (int) ((now-stoptime)/1000);
         } else {
             timegap = 0;
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        cur = 0;
+                        for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                            if(adapter.getItems().get(i).getCurtime()>0){
+                                int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
+                                cur += curtime;
+                                Log.e(TAG, "onRestart: "+ cur);
+                            } else {
+                                int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
+                                cur += count;
+                                Log.e(TAG, "onRestart: "+ cur );
+                            }
+                        }
+                        tvTodayProgress.setText("오늘의 실행율 : " + cur/itemsize+ "%" );
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        long now = System.currentTimeMillis();
 
-        new Thread(() -> {
-            for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                if(items.get(i).getIsrunning()) {
-                    items.get(i).setCurtime(lastsec);
-                    Log.e(TAG, "onStop: "+ lastsec);
-                    db.todoDao().update(adapter.getItems().get(i));
-
-                    editor.putLong("stoptime", now);
-                    editor.apply();
-                }
-            }
-        }).start();
     }
 
     private void initSwipe() {
@@ -208,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
                             db.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();
+                    resetId();
                 }else {
                     //오른쪽으로 밀었을때.
                 }
