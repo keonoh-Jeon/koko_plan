@@ -36,6 +36,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
+import static com.koko_plan.MainActivity.btnsavelist;
 import static com.koko_plan.MainActivity.editor;
 import static com.koko_plan.MainActivity.lastsec;
 import static com.koko_plan.MainActivity.pref;
@@ -45,6 +46,7 @@ import static com.koko_plan.MainActivity.totalprogress;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
     public static List<Todo> items = new ArrayList<>();
+    public static TimerTask timerTask;
     private Context mContext;
     private TodoDatabase db;
     private boolean isRunning;
@@ -80,6 +82,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+
+        btnsavelist.setVisibility(View.VISIBLE);
+
+        /*Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable()  {
+            public void run() {
+                // 시간 지난 후 실행할 코딩
+                new Thread(() -> {
+                    for(int i=0; i < items.size() ; i++){
+                        items.get(i).setId(i+1);
+                        db.todoDao().update(items.get(i));
+                    }
+                }).start();
+            }
+        }, 5000); // 0.5초후*/
 
         /*new Thread(() -> {
 
@@ -173,13 +190,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private int index, gap;
 
         ProgressBar progressBar;
-
-        TimerTask timerTask;
         Timer timer = new Timer();
 
         @SuppressLint("SetTextI18n")
         public ViewHolder(View view) {
             super(view);
+
+
 
             tvTitle = view.findViewById(R.id.tvTitle);
             tvProgress = view.findViewById(R.id.tv_progress);
@@ -267,6 +284,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 {
                     count++;
                     lastsec = count;
+                    Log.e(TAG, "run: " + count );
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;
@@ -293,6 +311,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             if(timerTask != null)
             {
+                Log.d(TAG, "stopTimerTask: run " + "스레드 중지");
                 timerTask.cancel();
                 timerTask = null;
             }
@@ -356,19 +375,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
             }
 
-            Log.d(TAG, "onBind: " + totalprogress);
-
 //            totalprogress = totalprogress/items.size();
 
-            if(todo.getIsrunning()) {
-                startTimerTask();
-            } else {
-                if(timerTask != null)
-                {
-                    timerTask.cancel();
-                    timerTask = null;
-                }
-            }
+            if(todo.getIsrunning()) startTimerTask();
+
         }
 
         /*public void editData(String contents){
@@ -609,7 +619,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         DatePickerDialog alert = new DatePickerDialog(mContext,  mDateSetListener, cyear, cmonth, cday);
         alert.show();
     }
-//todo
     @SuppressLint("SetTextI18n")
     private void maketimerdialog(View v, final int position){
 

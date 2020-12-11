@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.RecyclerAdapter.items;
+import static com.koko_plan.RecyclerAdapter.timerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences.Editor editor;
 
     private View btnPlus;
+    public static Button btnsavelist, btndeletesave;
 
     public static int lastsec, timegap, totalprogress;
 
@@ -66,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
         editor = pref.edit();
 
         btnPlus = findViewById(R.id.btnPlus);
+        btnsavelist = findViewById(R.id.btn_savelist);
+        btndeletesave = findViewById(R.id.btn_deletesave);
+
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
@@ -82,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
         //RecyclerView에 ItemTouchHelper 붙이기
         helper.attachToRecyclerView(recyclerView);
-
     }
 
     @Override
@@ -91,6 +96,20 @@ public class MainActivity extends AppCompatActivity {
 
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
+        });
+
+        btnsavelist.setVisibility(View.INVISIBLE);
+        btnsavelist.setOnClickListener(v -> {
+            timegap =0;
+            resetId();
+            btnsavelist.setVisibility(View.INVISIBLE);
+        });
+
+        btndeletesave.setVisibility(View.INVISIBLE);
+        btndeletesave.setOnClickListener(v -> {
+            timegap =0;
+            resetId();
+            btndeletesave.setVisibility(View.INVISIBLE);
         });
 
         //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
@@ -123,7 +142,9 @@ public class MainActivity extends AppCompatActivity {
                 int totalsec = hour*60*60+min*60+sec;
 
                 new Thread(() -> {
-                    Todo todo = new Todo(items.size()+1, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
+                    int size = items.size()+1;
+                    Log.e(TAG, "onActivityResult: " + size);
+                    Todo todo = new Todo(size, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -140,8 +161,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
-        resetId();
 
         long now = System.currentTimeMillis();
 
@@ -162,8 +181,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetId() {
         if(items.size() > 0) {
+            Log.e(TAG, "resetId: " + items.size());
             new Thread(() -> {
-                for(int i=0; i < items.size() ; i++){
+                for(int i=0; i < adapter.getItems().size() ; i++){
+                    Log.e(TAG, "resetId: "+ adapter.getItems().get(i).getId());
+                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
                     adapter.getItems().get(i).setId(i+1);
                     db.todoDao().update(adapter.getItems().get(i));
                 }
@@ -205,11 +227,9 @@ public class MainActivity extends AppCompatActivity {
                                 if(adapter.getItems().get(i).getCurtime()>0){
                                     int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
                                     cur += curtime;
-                                    Log.e(TAG, "onRestart: "+ cur);
                                 } else {
                                     int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
                                     cur += count;
-                                    Log.e(TAG, "onRestart: "+ cur );
                                 }
                             }
                             tvTodayProgress.setText("오늘의 실행율 : " + cur/itemsize+ "%" );
@@ -226,7 +246,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
+        resetId();
 
+        if(timerTask != null)
+        {
+            Log.e(TAG, "onPause: run");
+            timerTask.cancel();
+            timerTask = null;
+        }
     }
 
     private void initSwipe() {
@@ -248,7 +275,8 @@ public class MainActivity extends AppCompatActivity {
                             db.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();
-                    resetId();
+
+                    btndeletesave.setVisibility(View.VISIBLE);
                 }else {
                     //오른쪽으로 밀었을때.
                 }
