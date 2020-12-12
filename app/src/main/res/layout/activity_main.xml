@@ -24,15 +24,20 @@
                 android:layout_height="wrap_content"
                 tools:ignore="HardcodedText,SpUsage" />
 
-
+            <Button
+                android:id="@+id/btn_savelist"
+                android:text="순서저장"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:ignore="HardcodedText,RtlHardcoded" />
 
         </LinearLayout>
 
-
-
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:fillViewport="false">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -52,22 +57,6 @@
         android:layout_gravity="bottom"
         android:gravity="right"
         tools:ignore="RtlHardcoded">
-
-        <Button
-            android:id="@+id/btn_deletesave"
-            android:text="순서저장"
-            android:gravity="right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="HardcodedText,RtlHardcoded" />
-
-        <Button
-            android:id="@+id/btn_savelist"
-            android:text="순서저장"
-            android:gravity="right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="HardcodedText,RtlHardcoded" />
 
         <com.melnykov.fab.FloatingActionButton
             android:id="@+id/btnPlus"

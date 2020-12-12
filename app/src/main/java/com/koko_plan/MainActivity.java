@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences.Editor editor;
 
     private View btnPlus;
-    public static Button btnsavelist, btndeletesave;
+    public static Button btnsavelist;
 
     public static int lastsec, timegap, totalprogress;
 
@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
-        btndeletesave = findViewById(R.id.btn_deletesave);
-
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
@@ -105,30 +103,22 @@ public class MainActivity extends AppCompatActivity {
             btnsavelist.setVisibility(View.INVISIBLE);
         });
 
-        btndeletesave.setVisibility(View.INVISIBLE);
-        btndeletesave.setOnClickListener(v -> {
-            timegap =0;
-            resetId();
-            btndeletesave.setVisibility(View.INVISIBLE);
-        });
-
         //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
         db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
-//                tvTodayProgress.setText("오늘의 실행 : " + totalprogress+ "%");
             }
         });
 
-        db.todoDao().getAlphabetizedTitles().observe(this, new Observer<List<Todo>>() {
+        /*db.todoDao().getAlphabetizedTitles().observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
             }
-        });
+        });*/
 
 
     }
@@ -217,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        db.todoDao().getAlphabetizedTitles();
+//        db.todoDao().getAlphabetizedTitles();
 
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
@@ -288,11 +278,10 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+
                             db.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();
-
-                    btndeletesave.setVisibility(View.VISIBLE);
                 }else {
                     //오른쪽으로 밀었을때.
                 }

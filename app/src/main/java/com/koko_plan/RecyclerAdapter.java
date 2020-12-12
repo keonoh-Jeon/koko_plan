@@ -85,50 +85,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         btnsavelist.setVisibility(View.VISIBLE);
 
-        /*Handler mHandler = new Handler();
-        mHandler.postDelayed(new Runnable()  {
-            public void run() {
-                // 시간 지난 후 실행할 코딩
-                new Thread(() -> {
-                    for(int i=0; i < items.size() ; i++){
-                        items.get(i).setId(i+1);
-                        db.todoDao().update(items.get(i));
-                    }
-                }).start();
-            }
-        }, 5000); // 0.5초후*/
-
-        /*new Thread(() -> {
-
-            if (fromPosition < toPosition) {
-
-                items.get(fromPosition).setId(1);
-                db.todoDao().update(items.get(fromPosition));
-                *//*items.get(toPosition).setId(fromPosition);
-                db.todoDao().update(items.get(toPosition));*//*
-
-                Log.e(TAG, "onItemMove: "+ fromPosition + "/" + items.size() + "/" + toPosition);
-
-            } else {
-                for (int i = fromPosition; i > toPosition; i--) {
-                    items.get(fromPosition).setId(i - 1);
-                    db.todoDao().update(items.get(i));
-                }
-            }
-        }).start();*/
-
         return true;
     }
 
     @Override
     public void onItemSwipe(int position) {
 
-        /*items.remove(position);
-        notifyItemRemoved(position);
-
-        new Thread(() -> {
-            db.todoDao().delete(items.get(position));
-        }).start();*/
     }
 
     @NonNull
@@ -138,13 +100,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         mContext = viewGroup.getContext();
         final ViewHolder holder = new ViewHolder(v);
 
-        /*v.findViewById(R.id.tv_count).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                MySoundPlayer.play(MySoundPlayer.CLICK);
-//                showPopupcycle(v, holder.getAdapterPosition());
-            }
-        });*/
         v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,8 +151,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public ViewHolder(View view) {
             super(view);
 
-
-
             tvTitle = view.findViewById(R.id.tvTitle);
             tvProgress = view.findViewById(R.id.tv_progress);
             tvCurTime = view.findViewById(R.id.tv_curtime);
@@ -220,56 +173,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             ivStop.setVisibility(View.GONE);
             ivStop.setOnClickListener(v -> editStop());
 
-//            ivbtnreset.setOnClickListener(v -> editPlayPluscount());
-
-//            ivbdelete = view.findViewById(R.id.ivbnt_delete);
-//            ivbdelete.setOnClickListener(v -> itemdelete());
-
             progressBar = view.findViewById(R.id.progressBar);
-
-            /*mStartBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    v.setVisibility(View.GONE);
-                    mStopBtn.setVisibility(View.VISIBLE);
-                    mRecordBtn.setVisibility(View.VISIBLE);
-                    mPauseBtn.setVisibility(View.VISIBLE);
-
-                    timeThread.start();
-                }
-            });
-
-            mStopBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    v.setVisibility(View.GONE);
-                    mRecordBtn.setVisibility(View.GONE);
-                    mStartBtn.setVisibility(View.VISIBLE);
-                    mPauseBtn.setVisibility(View.GONE);
-                    mRecordTextView.setText("");
-                    timeThread.interrupt();
-                }
-            });
-
-            mRecordBtn.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    mRecordTextView.setText(mRecordTextView.getText() + mTimeTextView.getText().toString() + "\n");
-                }
-            });
-
-            mPauseBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isRunning = !isRunning;
-                    if (isRunning) {
-                        mPauseBtn.setText("일시정지");
-                    } else {
-                        mPauseBtn.setText("시작");
-                    }
-                }
-            });*/
         }
 
         private void startTimerTask()
@@ -284,7 +188,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 {
                     count++;
                     lastsec = count;
-                    Log.e(TAG, "run: " + count );
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;
@@ -311,7 +214,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             if(timerTask != null)
             {
-                Log.d(TAG, "stopTimerTask: run " + "스레드 중지");
                 timerTask.cancel();
                 timerTask = null;
             }
@@ -349,7 +251,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 tvCurTime.setText(""+todo.getCurcount());
                 tvProgress.setText(progress + " %");
                 progressBar.setProgress(progress);
-
+                /*if(progress>=100) {
+                    new Thread(() -> {
+                        items.get(index).setNum(getItemCount());
+                        db.todoDao().update(items.get(index));
+                    }).start();
+                }*/
                 totalprogress += progress;
 
             } else {
@@ -363,54 +270,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
                     tvProgress.setText(progress + " %");
                     progressBar.setProgress(progress);
-
-//                    totalprogress += progress;
-//                    Log.d(TAG, "onBind: " + totalprogress);
+                    /*if(progress>=100) {
+                        new Thread(() -> {
+                            items.get(index).setNum(getItemCount());
+                            db.todoDao().update(items.get(index));
+                        }).start();
+                    }*/
 
                 } else {
                     tvCurTime.setText("00:00:00");
                     int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
                     tvProgress.setText(progress + " %");
                     progressBar.setProgress(progress);
+                    /*if(progress>=100) {
+                        new Thread(() -> {
+                            items.get(index).setNum(getItemCount());
+                            db.todoDao().update(items.get(index));
+                        }).start();
+                    }*/
                 }
             }
-
-//            totalprogress = totalprogress/items.size();
-
             if(todo.getIsrunning()) startTimerTask();
 
         }
-
-        /*public void editData(String contents){
-            new Thread(() -> {
-                items.get(index).setContents(contents);
-                db.memoDao().update(items.get(index));
-            }).start();
-            Toast.makeText(mContext,"저장완료", Toast.LENGTH_SHORT).show();
-        }*/
-
-        /*@SuppressLint("SetTextI18n")
-        public void itemdelete() {
-            if(timerTask != null)
-            {
-                timerTask.cancel();
-                timerTask = null;
-            }
-
-            int select = items.get(index).getId()-1;
-
-            new Thread(() -> {
-                for(int i=0; i<select; i++){
-                    items.get(i).setId(i);
-                    db.todoDao().update(items.get(i));
-                }
-                for(int i = select+1; i <items.size() ; i++){
-                    items.get(i).setId(i-1);
-                    db.todoDao().update(items.get(i));
-                }
-                db.todoDao().delete(items.get(index));
-            }).start();
-        }*/
 
         @SuppressLint("SetTextI18n")
         public void editStop() {
@@ -524,7 +406,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(curcount > 0) {
                 curcount = items.get(index).getCurcount() - 1;
             }
-//            tvCurTime.setText(curcount + "");
             int finalCurcount = curcount;
             new Thread(() -> {
 
@@ -565,16 +446,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         items.get(position).setTitle(edittext.getText().toString());
                         db.todoDao().update(items.get(position));
                     }).start();
-
                 });
         builder.setNegativeButton("취소",
                 (dialog, which) -> {
                     //취소버튼 클릭
                 });
         builder.show();
-    }
-
-    private void runOnUiThread(Runnable runnable) {
     }
 
     private void showPopupCountTime(View v, final int position){

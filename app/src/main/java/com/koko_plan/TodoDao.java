@@ -21,14 +21,14 @@ public interface TodoDao {
     @Delete
     void delete(Todo todo);
 
-    @Query("SELECT * FROM todoTable")
+    @Query("SELECT * FROM todoTable ORDER BY num ASC")
     LiveData<List<Todo>> getAll(); //LiveData
 
     @Query("DELETE FROM todoTable")
     void deleteAll();
 
-    @Query("SELECT * from todoTable ORDER BY num ASC")
-    LiveData<List<Todo>> getAlphabetizedTitles();
+    /*@Query("SELECT * from todoTable ORDER BY num ASC")
+    LiveData<List<Todo>> getAlphabetizedTitles();*/
     //오름차순(ASC) 정렬하여 가져옵니다. (*DESC: 내림차순)
 
 }
