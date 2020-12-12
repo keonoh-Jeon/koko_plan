@@ -121,6 +121,16 @@ public class MainActivity extends AppCompatActivity {
 //                tvTodayProgress.setText("오늘의 실행 : " + totalprogress+ "%");
             }
         });
+
+        db.todoDao().getAlphabetizedTitles().observe(this, new Observer<List<Todo>>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onChanged(List<Todo> data) {
+                adapter.setItem(data);
+            }
+        });
+
+
     }
 
     @Override
@@ -144,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(() -> {
                     int size = items.size()+1;
                     Log.e(TAG, "onActivityResult: " + size);
-                    Todo todo = new Todo(size, habbittitle,0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(size+1, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
@@ -180,17 +190,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetId() {
+
         if(items.size() > 0) {
-            Log.e(TAG, "resetId: " + items.size());
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
-                    Log.e(TAG, "resetId: "+ adapter.getItems().get(i).getId());
+                    Log.e(TAG, "resetId: get" + adapter.getItems().get(i).getNum());
                     if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    adapter.getItems().get(i).setId(i+1);
+                    adapter.getItems().get(i).setNum((i+1));
+                    Log.e(TAG, "resetId: set" + adapter.getItems().get(i).getNum());
                     db.todoDao().update(adapter.getItems().get(i));
                 }
             }).start();
         }
+
+
     }
 
     @Override
@@ -203,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        db.todoDao().getAlphabetizedTitles();
+
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);

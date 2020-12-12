@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -27,6 +26,10 @@ public interface TodoDao {
 
     @Query("DELETE FROM todoTable")
     void deleteAll();
+
+    @Query("SELECT * from todoTable ORDER BY num ASC")
+    LiveData<List<Todo>> getAlphabetizedTitles();
+    //오름차순(ASC) 정렬하여 가져옵니다. (*DESC: 내림차순)
 
 }
 

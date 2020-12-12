@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -15,16 +16,23 @@ import static android.content.ContentValues.TAG;
 public class Todo {
 
     //Room에서 자동으로 id를 할당
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
+
+    @ColumnInfo(name="title")
     private String title;
+
+    @ColumnInfo(name="num")
+    private int num;
+
     private int curtime, curcount, count;
     private int totalsec;
     private int hour, min, sec;
     private boolean isrunning;
 
-    public Todo(int id, String title, int curtime, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
+    public Todo(int num, String title, int curtime, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
         this.id = id;
+        this.num = num;
         this.title = title;
         this.curtime = curtime;
         this.count = count;
@@ -38,6 +46,9 @@ public class Todo {
 
     public int getId(){ return id; }
     public void setId(int id){ this.id = id;  }
+
+    public int getNum(){ return num; }
+    public void setNum(int num){ this.num = num;  }
 
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
