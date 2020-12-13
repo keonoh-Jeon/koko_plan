@@ -1,5 +1,6 @@
 package com.koko_plan;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -8,13 +9,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -195,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e(TAG, "onResume: run stoptime" + stoptime );
 
-
         if(stoptime != 0){
             timegap = (int)((now-stoptime)/1000);
             Log.e(TAG, "onResume: run 존재 " + timegap);
@@ -203,8 +210,6 @@ public class MainActivity extends AppCompatActivity {
             timegap = 0;
             Log.e(TAG, "onResume: run 존재 없슴 " + timegap);
         }
-
-
 
         if(itemsize > 0){
             new Thread(new Runnable() {

@@ -1,9 +1,14 @@
 package com.koko_plan;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Handler;
@@ -29,8 +34,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -93,6 +100,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
     @Override
     public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -147,6 +155,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ProgressBar progressBar;
         Timer timer = new Timer();
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public ViewHolder(View view) {
             super(view);
@@ -178,8 +187,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
+            Log.e(TAG, "startTimerTask run: getcurtime" + items.get(index).getCurtime());
+            Log.e(TAG, "startTimerTask run: timegap" + timegap);
             stopTimerTask();
             timerTask = new TimerTask()
+
             {
                 int count = items.get(index).getCurtime() + timegap;
 
@@ -258,6 +270,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         db.todoDao().update(items.get(index));
                     }).start();
                 }*/
+
+                if(progress >= 100) {
+                    Toast.makeText(mContext,"100% 도달", Toast.LENGTH_SHORT).show();
+                }
                 totalprogress += progress;
 
             } else {
@@ -320,6 +336,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editPlay() {
             timegap = 0;
@@ -345,7 +362,117 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     db.todoDao().update(items.get(i));
                 }
             }).start();
+
+            long curTime = System.currentTimeMillis();
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
+            int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)))+12;
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
+            int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
+
+            int hour, hour_24, minute;
+            //남은 시간
+            long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime();
+            Log.e(TAG, "editPlay: 남은 초"  +  totalsec);
+
+            int lesthour = (int) (totalsec / 3600 % 24);
+            hour_24 = (int) (lesthour + curhour);
+            Log.e(TAG, "editPlay: 예약 시간"  +  hour_24);
+
+            int lestmin = (int) (totalsec / 60 % 60);
+            minute = lestmin;
+            Log.e(TAG, "editPlay: 예약 시간"  +  minute);
+
+            /*String am_pm;
+            if (Build.VERSION.SDK_INT >= 23 ){
+                hour_24 = (int) lesthour;
+                minute = picker.getMinute();
+            }
+            else{
+                hour_24 = picker.getCurrentHour();
+                minute = picker.getCurrentMinute();
+            }
+            if(hour_24 > 12) {
+                am_pm = "PM";
+                hour = hour_24 - 12;
+            }
+            else
+            {
+                hour = hour_24;
+                am_pm="AM";
+            }
+*/
+
+
+            // 현재 지정된 시간으로 알람 시간 설정
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, hour_24);
+            calendar.set(Calendar.MINUTE, minute);
+//            calendar.set(Calendar.SECOND, 0);
+//
+            // 이미 지난 시간을 지정했다면 다음날 같은 시간으로 설정
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(Calendar.DATE, 1);
+            }
+
+            /*Date currentDateTime = calendar.getTime();
+            String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(currentDateTime);
+            Toast.makeText(getApplicationContext(),date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
+
+            //  Preference에 설정한 값 저장
+            SharedPreferences.Editor editor = getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
+            editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
+            editor.apply();
+
+            diaryNotification(calendar);*/
+
         }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        void diaryNotification(Calendar calendar)
+        {
+//        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+//        Boolean dailyNotify = sharedPref.getBoolean(SettingsActivity.KEY_PREF_DAILY_NOTIFICATION, true);
+            Boolean dailyNotify = true; // 무조건 알람을 사용
+
+            PackageManager pm = mContext.getPackageManager();
+            ComponentName receiver = new ComponentName(mContext, DeviceBootReceiver.class);
+            Intent alarmIntent = new Intent(mContext, AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, alarmIntent, 0);
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+
+            // 사용자가 매일 알람을 허용했다면
+            if (dailyNotify) {
+
+                if (alarmManager != null) {
+
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY, pendingIntent);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    }
+                }
+
+                // 부팅 후 실행되는 리시버 사용가능하게 설정
+                pm.setComponentEnabledSetting(receiver,
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                        PackageManager.DONT_KILL_APP);
+
+            }
+//        else { //Disable Daily Notifications
+//            if (PendingIntent.getBroadcast(this, 0, alarmIntent, 0) != null && alarmManager != null) {
+//                alarmManager.cancel(pendingIntent);
+//                //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
+//            }
+//            pm.setComponentEnabledSetting(receiver,
+//                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+//                    PackageManager.DONT_KILL_APP);
+//        }
+        }
+
 
         @SuppressLint("SetTextI18n")
         public void editPause() {
