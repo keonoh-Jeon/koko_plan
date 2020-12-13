@@ -6,10 +6,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Objects;
+
+import static com.koko_plan.MainActivity.pref;
 
 public class DeviceBootReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -23,12 +31,11 @@ public class DeviceBootReceiver extends BroadcastReceiver {
 
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 //
-            /*SharedPreferences sharedPreferences = context.getSharedPreferences("daily alarm", MODE_PRIVATE);
-            long millis = sharedPreferences.getLong("nextNotifyTime", Calendar.getInstance().getTimeInMillis());
+            long millis = pref.getLong("nextNotifyTime", Calendar.getInstance().getTimeInMillis());
 
             Calendar current_calendar = Calendar.getInstance();
             Calendar nextNotifyTime = new GregorianCalendar();
-            nextNotifyTime.setTimeInMillis(sharedPreferences.getLong("nextNotifyTime", millis));
+            nextNotifyTime.setTimeInMillis(pref.getLong("nextNotifyTime", millis));
 
             if (current_calendar.after(nextNotifyTime)) {
                 nextNotifyTime.add(Calendar.DATE, 1);
@@ -41,7 +48,7 @@ public class DeviceBootReceiver extends BroadcastReceiver {
             if (manager != null) {
                 manager.setRepeating(AlarmManager.RTC_WAKEUP, nextNotifyTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY, pendingIntent);
-            }*/
+            }
         }
     }
 }
