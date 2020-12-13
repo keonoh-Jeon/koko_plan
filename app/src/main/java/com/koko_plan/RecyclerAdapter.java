@@ -188,6 +188,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 {
                     count++;
                     lastsec = count;
+                    Log.e(TAG, "startTimerTask run: " + count);
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;

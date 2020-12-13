@@ -158,26 +158,7 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
 
-        long now = System.currentTimeMillis();
-
-        new Thread(() -> {
-            for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                if(items.get(i).getIsrunning()) {
-                    items.get(i).setCurtime(lastsec-1);
-                    db.todoDao().update(adapter.getItems().get(i));
-                    editor.putLong("stoptime", now);
-                    editor.apply();
-                }
-            }
-        }).start();
-
-        editor.putInt("itemsize", adapter.getItemCount());
-        editor.apply();
-    }
 
     private void resetId() {
 
@@ -207,18 +188,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-//        db.todoDao().getAlphabetizedTitles();
-
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
         int itemsize = pref.getInt("itemsize", 0);
 
+        Log.e(TAG, "onResume: run stoptime" + stoptime );
+
+
         if(stoptime != 0){
             timegap = (int)((now-stoptime)/1000);
+            Log.e(TAG, "onResume: run 존재 " + timegap);
         } else {
             timegap = 0;
+            Log.e(TAG, "onResume: run 존재 없슴 " + timegap);
         }
+
+
 
         if(itemsize > 0){
             new Thread(new Runnable() {
@@ -246,6 +232,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        long now = System.currentTimeMillis();
+
+        editor.putLong("stoptime", 0);
+        editor.apply();
+
+        new Thread(() -> {
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                if(items.get(i).getIsrunning()) {
+                    items.get(i).setCurtime(lastsec-1);
+                    db.todoDao().update(adapter.getItems().get(i));
+                    editor.putLong("stoptime", now);
+                    editor.apply();
+                }
+            }
+        }).start();
+
+        Log.e(TAG, "onPause: run now" + pref.getLong("stoptime", 0));
+
+        editor.putInt("itemsize", adapter.getItemCount());
+        editor.apply();
     }
 
     @Override
