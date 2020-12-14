@@ -19,6 +19,9 @@ public class Todo {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @ColumnInfo(name="date")
+    private String date;
+
     @ColumnInfo(name="title")
     private String title;
 
@@ -30,8 +33,9 @@ public class Todo {
     private int hour, min, sec;
     private boolean isrunning;
 
-    public Todo(int num, String title, int curtime, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
+    public Todo(int num, String date, String title, int curtime, int curcount, int count, int hour, int min, int sec, int totalsec, boolean isrunning){
         this.id = id;
+        this.date = date;
         this.num = num;
         this.title = title;
         this.curtime = curtime;
@@ -49,6 +53,9 @@ public class Todo {
 
     public int getNum(){ return num; }
     public void setNum(int num){ this.num = num;  }
+
+    public String getDate(){ return date; }
+    public void setDate(String date){ this.date = date; }
 
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }

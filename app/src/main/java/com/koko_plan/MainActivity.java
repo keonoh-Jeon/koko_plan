@@ -16,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +31,10 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
@@ -64,7 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
     int cur, total;
 
+    private String day;
+    private SimpleDateFormat dateformat;
+
     ItemTouchHelper helper;
+    private String selecteddata;
+    private Calendar today;
 
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
@@ -72,6 +80,16 @@ public class MainActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dateformat = new SimpleDateFormat("yyyy-MM/dd");
+
+        //가로 달력 추가
+
+
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        day = dateformat.format(date);
 
         /* starts before 1 month from now */
         Calendar startDate = Calendar.getInstance();
@@ -83,18 +101,20 @@ public class MainActivity extends AppCompatActivity {
 
         HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
                 .range(startDate, endDate)
-                .datesNumberOnScreen(5)
+                .datesNumberOnScreen(7)
                 .build();
 
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDateSelected(Calendar date, int position) {
-
+                Log.e(TAG, "onDateSelected: " + dateformat.format(date.getTime()));
+                selecteddata = dateformat.format(date.getTime());
             }
 
             @Override
-            public void onCalendarScroll(HorizontalCalendarView calendarView,
-                                         int dx, int dy) {
+            public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
 
             }
 
@@ -159,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //EditHabbit에서 돌아와서 처리
+        //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
 
@@ -175,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
                 new Thread(() -> {
                     int size = items.size()+1;
-                    Todo todo = new Todo(size+1, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(size+1, day, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
             }
