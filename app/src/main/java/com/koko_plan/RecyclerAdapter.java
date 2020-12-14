@@ -151,6 +151,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         ProgressBar progressBar;
         Timer timer = new Timer();
+        private boolean dailyNotify;
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
@@ -184,8 +185,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
-            Log.e(TAG, "startTimerTask run: getcurtime" + items.get(index).getCurtime());
-            Log.e(TAG, "startTimerTask run: timegap" + timegap);
+            Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
             stopTimerTask();
             timerTask = new TimerTask()
 
@@ -267,10 +267,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         db.todoDao().update(items.get(index));
                     }).start();
                 }*/
-
-                if(progress >= 100) {
-                    Toast.makeText(mContext,"100% 도달", Toast.LENGTH_SHORT).show();
-                }
                 totalprogress += progress;
 
             } else {
@@ -308,9 +304,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editStop() {
             timegap = 0;
+            dailyNotify = false;
             if(isRunning = true) {
                 stopTimerTask();
                 ivPlay.setVisibility(View.VISIBLE);
@@ -331,6 +329,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     db.todoDao().update(items.get(index));
                 }).start();
             }
+            alramset(false);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -361,51 +360,67 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             }).start();
 
-            long curTime = System.currentTimeMillis();
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
-            int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)))+12;
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
-            int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
-            int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime)));
+            alramset(true);
+        }
 
-            int hour_24, minute, secon;
-            //남은 시간
-            long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime();
-            Log.e(TAG, "editPlay: 남은 총 초"  +  totalsec);
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        private void alramset(boolean on) {
+            if(on) {
+                dailyNotify = true;
+                long curTime = System.currentTimeMillis();
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
+                int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)))+12;
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
+                int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
+                int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime)));
 
-            //예약 시간
-            int lesthour = (int) (totalsec / 3600 % 24);
-            hour_24 = (int) (lesthour + curhour);
-            int lestmin = (int) (totalsec / 60 % 60);
-            minute = (int) (lestmin + curmin);
-            int lestsec = (int) (totalsec % 60);
-            secon = (int) (lestsec + cursec);
+                int hour_24, minute, secon;
+                //남은 시간
+                long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime();
+                Log.e(TAG, "editPlay: 남은 총 초"  +  totalsec);
 
-            // 현재 지정된 시간으로 알람 시간 설정
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, hour_24);
-            calendar.set(Calendar.MINUTE, minute);
-            calendar.set(Calendar.SECOND, secon);
+                //예약 시간
+                int lesthour = (int) (totalsec / 3600 % 24);
+                hour_24 = (int) (lesthour + curhour);
+                Log.e(TAG, "editPlay 시: " + hour_24);
+                int lestmin = (int) (totalsec / 60 % 60);
+                minute = (int) (lestmin + curmin);
+                Log.e(TAG, "editPlay 분: " + minute);
+                int lestsec = (int) (totalsec % 60);
+                secon = (int) (lestsec + cursec);
+                Log.e(TAG, "editPlay 초: " + secon);
+
+                // 현재 지정된 시간으로 알람 시간 설정
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                calendar.set(Calendar.HOUR_OF_DAY, hour_24);
+                calendar.set(Calendar.MINUTE, minute);
+                calendar.set(Calendar.SECOND, secon);
 //
-            // 이미 지난 시간을 지정했다면 다음날 같은 시간으로 설정
-            if (calendar.before(Calendar.getInstance())) {
-                calendar.add(Calendar.DATE, 1);
+                // 이미 지난 시간을 지정했다면 다음날 같은 시간으로 설정
+                if (calendar.before(Calendar.getInstance())) {
+                    calendar.add(Calendar.DATE, 1);
+                }
+
+                // 알람 시간 설정 메시지
+                Date currentDateTime = calendar.getTime();
+                String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ss초 ", Locale.getDefault()).format(currentDateTime);
+                Toast.makeText(mContext,date_text + "에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
+
+                //  Preference에 설정한 값 저장
+                editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
+                editor.putString("alarmtitle", items.get(index).getTitle());
+                editor.apply();
+
+                diaryNotification(calendar);
+            } else {
+
+                dailyNotify = false;
+                Toast.makeText(mContext,"알람이 해제 되었습니다.", Toast.LENGTH_SHORT).show();
+                Calendar calendar = Calendar.getInstance();
+                diaryNotification(calendar);
             }
-
-            // 알람 시간 설정 메시지
-            Date currentDateTime = calendar.getTime();
-            String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ss초 ", Locale.getDefault()).format(currentDateTime);
-            Toast.makeText(mContext,date_text + "에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
-
-            //  Preference에 설정한 값 저장
-            editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
-            editor.putString("alarmtitle", items.get(index).getTitle());
-            editor.apply();
-
-            diaryNotification(calendar);
-
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -414,7 +429,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 //        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 //        Boolean dailyNotify = sharedPref.getBoolean(SettingsActivity.KEY_PREF_DAILY_NOTIFICATION, true);
-            Boolean dailyNotify = true; // 무조건 알람을 사용
+//            dailyNotify = true; // 무조건 알람을 사용
 
             PackageManager pm = mContext.getPackageManager();
             ComponentName receiver = new ComponentName(mContext, DeviceBootReceiver.class);
@@ -424,9 +439,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             // 사용자가 매일 알람을 허용했다면
             if (dailyNotify) {
-
                 if (alarmManager != null) {
-
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                             AlarmManager.INTERVAL_DAY, pendingIntent);
 
@@ -434,26 +447,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                     }
                 }
-
                 // 부팅 후 실행되는 리시버 사용가능하게 설정
-//                pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
             }
-//        else { //Disable Daily Notifications
-//            if (PendingIntent.getBroadcast(this, 0, alarmIntent, 0) != null && alarmManager != null) {
-//                alarmManager.cancel(pendingIntent);
-//                //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
-//            }
-//            pm.setComponentEnabledSetting(receiver,
-//                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-//                    PackageManager.DONT_KILL_APP);
-//        }
+            else { //Disable Daily Notifications
+                if (PendingIntent.getBroadcast(mContext, 0, alarmIntent, 0) != null && alarmManager != null) {
+                    alarmManager.cancel(pendingIntent);
+                    //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
+                }
+                pm.setComponentEnabledSetting(receiver,
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP);
+            }
         }
 
-
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editPause() {
             timegap = 0;
+            alramset(false);
             if(timerTask != null)
             {
                 new Thread(() -> {

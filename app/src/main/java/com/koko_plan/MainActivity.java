@@ -23,7 +23,20 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.HorizontalCalendarView;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 import static com.koko_plan.RecyclerAdapter.items;
 import static com.koko_plan.RecyclerAdapter.timerTask;
@@ -42,13 +55,14 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences.Editor editor;
 
     private View btnPlus;
+    @SuppressLint("StaticFieldLeak")
     public static Button btnsavelist;
 
     public static int lastsec, timegap, totalprogress;
 
     private TextView tvTodayProgress;
 
-    int cur;
+    int cur, total;
 
     ItemTouchHelper helper;
 
@@ -59,7 +73,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        db = TodoDatabase.getDatabase(this);
+        /* starts before 1 month from now */
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+
+        /* ends after 1 month from now */
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(5)
+                .build();
+
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+
+            }
+
+            @Override
+            public void onCalendarScroll(HorizontalCalendarView calendarView,
+                                         int dx, int dy) {
+
+            }
+
+            @Override
+            public boolean onDateLongClicked(Calendar date, int position) {
+                return true;
+            }
+        });
 
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
@@ -67,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
 
+        db = TodoDatabase.getDatabase(this);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -88,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        timegap =0;
+
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
         });
@@ -107,16 +153,6 @@ public class MainActivity extends AppCompatActivity {
                 adapter.setItem(data);
             }
         });
-
-        /*db.todoDao().getAlphabetizedTitles().observe(this, new Observer<List<Todo>>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onChanged(List<Todo> data) {
-                adapter.setItem(data);
-            }
-        });*/
-
-
     }
 
     @Override
@@ -139,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
 
                 new Thread(() -> {
                     int size = items.size()+1;
-                    Log.e(TAG, "onActivityResult: " + size);
                     Todo todo = new Todo(size+1, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     db.todoDao().insert(todo);
                 }).start();
@@ -154,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-
-
     private void resetId() {
 
         if(items.size() > 0) {
@@ -169,17 +202,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         }
-
-
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
-    }
-
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onResume() {
         super.onResume();
@@ -189,14 +214,12 @@ public class MainActivity extends AppCompatActivity {
         long stoptime = pref.getLong("stoptime", 0);
         int itemsize = pref.getInt("itemsize", 0);
 
-        Log.e(TAG, "onResume: run stoptime" + stoptime );
-
         if(stoptime != 0){
             timegap = (int)((now-stoptime)/1000);
-            Log.e(TAG, "onResume: run 존재 " + timegap);
+            Log.e(TAG, "onResume: run timegap 존재 " + timegap);
         } else {
             timegap = 0;
-            Log.e(TAG, "onResume: run 존재 없슴 " + timegap);
+            Log.e(TAG, "onResume: run timegap 존재 없슴 " + timegap);
         }
 
         if(itemsize > 0){
@@ -224,7 +247,34 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         }
 
+        PieChart pieChart = findViewById(R.id.piechart);
 
+        if(adapter.getItemCount() > 0){
+            ArrayList NoOfTotalsec = new ArrayList();
+            total = 0;
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
+                total += items.get(i).getTotalsec();
+            }
+
+            //하루 24 남은 시간
+            NoOfTotalsec.add(new Entry(24*3600-total, 0));
+            PieDataSet dataSet = new PieDataSet(NoOfTotalsec, "... Hour Of habbits");
+
+            //차트 항목 타이틀 지정
+            ArrayList title = new ArrayList();
+            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                title.add(adapter.getItems().get(i).getTitle());
+            }
+            title.add("하루");
+
+            PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
+            pieChart.setData(data);
+            dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+            pieChart.animateXY(2000, 2000);
+            pieChart.setCenterText("습관\n비중\n"+String.format("%.2f", total/(24*3600.0)*100)+"%");
+
+        }
     }
 
     @Override
@@ -240,14 +290,13 @@ public class MainActivity extends AppCompatActivity {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(items.get(i).getIsrunning()) {
                     items.get(i).setCurtime(lastsec-1);
+                    Log.e(TAG, "onPause: run 현재 저장  " + items.get(i).getCurtime());
                     db.todoDao().update(adapter.getItems().get(i));
                     editor.putLong("stoptime", now);
                     editor.apply();
                 }
             }
         }).start();
-
-        Log.e(TAG, "onPause: run now" + pref.getLong("stoptime", 0));
 
         editor.putInt("itemsize", adapter.getItemCount());
         editor.apply();
@@ -256,8 +305,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
-        resetId();
 
         if(timerTask != null)
         {

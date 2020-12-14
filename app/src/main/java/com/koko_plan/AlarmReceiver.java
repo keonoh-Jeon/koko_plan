@@ -51,7 +51,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             channel.enableVibration(true);// 진동 무음
             channel.enableLights(true);
             channel.setLightColor(Color.RED);
-            channel.setVibrationPattern(new long[]{100, 100, 100, 100, 100, 100, 100, 100, 100});
+            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             if (notificationManager != null) {
                 // 노티피케이션 채널을 시스템에 등록
@@ -65,7 +65,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                 .setTicker("{Time to watch some cool stuff!}")
                 .setContentTitle("습관 할당 시간 100% 도달!")
-                .setContentText(pref.getString("alarmtitle", null) + "의 목표 시간을 달성하였습니다.")
+                .setContentText("'"+ pref.getString("alarmtitle", null) + "' 의 목표 시간을 달성하였습니다.")
                 .setContentInfo("INFO")
                 .setContentIntent(pendingI);
 
