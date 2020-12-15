@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.PopupMenu;
@@ -53,6 +55,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public static TimerTask timerTask;
     private Context mContext;
     private TodoDatabase db;
+    TodoDatabase itemsall;
     private boolean isRunning;
     private TextView tvCycle;
 
@@ -65,14 +68,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return items.size();
     }
 
-    public void addItem(Todo todo){ items.add(todo); }
+    public void addItem(Todo todo){
+        items.add(todo); }
 
-    public List<Todo> getItems() {return items;}
+    public List<Todo> getItems() {
+        return items;}
 
     public void setItem(List<Todo> data) {
         items = data;
         notifyDataSetChanged();
     }
+
+    public void updateList(List<Todo> data){
+        items = data;
+        items.addAll(data);
+        notifyDataSetChanged();
+    }
+
 //todo
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -132,6 +144,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         super.onDetachedFromRecyclerView(recyclerView);
         Log.e(TAG, "onDetachedFromRecyclerView: ");
     }
+
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

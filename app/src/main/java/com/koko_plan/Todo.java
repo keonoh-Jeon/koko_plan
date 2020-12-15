@@ -8,9 +8,11 @@ import android.util.Log;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Fts4;
 import androidx.room.PrimaryKey;
 
 import static android.content.ContentValues.TAG;
+
 
 @Entity(tableName = "todoTable")
 public class Todo {

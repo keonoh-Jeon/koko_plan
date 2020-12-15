@@ -21,8 +21,11 @@ public interface TodoDao {
     @Delete
     void delete(Todo todo);
 
-    @Query("SELECT * FROM todoTable WHERE date ORDER BY num ASC")
-    LiveData<List<Todo>> getAll(); //LiveData
+    @Query("SELECT * FROM todoTable WHERE date LIKE :day ORDER BY num ASC")
+    List<Todo> search(String day);
+
+    @Query("SELECT * FROM todoTable WHERE date LIKE :search ORDER BY num ASC")
+    LiveData<List<Todo>> getAll(String search); //LiveData
 
     @Query("DELETE FROM todoTable")
     void deleteAll();

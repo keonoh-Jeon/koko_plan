@@ -1,5 +1,6 @@
 package com.koko_plan;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     ItemTouchHelper helper;
     private String selecteddata;
     private Calendar today;
+    private Date date;
 
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
@@ -81,48 +85,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //날짜 표시 형식 지정
         dateformat = new SimpleDateFormat("yyyy-MM/dd");
-
-        //가로 달력 추가
-
-
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        day = dateformat.format(date);
-
-        /* starts before 1 month from now */
-        Calendar startDate = Calendar.getInstance();
-        startDate.add(Calendar.MONTH, -1);
-
-        /* ends after 1 month from now */
-        Calendar endDate = Calendar.getInstance();
-        endDate.add(Calendar.MONTH, 1);
-
-        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
-                .range(startDate, endDate)
-                .datesNumberOnScreen(7)
-                .build();
-
-        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
-
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onDateSelected(Calendar date, int position) {
-                Log.e(TAG, "onDateSelected: " + dateformat.format(date.getTime()));
-                selecteddata = dateformat.format(date.getTime());
-            }
-
-            @Override
-            public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
-
-            }
-
-            @Override
-            public boolean onDateLongClicked(Calendar date, int position) {
-                return true;
-            }
-        });
 
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
@@ -139,6 +103,63 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
+
+        date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        day = dateformat.format(date);
+
+        //가로 달력 추가
+        // 현재 날짜 구하기
+
+
+        /* starts before 1 month from now */
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+
+        /* ends after 1 month from now */
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        //가로 달력 구현
+        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(7)
+                .build();
+        //달력 구동시 리스너
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+
+                selecteddata = dateformat.format(date.getTime());
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable(){
+                            @Override
+                            public void run() {
+                                // 해당 작업을 처리함
+                                adapter.setItem(db.todoDao().search(selecteddata));
+                            }
+                        });
+                    }
+                }).start();
+
+            }
+
+            @Override
+            public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
+
+            }
+
+            @Override
+            public boolean onDateLongClicked(Calendar date, int position) {
+                return true;
+            }
+        });
 
         initSwipe();
 
@@ -165,14 +186,23 @@ public class MainActivity extends AppCompatActivity {
             btnsavelist.setVisibility(View.INVISIBLE);
         });
 
-        //UI 갱신 (라이브데이터 Observer 이용, 해당 디비값이 변화가생기면 실행됨)
-        db.todoDao().getAll().observe(this, new Observer<List<Todo>>() {
+        db.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
+                Log.e(TAG, "onStart onChanged: "  + data );
                 adapter.setItem(data);
             }
         });
+
+        /*db.todoDao().search(selecteddata)(List<Todo> data) {
+
+            public String toString(List<Todo> data) {
+                return super.toString();
+                adapter.setItem(data);
+            }
+        });*/
+
     }
 
     @Override
@@ -310,7 +340,6 @@ public class MainActivity extends AppCompatActivity {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(items.get(i).getIsrunning()) {
                     items.get(i).setCurtime(lastsec-1);
-                    Log.e(TAG, "onPause: run 현재 저장  " + items.get(i).getCurtime());
                     db.todoDao().update(adapter.getItems().get(i));
                     editor.putLong("stoptime", now);
                     editor.apply();
