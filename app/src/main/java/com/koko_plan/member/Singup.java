@@ -21,8 +21,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.koko_plan.MainActivity;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
+import com.koko_plan.sub.MySoundPlayer;
 
 public class Singup extends AppCompatActivity {
 
@@ -62,15 +63,15 @@ public class Singup extends AppCompatActivity {
         public void onClick(View v) {
             switch(v.getId()) {
                 case R.id.emailsignup:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(Singupmail.class);
                     break;
                 case R.id.gotoLogin:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(Login.class);
                     break;
                 case R.id.sign_in_button:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     if(mGoogleSignInClient != null) {
                     mGoogleSignInClient.signOut();}
                     signIn();

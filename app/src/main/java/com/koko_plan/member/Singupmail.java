@@ -17,7 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.koko_plan.MainActivity;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
 import com.koko_plan.sub.MySoundPlayer;
 

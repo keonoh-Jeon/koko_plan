@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.sub;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.koko_plan.sub.AlarmReceiver;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,7 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Objects;
 
-import static com.koko_plan.MainActivity.pref;
+import static com.koko_plan.main.MainActivity.pref;
 
 public class DeviceBootReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

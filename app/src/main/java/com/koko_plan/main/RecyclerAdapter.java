@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.main;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -30,6 +30,11 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.koko_plan.sub.DeviceBootReceiver;
+import com.koko_plan.R;
+import com.koko_plan.sub.AlarmReceiver;
+import com.koko_plan.sub.ItemTouchHelperListener;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,11 +46,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
-import static com.koko_plan.MainActivity.btnsavelist;
-import static com.koko_plan.MainActivity.editor;
-import static com.koko_plan.MainActivity.lastsec;
-import static com.koko_plan.MainActivity.timegap;
-import static com.koko_plan.MainActivity.totalprogress;
+import static com.koko_plan.main.MainActivity.btnsavelist;
+import static com.koko_plan.main.MainActivity.editor;
+import static com.koko_plan.main.MainActivity.lastsec;
+import static com.koko_plan.main.MainActivity.timegap;
+import static com.koko_plan.main.MainActivity.totalprogress;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -74,12 +79,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     public void setItem(List<Todo> data) {
         items = data;
-        notifyDataSetChanged();
-    }
-
-    public void updateList(List<Todo> data){
-        items = data;
-        items.addAll(data);
         notifyDataSetChanged();
     }
 
@@ -143,15 +142,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         Log.e(TAG, "onDetachedFromRecyclerView: ");
     }
 
-
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvTitle;
         private TextView tvProgress;
         private TextView tvCurTime, tvTime;
-        private Button btnSave;
-        private TextView tvplayCount;
         private ImageView ivPlus, ivMinus, ivPlay, ivPause, ivStop, ivbdelete;
 
         private Button mStartBtn, mStopBtn, mRecordBtn, mPauseBtn;
@@ -159,7 +154,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private Thread timeThread = null;
         private Boolean isRunning = true;
 
-        private int index, gap;
+        private int index;
 
         ProgressBar progressBar;
         Timer timer = new Timer();

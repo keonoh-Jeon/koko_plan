@@ -1,6 +1,5 @@
-package com.koko_plan;
+package com.koko_plan.sub;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,13 +11,16 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.koko_plan.R;
+import com.koko_plan.main.RecyclerAdapter;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.koko_plan.MainActivity.editor;
-import static com.koko_plan.MainActivity.pref;
+import static com.koko_plan.main.MainActivity.editor;
+import static com.koko_plan.main.MainActivity.pref;
 
 public class AlarmReceiver extends BroadcastReceiver {
 

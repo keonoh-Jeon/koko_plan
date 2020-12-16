@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.main;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -56,6 +56,8 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.koko_plan.sub.ItemTouchHelperCallback;
+import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
 import com.koko_plan.member.MemberEditActivity;
 import com.koko_plan.member.Profile_Item;
@@ -77,8 +79,8 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
-import static com.koko_plan.RecyclerAdapter.items;
-import static com.koko_plan.RecyclerAdapter.timerTask;
+import static com.koko_plan.main.RecyclerAdapter.items;
+import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int REQUEST_APP_UPDATE = 600;
 
     private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseAuth mAuth;
 
     public static String name, email;
     private String inputname;
@@ -147,8 +152,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         init();
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore firebasedb = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         roomdb = TodoDatabase.getDatabase(this);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
@@ -158,8 +163,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter = new RecyclerAdapter(roomdb);
         recyclerView.setAdapter(adapter);
 
-
-
         date = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -167,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //가로 달력 추가
         // 현재 날짜 구하기
-
 
         /* starts before 1 month from now */
         Calendar startDate = Calendar.getInstance();
@@ -182,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .range(startDate, endDate)
                 .datesNumberOnScreen(7)
                 .build();
+
         //달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
 
@@ -233,11 +236,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EventCalendarMaker();
     }
 
-    private void init() {
-        Inits thread = new Inits();
-        thread.start();
-    }
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -271,6 +269,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    private void init() {
+        Inits thread = new Inits();
+        thread.start();
+    }
+
     class Inits extends Thread {
         public void run() {
 
@@ -296,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                 } else {
                                     Log.d(TAG, "No such document");
-                                    myStartActivity(MemberActivity.class);
+                                    myStartActivity2(MemberActivity.class);
                                 }
                             }
                         } else {
@@ -375,6 +378,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: 시작=============");
+        System.gc();
+        super.onDestroy();
     }
 
     private void Appupdatemanager() {
@@ -485,9 +495,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(this, c);
-
         startActivityForResult(intent, 1);
         overridePendingTransition(0, 0);
+    }
+
+    private void myStartActivity2(Class c) {
+        Intent intent = new Intent(this, c);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
     }
 
     private void resetId() {

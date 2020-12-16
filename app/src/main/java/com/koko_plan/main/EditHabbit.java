@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.koko_plan.R;
 
 public class EditHabbit extends AppCompatActivity {
 

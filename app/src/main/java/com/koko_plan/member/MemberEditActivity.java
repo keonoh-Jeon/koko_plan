@@ -34,7 +34,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.koko_plan.MainActivity;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
 
 public class MemberEditActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.sub;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;

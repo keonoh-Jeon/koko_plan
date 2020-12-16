@@ -26,7 +26,7 @@
             android:name="com.google.android.gms.ads.reward.API_KEY"
             android:value="@string/google_ads_reward_api_key"/>
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".main.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,17 +35,17 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".DeviceBootReceiver"
+        <receiver android:name=".sub.DeviceBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".sub.AlarmReceiver" />
 
         <activity
-            android:name="com.koko_plan.EditHabbit"
+            android:name="com.koko_plan.main.EditHabbit"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
             tools:ignore="LockedOrientationActivity" />

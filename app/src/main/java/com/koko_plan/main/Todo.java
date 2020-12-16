@@ -1,4 +1,4 @@
-package com.koko_plan;
+package com.koko_plan.main;
 
 import android.annotation.SuppressLint;
 import android.net.wifi.aware.DiscoverySession;

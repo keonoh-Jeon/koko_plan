@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,8 +25,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.koko_plan.MainActivity;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
+import com.koko_plan.sub.MySoundPlayer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,11 +40,6 @@ public class MemberActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private static final String TAG = "MemberInitActivity";
-
-    private ProgressDialog pd;
-
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
 
     private String name;
     private String gender;
@@ -69,7 +66,6 @@ public class MemberActivity extends AppCompatActivity {
 
     public void InitializeView()
     {
-
         textView_Date = (TextView)findViewById(R.id.textView_date);
     }
 
@@ -84,17 +80,15 @@ public class MemberActivity extends AppCompatActivity {
                 textView_Date.setText(year + "-" + (monthOfYear+1) + "-" + dayOfMonth);
                 String strColor = "#000000";
                 textView_Date.setTextColor(Color.parseColor(strColor));
-
             }
         };
     }
 
     public void OnClickHandler(View view)
     {
-        DatePickerDialog dialog = new DatePickerDialog(this, callbackMethod, curyear, curmonth, curday);
+        DatePickerDialog dialog = new DatePickerDialog(this, callbackMethod, curyear, curmonth-1, curday);
         dialog.show();
     }
-
 
     @SuppressLint("SetTextI18n")
     private void init (){
@@ -112,7 +106,7 @@ public class MemberActivity extends AppCompatActivity {
         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
 
         curyear = Integer.parseInt(yearFormat.format(currentTime));
-        curmonth = Integer.parseInt(monthFormat.format(currentTime))-1;
+        curmonth = Integer.parseInt(monthFormat.format(currentTime));
         curday = Integer.parseInt(dayFormat.format(currentTime));
 
         if (gender == null) gender = "male";
@@ -124,12 +118,12 @@ public class MemberActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.MemberCheckBtn:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     profileUpdate();
                     addclubtodatabase();
                     break;
                 case R.id.edit_name:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     AlertDialog.Builder ad = new AlertDialog.Builder(MemberActivity.this);
                     ad.setTitle("Nickname");
                     final EditText et = new EditText(MemberActivity.this);
@@ -177,11 +171,11 @@ public class MemberActivity extends AppCompatActivity {
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.gender1:
-//                        MySoundPlayer.play(MySoundPlayer.CLICK);
+                        MySoundPlayer.play(MySoundPlayer.CLICK);
                         gender = "male";
                         break;
                     case R.id.gender2:
-//                        MySoundPlayer.play(MySoundPlayer.CLICK);
+                        MySoundPlayer.play(MySoundPlayer.CLICK);
                         gender = "female";
                         break;
                 }
