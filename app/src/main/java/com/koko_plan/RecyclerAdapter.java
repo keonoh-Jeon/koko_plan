@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.PopupMenu;
@@ -635,7 +633,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View di = inflater.inflate(R.layout.timerinput, null);
+        View di = inflater.inflate(R.layout.timer_input, null);
 
         final NumberPicker hourPicker = (NumberPicker) di.findViewById(R.id.picker_hour);
         final NumberPicker minPicker = (NumberPicker) di.findViewById(R.id.picker_min);

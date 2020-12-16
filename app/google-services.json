@@ -1,0 +1,117 @@
+{
+  "project_info": {
+    "project_number": "446848784259",
+    "firebase_url": "https://koko-gps-kor.firebaseio.com",
+    "project_id": "koko-gps-kor",
+    "storage_bucket": "koko-gps-kor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446848784259:android:065a4040376ccdcee808b6",
+        "android_client_info": {
+          "package_name": "com.koko.gps_korea"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446848784259-fof9pul7lbu0j867240g0fc90rcfku88.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko.gps_korea",
+            "certificate_hash": "39df49b4e9d043877a028d5197152be8e64e77f7"
+          }
+        },
+        {
+          "client_id": "446848784259-is4jrtm4diabhrd7i89n0ss9d5lo43s6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko.gps_korea",
+            "certificate_hash": "f77d4ffab8572863274f97dad17062a9ba95675b"
+          }
+        },
+        {
+          "client_id": "446848784259-lbak55l2ie8aemjkndnj35uchkvgmvos.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko.gps_korea",
+            "certificate_hash": "63a80991eba5e90c7c67e083a99aa8e22fd50b01"
+          }
+        },
+        {
+          "client_id": "446848784259-ut2qhoo2059umqnsvta355ft7uc128t2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko.gps_korea",
+            "certificate_hash": "b5b3489c33c4e1454dbf946952c59b30701c0e75"
+          }
+        },
+        {
+          "client_id": "446848784259-vbv1mucg30in1uuhntp1jq5d9i8cas02.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko.gps_korea",
+            "certificate_hash": "a5a97fd354040a66cc6f394d0d6bab4a78933a56"
+          }
+        },
+        {
+          "client_id": "446848784259-nf98p5dg36jdhs3g8ueefnu76jsodks1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDljowf7Ynv0ngb4XOEKRJfba0yW2anI4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446848784259-nf98p5dg36jdhs3g8ueefnu76jsodks1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446848784259:android:d6c5f7c95183d8ebe808b6",
+        "android_client_info": {
+          "package_name": "com.koko_plan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446848784259-kr2peink4gtbn2vs0ku28og40bnl3idd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koko_plan",
+            "certificate_hash": "a5a97fd354040a66cc6f394d0d6bab4a78933a56"
+          }
+        },
+        {
+          "client_id": "446848784259-nf98p5dg36jdhs3g8ueefnu76jsodks1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDljowf7Ynv0ngb4XOEKRJfba0yW2anI4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446848784259-nf98p5dg36jdhs3g8ueefnu76jsodks1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center_vertical"
+    tools:context=".member.Singup">
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        tools:ignore="UselessParent">
+
+
+
+        <TextView
+            android:layout_gravity="center_horizontal"
+            android:textSize="50sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="로그 인"
+            android:textStyle="bold"
+            android:textColor="#486725"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:hint="E-mail@Example.com"
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:hint="Password"
+            tools:ignore="HardcodedText"
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword" />
+
+
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20sp"
+            android:background="#40C4FF"
+            tools:ignore="HardcodedText"
+            android:text="로그인" />
+
+        <Button
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginTop="100sp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/reset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CED6D6"
+            tools:ignore="HardcodedText"
+            android:text="비밀번호를 잃어버리셨나요?" />
+
+
+
+
+
+
+
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

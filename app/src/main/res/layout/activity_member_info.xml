@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/back4"
+    tools:context=".member.MemberActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:layout_gravity="center_horizontal"
+            android:textSize="50sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원 정보"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="50dp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:layout_gravity="center_horizontal"
+            android:textSize="15sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(아래 정보는 앱 기능 향상에 활용됩니다)"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="50dp"
+            tools:ignore="HardcodedText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:background="#90D6D6"
+            android:layout_margin="5sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="@string/name"
+                android:id="@+id/nameETXT"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:layout_width="0dp"
+                android:textColor="#8A8A8A"
+                android:layout_weight="1.5"
+                android:layout_height="50sp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                tools:ignore="TextViewEdits" />
+
+            <ImageView
+                android:id="@+id/edit_name"
+                android:layout_width="0dp"
+                android:layout_weight="0.3"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center"
+                android:src="@drawable/pen"
+                tools:ignore="RtlHardcoded"
+                android:contentDescription="TODO" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+
+
+        <RadioGroup
+            android:id="@+id/parrg"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:layout_margin="5sp"
+            android:orientation="horizontal"
+            android:background="#90D6D6">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+            <RadioButton
+                android:id="@+id/gender1"
+                android:text="남"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50sp"
+                android:checked="true"
+                tools:ignore="HardcodedText" />
+
+            <RadioButton
+                android:id="@+id/gender2"
+                android:text="여"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#90D6D6"
+            android:layout_margin="5sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/textView_date"
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:textSize="20sp"
+                android:layout_height="50sp"
+                android:gravity="center"
+                android:textColor="#8A8A8A"
+                android:layout_gravity="center"
+                android:text="@string/birthday" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="0.3"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:onClick="OnClickHandler"
+                android:src="@drawable/pen"
+                tools:ignore="RtlHardcoded"
+                android:contentDescription="TODO" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
+
+        <Button
+            android:layout_marginTop="50dp"
+            android:textSize="20sp"
+            android:layout_gravity="bottom"
+            android:id="@+id/MemberCheckBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#40C4FF"
+            android:text="확인"
+            tools:ignore="HardcodedText" />
+
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

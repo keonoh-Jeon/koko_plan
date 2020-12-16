@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/back6"
+    tools:context=".member.Singup">
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
+
+        <TextView
+            android:layout_gravity="center_horizontal"
+            android:textSize="40sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비밀번호 재지정"
+            android:textColor="#C9C9C9"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="50dp"
+            tools:ignore="HardcodedText" />
+
+
+        <EditText
+            android:hint="E-mail"
+            android:textColorHint="#FFFFFF"
+            android:textColor="#FFFFFF"
+            android:id="@+id/passwordResetText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            tools:ignore="HardcodedText,TextFields" />
+
+
+
+        <Button
+            android:layout_marginTop="60dp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/passreset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#40C4FF"
+            android:text="리셋"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/passcheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#40FF46"
+            android:text="확인"
+            tools:ignore="HardcodedText" />
+
+
+
+
+
+
+
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
