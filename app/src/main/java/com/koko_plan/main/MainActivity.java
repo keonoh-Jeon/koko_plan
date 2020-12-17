@@ -34,10 +34,13 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
+import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
+import com.applandeo.materialcalendarview.listeners.OnDayClickListener;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Paint p = new Paint();
 
     private TodoDatabase roomdb;
+    private ScrollView scrollview;
 
     public static SharedPreferences pref;
     public static SharedPreferences.Editor editor;
@@ -110,22 +114,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static Button btnsavelist;
 
-    public static int lastsec, timegap, totalprogress;
+    public static int lastsec, timegap, totalprogress, curtime;
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
 
     int cur, total;
 
-    private String day;
+    private String todaydate;
     private SimpleDateFormat dateformat;
 
     ItemTouchHelper helper;
     private String selecteddata;
-    private Calendar today;
     private Date date;
     private AppUpdateManager appUpdateManager;
     private ImageView nav_header_photo_image;
+    private Calendar calendar;
+    private HorizontalCalendar horizontalCalendar;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -144,17 +149,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
 
-        //날짜 표시 형식 지정
-        dateformat = new SimpleDateFormat("yyyy-MM/dd");
-
+        init();
         //객체 초기화
         InitializeView();
-
-        init();
 
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
+        // 현재 날짜 구하기
+        date = new Date();
+        calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        //날짜 표시 형식 지정
+        dateformat = new SimpleDateFormat("yyyy-MM/dd");
+        todaydate = dateformat.format(date);
+
+        horizontalCalendarmaker(calendar);
+
+        //리사이클러뷰 초기화
         roomdb = TodoDatabase.getDatabase(this);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
@@ -163,14 +175,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter = new RecyclerAdapter(roomdb);
         recyclerView.setAdapter(adapter);
 
-        date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        day = dateformat.format(date);
+        //달력추가
+        try {
+            EventCalendarMaker();
+        } catch (OutOfDateRangeException e) {
+            e.printStackTrace();
+        }
 
+        initSwipe();
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper.attachToRecyclerView(recyclerView);
+    }
+
+    private void horizontalCalendarmaker(Calendar calendar) {
         //가로 달력 추가
-        // 현재 날짜 구하기
-
         /* starts before 1 month from now */
         Calendar startDate = Calendar.getInstance();
         startDate.add(Calendar.MONTH, -1);
@@ -180,20 +201,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         endDate.add(Calendar.MONTH, 1);
 
         //가로 달력 구현
-        HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
+        horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
                 .range(startDate, endDate)
+                .defaultSelectedDate(calendar)
                 .datesNumberOnScreen(7)
                 .build();
 
         //달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
-
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDateSelected(Calendar date, int position) {
-
                 selecteddata = dateformat.format(date.getTime());
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -201,8 +220,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             @Override
                             public void run() {
                                 // 해당 작업을 처리함
+                                new Thread(() -> {
+                                    Log.e(TAG, "run: 스레드 시작"+ (lastsec-1) );
+                                    for(int i=0; i< adapter.getItemCount() ; i++){
+                                        Log.e(TAG, "run: 러닝 "+ items.get(i).getIsrunning() );
+                                        if(items.get(i).getIsrunning()) {
+                                            items.get(i).setCurtime(lastsec-1);
+                                            roomdb.todoDao().update(items.get(i));
+                                            Log.e(TAG, "run: 현재 저장"+ (lastsec-1) );
+                                        }
+                                    }
+                                }).start();
+
+                                items.clear();
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
                                 int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
+
+                                if(selecteditemsize > 0){
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    cur = 0;
+                                                    for(int i=0 ; i < selecteditemsize ; i++) {
+                                                        if(adapter.getItems().get(i).getCurtime()>0){
+                                                            int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
+                                                            cur += curtime;
+                                                        } else {
+                                                            int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
+                                                            cur += count;
+                                                        }
+                                                    }
+                                                    tvTodayProgress.setText("오늘의 실행율 : " + cur/selecteditemsize+ "%" );
+                                                }
+                                            });
+                                        }
+                                    }).start();
+                                }
+
                                 for(int i=0 ; i < selecteditemsize ; i++){
                                     Log.e(TAG, "onDateSelected: " + roomdb.todoDao().search(selecteddata).get(i).getDate());
                                 }
@@ -216,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
+                Log.e(TAG, "onCalendarScroll: "+ "스크롤");
 
             }
 
@@ -224,16 +283,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
-
-        initSwipe();
-
-        //ItemTouchHelper 생성
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper.attachToRecyclerView(recyclerView);
-
-        //달력추가
-        EventCalendarMaker();
     }
 
     @Override
@@ -263,12 +312,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(Help.class);*/
 
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+// 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동.
     private void init() {
         Inits thread = new Inits();
         thread.start();
@@ -276,13 +325,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     class Inits extends Thread {
         public void run() {
-
             if (firebaseUser == null) {
                 myStartActivity(Singup.class);
             } else {
                 DocumentReference documentReference = FirebaseFirestore.getInstance().collection("users").document(firebaseUser.getUid());
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -292,11 +339,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 if (document.exists()) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                     Profile_Item profileItem = document.toObject(Profile_Item.class);
-
                                     assert profileItem != null;
                                     inputname = profileItem.getName();
-                                    nav_header_name_text.setText(inputname + " ");
-
+                                    nav_header_name_text.setText(inputname+"");
                                 } else {
                                     Log.d(TAG, "No such document");
                                     myStartActivity2(MemberActivity.class);
@@ -311,14 +356,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //화면 객체 초기화
+    @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void InitializeView() {
-        btnPlus = findViewById(R.id.btnPlus);
-        btnsavelist = findViewById(R.id.btn_savelist);
-        tvTodayProgress = findViewById(R.id.tv_todayprogress);
+
+        scrollview = findViewById(R.id.scrollview);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -327,17 +372,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         View nav_header_view = navigationView.getHeaderView(0);
-
         nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
-
         nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
         TextView nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
-
-        probitmap();
-
         nav_header_name_text.setText(name + " ");
         nav_header_mail_text.setText(email + " ");
+        probitmap();
 
+        btnPlus = findViewById(R.id.btnPlus);
+        btnsavelist = findViewById(R.id.btn_savelist);
+        tvTodayProgress = findViewById(R.id.tv_todayprogress);
+
+        //효과음 초기화
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
@@ -375,7 +421,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             } catch (IOException e){
                 e.printStackTrace();
-
             }
         }
     }
@@ -387,8 +432,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onDestroy();
     }
 
+    //어플 업데이트 관리
     private void Appupdatemanager() {
-        //어플 업데이트 관리
         appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
         appUpdateManager
                 .getAppUpdateInfo()
@@ -412,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         });
     }
 
-    private void EventCalendarMaker() {
+    private void EventCalendarMaker() throws OutOfDateRangeException {
 
         List<EventDay> events = new ArrayList<>();
 
@@ -425,10 +470,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView2);
         calendarView.setEvents(events);
+        calendarView.setDate(date);
+        Log.e(TAG, "EventCalendarMaker: "+ date);
+
+        //달력클릭
+        calendarView.setOnDayClickListener(new OnDayClickListener() {
+
+            @Override
+            public void onDayClick(EventDay eventDay) {
+                Calendar clickedDayCalendar = eventDay.getCalendar();
+                horizontalCalendar.selectDate(clickedDayCalendar, true);
+                scrollview.scrollTo(0,0);
+            }
+        });
     }
-
-
-
 
     @Override
     protected void onStart() {
@@ -446,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             resetId();
             btnsavelist.setVisibility(View.INVISIBLE);
         });
-
+        Log.e(TAG, "onStart: 오늘 날짜" +  dateformat.format(date.getTime()) );
         roomdb.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -486,7 +541,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 new Thread(() -> {
                     int size = items.size()+1;
-                    Todo todo = new Todo(size+1, day, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
+                    Todo todo = new Todo(size+1, todaydate, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     roomdb.todoDao().insert(todo);
                 }).start();
             }
@@ -526,6 +581,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
+        calendar = Calendar.getInstance();
+        horizontalCalendar.selectDate(calendar, false);
+        adapter.setItem(roomdb.todoDao().search(selecteddata));
+
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
@@ -537,31 +596,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             timegap = 0;
             Log.e(TAG, "onResume: run timegap 존재 없슴 " + timegap);
-        }
-
-        if(itemsize > 0){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            cur = 0;
-                            for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                                if(adapter.getItems().get(i).getCurtime()>0){
-                                    int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
-                                    cur += curtime;
-                                } else {
-                                    int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
-                                    cur += count;
-                                }
-                            }
-                            tvTodayProgress.setText("오늘의 실행율 : " + cur/itemsize+ "%" );
-                        }
-                    });
-                }
-            }).start();
         }
     }
 

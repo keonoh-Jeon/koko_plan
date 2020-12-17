@@ -58,6 +58,7 @@ public class MySoundPlayer {
 }
 
 /*      각 액티비티 초기화
+
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
