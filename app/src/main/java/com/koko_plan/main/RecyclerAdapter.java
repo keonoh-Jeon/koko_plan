@@ -191,8 +191,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
-            Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
             stopTimerTask();
+
+            Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                alramset(true);
+            }
 
             timerTask = new TimerTask()
             {
@@ -310,7 +314,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }*/
                 }
             }
-            if(todo.getIsrunning()) startTimerTask();
+            if(todo.getIsrunning()) {
+                startTimerTask();
+            }
 
         }
 
@@ -378,28 +384,39 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(on) {
                 dailyNotify = true;
                 long curTime = System.currentTimeMillis();
+                Log.e(TAG, "로그 추적 alramset: "+ curTime );
+
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
                 int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)))+12;
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
                 int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
-                int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime)));
+                int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime/1000)));
 
                 int hour_24, minute, secon;
                 //남은 시간
                 long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime();
-                Log.e(TAG, "editPlay: 남은 총 초"  +  totalsec);
 
                 //예약 시간
                 int lesthour = (int) (totalsec / 3600 % 24);
                 hour_24 = (int) (lesthour + curhour);
-                Log.e(TAG, "editPlay 시: " + hour_24);
                 int lestmin = (int) (totalsec / 60 % 60);
                 minute = (int) (lestmin + curmin);
-                Log.e(TAG, "editPlay 분: " + minute);
                 int lestsec = (int) (totalsec % 60);
                 secon = (int) (lestsec + cursec);
-                Log.e(TAG, "editPlay 초: " + secon);
+
+                Log.e(TAG,
+                        "로그 추적 run: 진행 초"  +  items.get(index).getCurtime()
+                                + "\n남은 설정 전체 초" + items.get(index).getTotalsec()
+                                + "\n남은 totalsec" + totalsec
+                                + "\n남은 시" + lesthour
+                                + "\n남은 분" + lestmin
+                                + "\n남은 초" + lestsec
+                                + "\n현재 시" + curhour
+                                + "\n현재 분" + curmin
+                                + "\n현재 초" + cursec
+
+                );
 
                 // 현재 지정된 시간으로 알람 시간 설정
                 Calendar calendar = Calendar.getInstance();

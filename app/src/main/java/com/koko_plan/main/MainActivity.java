@@ -22,6 +22,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.media.AudioManager;
@@ -37,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.applandeo.materialcalendarview.CalendarUtils;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .datesNumberOnScreen(7)
                 .build();
 
-        //달력 구동시 리스너
+        //가로 달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -219,18 +221,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         runOnUiThread(new Runnable(){
                             @Override
                             public void run() {
-                                // 해당 작업을 처리함
-                                new Thread(() -> {
-                                    Log.e(TAG, "run: 스레드 시작"+ (lastsec-1) );
-                                    for(int i=0; i< adapter.getItemCount() ; i++){
-                                        Log.e(TAG, "run: 러닝 "+ items.get(i).getIsrunning() );
-                                        if(items.get(i).getIsrunning()) {
-                                            items.get(i).setCurtime(lastsec-1);
-                                            roomdb.todoDao().update(items.get(i));
-                                            Log.e(TAG, "run: 현재 저장"+ (lastsec-1) );
-                                        }
-                                    }
-                                }).start();
 
                                 items.clear();
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
@@ -275,7 +265,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
                 Log.e(TAG, "onCalendarScroll: "+ "스크롤");
-
+                if(timerTask != null)
+                {
+                    timerTask.cancel();
+                    timerTask = null;
+                }
             }
 
             @Override
@@ -459,6 +453,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void EventCalendarMaker() throws OutOfDateRangeException {
 
+        // https://github.com/Applandeo/Material-Calendar-View
+
         List<EventDay> events = new ArrayList<>();
 
         /*Calendar calendar2 = Calendar.getInstance();
@@ -471,7 +467,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView2);
         calendarView.setEvents(events);
         calendarView.setDate(date);
-        Log.e(TAG, "EventCalendarMaker: "+ date);
 
         //달력클릭
         calendarView.setOnDayClickListener(new OnDayClickListener() {
@@ -480,6 +475,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onDayClick(EventDay eventDay) {
                 Calendar clickedDayCalendar = eventDay.getCalendar();
                 horizontalCalendar.selectDate(clickedDayCalendar, true);
+                selecteddata = dateformat.format(clickedDayCalendar.getTime());
                 scrollview.scrollTo(0,0);
             }
         });
@@ -501,24 +497,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             resetId();
             btnsavelist.setVisibility(View.INVISIBLE);
         });
-        Log.e(TAG, "onStart: 오늘 날짜" +  dateformat.format(date.getTime()) );
+
         roomdb.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
-                Log.e(TAG, "onStart onChanged: "  + data );
                 adapter.setItem(data);
             }
         });
-
-        /*db.todoDao().search(selecteddata)(List<Todo> data) {
-
-            public String toString(List<Todo> data) {
-                return super.toString();
-                adapter.setItem(data);
-            }
-        });*/
-
     }
 
     @Override
@@ -634,11 +620,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
 
+        //현재의 밀리세컨 구함
         long now = System.currentTimeMillis();
 
         editor.putLong("stoptime", 0);
         editor.apply();
 
+        //해당 항목을 어뎁터에 부어버림
+        adapter.setItem(roomdb.todoDao().search(todaydate));
+
+        //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(items.get(i).getIsrunning()) {
@@ -658,14 +649,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStop() {
         super.onStop();
 
+        //스레드 중지
         if(timerTask != null)
         {
-            Log.e(TAG, "onPause: run");
             timerTask.cancel();
             timerTask = null;
         }
     }
 
+    //스와이프 기능 헬퍼 연결
     private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
 
