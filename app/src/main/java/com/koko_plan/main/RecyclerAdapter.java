@@ -194,22 +194,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             stopTimerTask();
 
             Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                alramset(true);
-            }
 
             timerTask = new TimerTask()
             {
                 int count = items.get(index).getCurtime() + timegap;
-
                 @Override
                 public void run()
                 {
                     count++;
                     lastsec = count;
+
                     Log.e(TAG, "startTimerTask run: " + count);
-                    /*items.get(index).setCurtime(count);
-                    roomdb.todoDao().update(items.get(index));*/
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;
@@ -236,6 +231,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void stopTimerTask()
         {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                alramset(true);
+            }
+
             if(timerTask != null)
             {
                 timerTask.cancel();
@@ -373,10 +373,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     items.get(i).setIsrunning(!isRunning);
                     roomdb.todoDao().update(items.get(i));
                 }
-
             }).start();
-
-            alramset(true);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -384,20 +381,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(on) {
                 dailyNotify = true;
                 long curTime = System.currentTimeMillis();
-                Log.e(TAG, "로그 추적 alramset: "+ curTime );
-
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
-                int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)))+12;
+                int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)));
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
                 int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
-                int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime/1000)));
+                int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime)));
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat4 = new SimpleDateFormat("a");
+                String curampm = timeFormat4.format(new Date(curTime));
 
                 int hour_24, minute, secon;
                 //남은 시간
-                long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime();
+                long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime() - timegap;
 
                 //예약 시간
+                if(curampm.equals("오후")) curhour = curhour + 12;
+
                 int lesthour = (int) (totalsec / 3600 % 24);
                 hour_24 = (int) (lesthour + curhour);
                 int lestmin = (int) (totalsec / 60 % 60);
@@ -406,16 +405,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 secon = (int) (lestsec + cursec);
 
                 Log.e(TAG,
-                        "로그 추적 run: 진행 초"  +  items.get(index).getCurtime()
+                        "로그 추적 run: 진행 초"  +  (items.get(index).getCurtime() + timegap)
                                 + "\n남은 설정 전체 초" + items.get(index).getTotalsec()
                                 + "\n남은 totalsec" + totalsec
-                                + "\n남은 시" + lesthour
-                                + "\n남은 분" + lestmin
-                                + "\n남은 초" + lestsec
-                                + "\n현재 시" + curhour
-                                + "\n현재 분" + curmin
-                                + "\n현재 초" + cursec
-
+                                + "\n남은 시" + lesthour + " 남은 분" + lestmin + " 남은 초" + lestsec
+                                + "\n현재 시" + curhour  + " 현재 분" + curmin  + " 현재 초" + cursec
+                                + "\n예약 시" + hour_24  + " 예약 분" + minute  + " 예약 초" + secon
                 );
 
                 // 현재 지정된 시간으로 알람 시간 설정
@@ -432,8 +427,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 // 알람 시간 설정 메시지
                 Date currentDateTime = calendar.getTime();
-                String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ss초 ", Locale.getDefault()).format(currentDateTime);
-                Toast.makeText(mContext,date_text + "에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
+//                String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ss초 ", Locale.getDefault()).format(currentDateTime);
+                String date_text = lesthour + "시간 " + lestmin +"분 " + lestsec+"초";
+                if(totalsec>0)
+                Toast.makeText(mContext,date_text + "뒤에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
 
                 //  Preference에 설정한 값 저장
                 editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
@@ -441,10 +438,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 editor.apply();
 
                 diaryNotification(calendar);
+
             } else {
 
                 dailyNotify = false;
-                Toast.makeText(mContext,"알람이 해제 되었습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"알람 해제!", Toast.LENGTH_SHORT).show();
                 Calendar calendar = Calendar.getInstance();
                 diaryNotification(calendar);
             }
@@ -480,6 +478,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
             else { //Disable Daily Notifications
                 if (PendingIntent.getBroadcast(mContext, 0, alarmIntent, 0) != null && alarmManager != null) {
+                    // 알람매니저 취소
                     alarmManager.cancel(pendingIntent);
                     //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
                 }

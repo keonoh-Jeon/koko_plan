@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 
 import com.koko_plan.R;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.main.RecyclerAdapter;
 
 import java.text.SimpleDateFormat;
@@ -19,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.pref;
 
@@ -33,6 +35,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingI = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default");
 
@@ -69,6 +73,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentTitle("습관 할당 시간 100% 도달!")
                 .setContentText("'"+ pref.getString("alarmtitle", null) + "' 의 목표 시간을 달성하였습니다.")
                 .setContentInfo("INFO")
+                .setOngoing(true) // 사용자가 직접 못지우게 계속 실행하기.
                 .setContentIntent(pendingI);
 
         if (notificationManager != null) {

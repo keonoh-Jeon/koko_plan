@@ -32,7 +32,8 @@
                         android:id="@+id/calendarView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/colorAccent"/>
+                        app:textColorNormal="#FFFFFF"
+                        android:background="#23DDCB"/>
 
                 </LinearLayout>
 

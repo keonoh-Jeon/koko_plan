@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ImageView nav_header_photo_image;
     private Calendar calendar;
     private HorizontalCalendar horizontalCalendar;
+    private PieChart pieChart;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -196,11 +197,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //가로 달력 추가
         /* starts before 1 month from now */
         Calendar startDate = Calendar.getInstance();
-        startDate.add(Calendar.MONTH, -1);
+        startDate.add(Calendar.MONTH, -12);
 
         /* ends after 1 month from now */
         Calendar endDate = Calendar.getInstance();
-        endDate.add(Calendar.MONTH, 1);
+        endDate.add(Calendar.MONTH, 12);
 
         //가로 달력 구현
         horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
@@ -225,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 items.clear();
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
                                 int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
+
+                                tvTodayProgress.setText("실행한 습관이 없습니다.");
 
                                 if(selecteditemsize > 0){
                                     new Thread(new Runnable() {
@@ -251,9 +254,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }).start();
                                 }
 
-                                for(int i=0 ; i < selecteditemsize ; i++){
+                                /*for(int i=0 ; i < selecteditemsize ; i++){
                                     Log.e(TAG, "onDateSelected: " + roomdb.todoDao().search(selecteddata).get(i).getDate());
-                                }
+                                }*/
+
                                 piechartmaker();
                             }
                         });
@@ -265,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
                 Log.e(TAG, "onCalendarScroll: "+ "스크롤");
+                timegap = 0;
                 if(timerTask != null)
                 {
                     timerTask.cancel();
@@ -372,6 +377,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_header_name_text.setText(name + " ");
         nav_header_mail_text.setText(email + " ");
         probitmap();
+
+        pieChart = findViewById(R.id.piechart);
 
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
@@ -562,32 +569,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        calendar = Calendar.getInstance();
-        horizontalCalendar.selectDate(calendar, false);
-        adapter.setItem(roomdb.todoDao().search(selecteddata));
-
-        long now = System.currentTimeMillis();
-        // 현재시간을 date 변수에 저장한다.
-        long stoptime = pref.getLong("stoptime", 0);
-        int itemsize = pref.getInt("itemsize", 0);
-
-        if(stoptime != 0){
-            timegap = (int)((now-stoptime)/1000);
-            Log.e(TAG, "onResume: run timegap 존재 " + timegap);
-        } else {
-            timegap = 0;
-            Log.e(TAG, "onResume: run timegap 존재 없슴 " + timegap);
-        }
-    }
-
+    //원형 차트 만들기
     private void piechartmaker() {
 
-        PieChart pieChart = findViewById(R.id.piechart);
+        pieChart.setData(null);
+        pieChart.clear();
 
         if(adapter.getItemCount() > 0) {
             ArrayList NoOfTotalsec = new ArrayList();
@@ -610,24 +596,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
             pieChart.setData(data);
-            dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+            dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
             pieChart.animateXY(2000, 2000);
             pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", total / (24 * 3600.0) * 100) + "%");
+
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        timegap = 0;
 
-        //현재의 밀리세컨 구함
-        long now = System.currentTimeMillis();
+        //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
+        adapter.setItem(roomdb.todoDao().search(todaydate));
 
         editor.putLong("stoptime", 0);
         editor.apply();
-
-        //해당 항목을 어뎁터에 부어버림
-        adapter.setItem(roomdb.todoDao().search(todaydate));
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
@@ -635,6 +620,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(items.get(i).getIsrunning()) {
                     items.get(i).setCurtime(lastsec-1);
                     roomdb.todoDao().update(adapter.getItems().get(i));
+
+                    //현재의 밀리세컨 구함
+                    long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
                     editor.apply();
                 }
@@ -649,13 +637,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStop() {
         super.onStop();
 
-        //스레드 중지
+        //플레이 중이면 스레드 중지
         if(timerTask != null)
         {
             timerTask.cancel();
             timerTask = null;
         }
     }
+
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        calendar = Calendar.getInstance();
+        horizontalCalendar.selectDate(calendar, false);
+
+        long now = System.currentTimeMillis();
+        // 현재시간을 date 변수에 저장한다.
+        long stoptime = pref.getLong("stoptime", 0);
+        int itemsize = pref.getInt("itemsize", 0);
+
+        timegap = (int)((now-stoptime)/1000);
+    }
+
+
 
     //스와이프 기능 헬퍼 연결
     private void initSwipe() {
