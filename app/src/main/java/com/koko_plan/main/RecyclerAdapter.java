@@ -376,18 +376,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }).start();
         }
 
+        @SuppressLint("SimpleDateFormat")
         @RequiresApi(api = Build.VERSION_CODES.N)
         private void alramset(boolean on) {
             if(on) {
                 dailyNotify = true;
                 long curTime = System.currentTimeMillis();
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh");
                 int curhour = Integer.parseInt(timeFormat.format(new Date(curTime)));
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
+                SimpleDateFormat timeFormat2 = new SimpleDateFormat("mm");
                 int curmin = Integer.parseInt(timeFormat2.format(new Date(curTime)));
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
+                SimpleDateFormat timeFormat3 = new SimpleDateFormat("ss");
                 int cursec = Integer.parseInt(timeFormat3.format(new Date(curTime)));
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat4 = new SimpleDateFormat("a");
+                SimpleDateFormat timeFormat4 = new SimpleDateFormat("a");
                 String curampm = timeFormat4.format(new Date(curTime));
 
                 int hour_24, minute, secon;
@@ -436,13 +437,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
                 editor.putString("alarmtitle", items.get(index).getTitle());
                 editor.apply();
-
                 diaryNotification(calendar);
 
             } else {
 
                 dailyNotify = false;
                 Toast.makeText(mContext,"알람 해제!", Toast.LENGTH_SHORT).show();
+
                 Calendar calendar = Calendar.getInstance();
                 diaryNotification(calendar);
             }
@@ -465,16 +466,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             // 사용자가 매일 알람을 허용했다면
             if (dailyNotify) {
                 if (alarmManager != null) {
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                            AlarmManager.INTERVAL_DAY, pendingIntent);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-                    }
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                 }
                 // 부팅 후 실행되는 리시버 사용가능하게 설정
                 pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
             }
             else { //Disable Daily Notifications
                 if (PendingIntent.getBroadcast(mContext, 0, alarmIntent, 0) != null && alarmManager != null) {
@@ -482,9 +478,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     alarmManager.cancel(pendingIntent);
                     //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
                 }
-                pm.setComponentEnabledSetting(receiver,
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                        PackageManager.DONT_KILL_APP);
+                pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
             }
         }
 

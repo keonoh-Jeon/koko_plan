@@ -7,10 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.main.RecyclerAdapter;
@@ -18,32 +25,48 @@ import com.koko_plan.main.RecyclerAdapter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
+import static android.content.ContentValues.TAG;
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.pref;
+import static com.koko_plan.main.MainActivity.roomdb;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class AlarmReceiver extends BroadcastReceiver {
+
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+    private Date newdate;
+    private Calendar calendar;
+    private SimpleDateFormat dateformat;
+    private String newtoday;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        //연결되는 액티비티
         Intent notificationIntent = new Intent(context, RecyclerAdapter.class);
 
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
+        //헤더 클릭시 액티비티 이동시 필요
         PendingIntent pendingI = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-
-
+        //노티 생성
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default");
 
         //OREO API 26 이상에서는 채널 필요
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
-            builder.setSmallIcon(R.drawable.ic_launcher_foreground); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
+            //헤더의 사용 아이콘
+            builder.setSmallIcon(R.drawable.habiticon); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
 
             String channelName ="매일 알람 채널";
             String description = "매일 정해진 시간에 알람합니다.";
@@ -56,25 +79,25 @@ public class AlarmReceiver extends BroadcastReceiver {
             channel.setDescription(description);
             channel.enableVibration(true);// 진동 무음
             channel.enableLights(true);
-            channel.setLightColor(Color.RED);
+            channel.setLightColor(Color.BLUE);
             channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             if (notificationManager != null) {
                 // 노티피케이션 채널을 시스템에 등록
                 notificationManager.createNotificationChannel(channel);
             }
-        }else builder.setSmallIcon(R.mipmap.ic_launcher); // Oreo 이하에서 mipmap 사용하지 않으면 Couldn't create icon: StatusBarIcon 에러남
+        } else builder.setSmallIcon(R.mipmap.ic_launcher); // Oreo 이하에서 mipmap 사용하지 않으면 Couldn't create icon: StatusBarIcon 에러남
 
+        //noti 세부 설정
         builder.setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-
                 .setTicker("{Time to watch some cool stuff!}")
                 .setContentTitle("습관 할당 시간 100% 도달!")
                 .setContentText("'"+ pref.getString("alarmtitle", null) + "' 의 목표 시간을 달성하였습니다.")
                 .setContentInfo("INFO")
                 .setOngoing(true) // 사용자가 직접 못지우게 계속 실행하기.
-                .setContentIntent(pendingI);
+                .setContentIntent(pendingI); //눌렀을때 액티비티 이동
 
         if (notificationManager != null) {
 
@@ -94,4 +117,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             Toast.makeText(context.getApplicationContext(),"다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

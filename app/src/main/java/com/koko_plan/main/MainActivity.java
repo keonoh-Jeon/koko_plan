@@ -1,6 +1,7 @@
 package com.koko_plan.main;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -20,9 +24,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.media.AudioManager;
@@ -30,6 +36,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.MonthDisplayHelper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -49,6 +56,8 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -58,9 +67,17 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.koko_plan.member.DairyInfo;
+import com.koko_plan.member.MemberInfo;
+import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -68,6 +85,7 @@ import com.koko_plan.member.MemberEditActivity;
 import com.koko_plan.member.Profile_Item;
 import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
+import com.koko_plan.sub.SaveProgressReceiver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -106,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView recyclerView;
     private Paint p = new Paint();
 
-    private TodoDatabase roomdb;
+    public static TodoDatabase roomdb;
     private ScrollView scrollview;
 
     public static SharedPreferences pref;
@@ -123,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     int cur, total;
 
-    private String todaydate;
+    public static String todaydate;
     private SimpleDateFormat dateformat;
 
     ItemTouchHelper helper;
@@ -134,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Calendar calendar;
     private HorizontalCalendar horizontalCalendar;
     private PieChart pieChart;
+
+    private int today_progress;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -164,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         calendar = Calendar.getInstance();
         calendar.setTime(date);
         //날짜 표시 형식 지정
-        dateformat = new SimpleDateFormat("yyyy-MM/dd");
+        dateformat = new SimpleDateFormat("yyyy-MM-dd");
         todaydate = dateformat.format(date);
 
         horizontalCalendarmaker(calendar);
@@ -247,11 +267,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                             cur += count;
                                                         }
                                                     }
-                                                    tvTodayProgress.setText("오늘의 실행율 : " + cur/selecteditemsize+ "%" );
+                                                    today_progress = cur/selecteditemsize;
+                                                    tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+
+                                                    new Thread(() -> {
+                                                        if(firebaseUser != null) {
+                                                            DairyInfo dairyInfo = new DairyInfo(today_progress);
+                                                            firebaseFirestore.collection("users")
+                                                                    .document(firebaseUser.getUid())
+                                                                    .collection("dates")
+                                                                    .document(todaydate)
+                                                                    .set(dairyInfo)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                        }
+                                                                    });
+                                                        }
+                                                    }).start();
                                                 }
                                             });
                                         }
                                     }).start();
+                                }
+
+                                //달력추가
+                                try {
+                                    EventCalendarMaker();
+                                } catch (OutOfDateRangeException e) {
+                                    e.printStackTrace();
                                 }
 
                                 /*for(int i=0 ; i < selecteditemsize ; i++){
@@ -458,22 +507,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         });
     }
 
+    //하단 달력 설정
     private void EventCalendarMaker() throws OutOfDateRangeException {
 
         // https://github.com/Applandeo/Material-Calendar-View
 
         List<EventDay> events = new ArrayList<>();
 
-        /*Calendar calendar2 = Calendar.getInstance();
-        events.add(new EventDay(calendar2, R.drawable.sample_icon));
+        Calendar calendar2 = Calendar.getInstance();
+        events.add(new EventDay(calendar2, new Drawable() {
+            @Override
+            public void draw(@NonNull Canvas canvas) {
+                //캔버스 바탕 설정
+                canvas.drawColor(Color.RED);
+                Paint pnt= new Paint();
+                //가로로 설정
+                pnt.setAntiAlias(true);
+                pnt.setColor(Color.BLACK);
+                pnt.setTextSize(20);
+                String str = String.valueOf(today_progress)+"%";
+                canvas.drawText(str, 10,20, pnt);
+
+            }
+
+            @Override
+            public void setAlpha(int i) {
+
+            }
+
+            @Override
+            public void setColorFilter(@Nullable ColorFilter colorFilter) {
+
+            }
+
+            /**
+             * @deprecated
+             */
+            @SuppressLint("WrongConstant")
+            @Override
+            public int getOpacity() {
+                return 0;
+            }
+        }));
+
 //or
-        events.add(new EventDay(calendar2, new Drawable()));
+        /*events.add(new EventDay(calendar2, new Drawable()));
 //or if you want to specify event label color
         events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
 
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView2);
         calendarView.setEvents(events);
         calendarView.setDate(date);
+        Log.e(TAG, "EventCalendarMaker: " + date);
 
         //달력클릭
         calendarView.setOnDayClickListener(new OnDayClickListener() {
@@ -512,6 +597,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 adapter.setItem(data);
             }
         });
+
+        saveProgressAlarm(this);
     }
 
     @Override
@@ -628,9 +715,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }).start();
-
-        editor.putInt("itemsize", adapter.getItemCount());
-        editor.apply();
     }
 
     @Override
@@ -651,17 +735,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
 
         calendar = Calendar.getInstance();
-        horizontalCalendar.selectDate(calendar, false);
+        //가로 달력 시작시, 선택날짜와 이동
+        horizontalCalendar.selectDate(calendar, true);
 
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
         long stoptime = pref.getLong("stoptime", 0);
-        int itemsize = pref.getInt("itemsize", 0);
 
         timegap = (int)((now-stoptime)/1000);
     }
-
-
 
     //스와이프 기능 헬퍼 연결
     private void initSwipe() {
@@ -732,4 +814,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
+    //자정마다 실행
+    public static void saveProgressAlarm(Context context){
+        AlarmManager saveProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        //리시브 받을 클래스 연결
+        Intent saveProgressIntent = new Intent(context, SaveProgressReceiver.class);
+        PendingIntent resetSender = PendingIntent.getBroadcast(context, 0, saveProgressIntent, 0);
+
+        // 자정 시간
+        Calendar resetCal = Calendar.getInstance();
+        resetCal.setTimeInMillis(System.currentTimeMillis());
+        resetCal.set(Calendar.HOUR_OF_DAY, 0);
+        resetCal.set(Calendar.MINUTE,0);
+        resetCal.set(Calendar.SECOND, 0);
+
+        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()
+                +AlarmManager.INTERVAL_DAY, AlarmManager.INTERVAL_DAY, resetSender);
+
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+
+        Log.d("resetAlarm", "ResetHour : " + setResetTime);
+    }
+
+    /*private void listenerDoc(){
+
+        firebaseFirestore.collection("users")
+                .document(firebaseUser.getUid())
+                .collection("clubs")
+                .orderBy("set", Query.Direction.DESCENDING)
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("listen:error", e);
+                            return;
+                        }
+
+                        assert snapshots != null;
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Log.w("ADDED","Data: " + dc.getDocument().getData());
+                                    clubItems.add(clubItems.size(), dc.getDocument().toObject(Club_Item.class));
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                                case MODIFIED:
+                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+//                                    maketoast("this club is already exist.");
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                                case REMOVED:
+                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+                        clubAdapter.notifyDataSetChanged();
+                    }
+                });
+    }*/
+
 }
