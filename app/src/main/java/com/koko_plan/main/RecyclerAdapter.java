@@ -30,9 +30,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.DeviceBootReceiver;
 import com.koko_plan.R;
-import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.ItemTouchHelperListener;
 
 import java.text.SimpleDateFormat;
@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 

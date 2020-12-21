@@ -40,59 +40,43 @@ import static com.koko_plan.main.RecyclerAdapter.items;
 public class SaveProgressReceiver extends BroadcastReceiver {
 
     private FirebaseFirestore firebaseFirestore;
-    private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-    private Date newdate;
-    private Calendar calendar;
-    private SimpleDateFormat dateformat;
     private String newtoday;
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     public void onReceive(Context context, Intent intent) {
 
         // 현재 날짜 구하기
-        newdate = new Date();
-        calendar = Calendar.getInstance();
+        Date newdate = new Date();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(newdate);
         //날짜 표시 형식 지정
-        dateformat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
         newtoday = dateformat.format(newdate);
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = mAuth.getCurrentUser();
 
         saveprogresstofirebase();
-
-        saveDairyprogresstofirebase();
     }
 
     private void saveprogresstofirebase() {
-        SaveprogressThread thread = new SaveprogressThread();
-        thread.start();
-    }
-    class SaveprogressThread extends Thread {
-        public void run() {
-
+        new Thread(() -> {
             for(int i=0; i < roomdb.todoDao().search(todaydate).size(); i++ ) {
-
-                Log.e(TAG, "SaveprogressThread : "+ roomdb.todoDao().search(todaydate).size());
-
                 String date = roomdb.todoDao().search(todaydate).get(i).getDate();
-                Log.e(TAG, "SaveprogressThread : " + date);
                 String habbit = roomdb.todoDao().search(todaydate).get(i).getTitle();
                 int curtime = roomdb.todoDao().search(todaydate).get(i).getCurtime();
                 int curcount = roomdb.todoDao().search(todaydate).get(i).getCount();
                 int totalsec = roomdb.todoDao().search(todaydate).get(i).getTotalsec();
 
                 Map<String, Object> todayprogresslist = new HashMap<>();
+                todayprogresslist.put("date", date);
                 todayprogresslist.put("habbit", habbit);
                 todayprogresslist.put("curtime", curtime);
                 todayprogresslist.put("curcount", curcount);
                 todayprogresslist.put("totalsec", totalsec);
-
-
 
                 if (firebaseUser != null) {
                     firebaseFirestore.collection("users")
@@ -116,34 +100,6 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                 roomdb.todoDao().search(todaydate).get(i).setDate(newtoday);
                 roomdb.todoDao().update(roomdb.todoDao().search(todaydate).get(i));
             }
-        }
-    }
-
-    private void saveDairyprogresstofirebase() {
-        DairyprogresstofirebaseThread thread = new DairyprogresstofirebaseThread();
-        thread.start();
-    }
-    class DairyprogresstofirebaseThread extends Thread {
-        public void run() {
-
-            for(int i=0; i < roomdb.todoDao().search(todaydate).size(); i++ ) {
-
-                String date = roomdb.todoDao().search(todaydate).get(i).getDate();
-                String habbit = roomdb.todoDao().search(todaydate).get(i).getTitle();
-                int curtime = roomdb.todoDao().search(todaydate).get(i).getCurtime();
-                int curcount = roomdb.todoDao().search(todaydate).get(i).getCount();
-                int totalsec = roomdb.todoDao().search(todaydate).get(i).getTotalsec();
-
-                Map<String, Object> todayprogresslist = new HashMap<>();
-                todayprogresslist.put("habbit", habbit);
-                todayprogresslist.put("curtime", curtime);
-                todayprogresslist.put("curcount", curcount);
-                todayprogresslist.put("totalsec", totalsec);
-            }
-
-
-
-
-        }
+        }).start();
     }
 }

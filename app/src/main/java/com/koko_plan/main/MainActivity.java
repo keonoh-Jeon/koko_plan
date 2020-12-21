@@ -804,7 +804,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getprofile() {
-
         if (firebaseUser != null) {
             for (UserInfo profile : firebaseUser.getProviderData()) {
                 name = profile.getDisplayName();
@@ -817,6 +816,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //자정마다 실행
     public static void saveProgressAlarm(Context context){
+        //알람 매니저 생성
         AlarmManager saveProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         //리시브 받을 클래스 연결
         Intent saveProgressIntent = new Intent(context, SaveProgressReceiver.class);
@@ -825,18 +825,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 자정 시간
         Calendar resetCal = Calendar.getInstance();
         resetCal.setTimeInMillis(System.currentTimeMillis());
-        resetCal.set(Calendar.HOUR_OF_DAY, 0);
-        resetCal.set(Calendar.MINUTE,0);
+        resetCal.set(Calendar.HOUR_OF_DAY, 23);
+        resetCal.set(Calendar.MINUTE, 55);
         resetCal.set(Calendar.SECOND, 0);
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()
-                +AlarmManager.INTERVAL_DAY, AlarmManager.INTERVAL_DAY, resetSender);
+                , AlarmManager.INTERVAL_DAY, resetSender);
 
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()));
 
-        Log.d("resetAlarm", "ResetHour : " + setResetTime);
+        Log.d("resetAlarm", "onReceive ResetHour : " + setResetTime);
     }
 
     /*private void listenerDoc(){

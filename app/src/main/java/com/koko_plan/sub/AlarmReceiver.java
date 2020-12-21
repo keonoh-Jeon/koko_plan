@@ -38,6 +38,9 @@ import static com.koko_plan.main.MainActivity.todaydate;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
+  /*  //메니페스트 등록
+    <receiver android:name=".sub.AlarmReceiver" />*/
+
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -49,6 +52,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        Log.e(TAG, "onReceive: " + "알람리시버");
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //연결되는 액티비티
