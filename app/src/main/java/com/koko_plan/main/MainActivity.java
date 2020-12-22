@@ -27,7 +27,6 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -36,7 +35,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.MonthDisplayHelper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -45,7 +43,6 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.applandeo.materialcalendarview.CalendarUtils;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
@@ -60,6 +57,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
@@ -67,17 +65,11 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.koko_plan.member.DairyInfo;
-import com.koko_plan.member.MemberInfo;
-import com.koko_plan.sub.AlarmReceiver;
+import com.google.firebase.firestore.SetOptions;
+import com.koko_plan.server.Ranking_list;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -96,13 +88,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
+import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.items;
+import static com.koko_plan.main.RecyclerAdapter.timer;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -110,10 +106,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = "MainActivity";
     private static final int REQUEST_APP_UPDATE = 600;
 
-    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseAuth mAuth;
+    //파이어베이스 사용
+    @SuppressLint("StaticFieldLeak")
+    public static FirebaseFirestore firebaseFirestore;
+    public static FirebaseUser firebaseUser;
 
     public static String name, email;
     private String inputname;
@@ -148,12 +144,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String selecteddata;
     private Date date;
     private AppUpdateManager appUpdateManager;
-    private ImageView nav_header_photo_image;
+    private ImageView nav_header_photo_image, ivTrophy;
     private Calendar calendar;
     private HorizontalCalendar horizontalCalendar;
     private PieChart pieChart;
 
     private int today_progress;
+    public static int todayitemsize;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -162,22 +159,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigator_main);
+        Log.e(TAG, "lifecycle onCreate: ");
 
         //어플 업데이트 매니저
         Appupdatemanager();
-
-        getprofile();
 
         // 저장 위치 초기화
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
 
-        init();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        initprofile();
+        getprofile();
+
         //객체 초기화
         InitializeView();
-
-        mAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
 
         // 현재 날짜 구하기
         date = new Date();
@@ -190,13 +188,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         horizontalCalendarmaker(calendar);
 
         //리사이클러뷰 초기화
-        roomdb = TodoDatabase.getDatabase(this);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
-        recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        //데이터베이스 지정
+        roomdb = TodoDatabase.getDatabase(this);
         adapter = new RecyclerAdapter(roomdb);
+        //리사이클러뷰 옵션 적용용
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper.attachToRecyclerView(recyclerView);
 
         //달력추가
         try {
@@ -207,10 +212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         initSwipe();
 
-        //ItemTouchHelper 생성
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper.attachToRecyclerView(recyclerView);
     }
 
     private void horizontalCalendarmaker(Calendar calendar) {
@@ -242,8 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         runOnUiThread(new Runnable(){
                             @Override
                             public void run() {
-
-                                items.clear();
+//                                items.clear();
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
                                 int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
 
@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         public void run() {
                                             // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
                                             runOnUiThread(new Runnable() {
+                                                @SuppressLint("SetTextI18n")
                                                 @Override
                                                 public void run() {
                                                     cur = 0;
@@ -270,26 +271,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     today_progress = cur/selecteditemsize;
                                                     tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
 
-                                                    new Thread(() -> {
-                                                        if(firebaseUser != null) {
-                                                            DairyInfo dairyInfo = new DairyInfo(today_progress);
-                                                            firebaseFirestore.collection("users")
-                                                                    .document(firebaseUser.getUid())
-                                                                    .collection("dates")
-                                                                    .document(todaydate)
-                                                                    .set(dairyInfo)
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                        }
-                                                                    })
-                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-                                                                        }
-                                                                    });
-                                                        }
-                                                    }).start();
+                                                    if(name!=null){
+                                                        //파이어베이스 저장
+                                                        new Thread(() -> {
+                                                            if(firebaseUser != null) {
+                                                                Map<String, Object> dairyInfo = new HashMap<>();
+                                                                dairyInfo.put(todaydate, today_progress);
+
+                                                                firebaseFirestore
+                                                                        .collection("names")
+                                                                        .document(name)
+                                                                        .set(dairyInfo, SetOptions.merge())
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                            }
+                                                                        });
+                                                            }
+                                                        }).start();
+                                                    }
                                                 }
                                             });
                                         }
@@ -323,6 +328,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 {
                     timerTask.cancel();
                     timerTask = null;
+                }
+                if(timer!=null){
+                    timer.cancel(); //스케쥴task과 타이머를 취소한다.
+                    timer.purge(); //task큐의 모든 task를 제거한다.
+                    timer=null;
                 }
             }
 
@@ -366,17 +376,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동.
-    private void init() {
-        Inits thread = new Inits();
-        thread.start();
-    }
-
-    class Inits extends Thread {
-        public void run() {
+    private void initprofile() {
+        new Thread(() -> {
             if (firebaseUser == null) {
                 myStartActivity(Singup.class);
             } else {
-                DocumentReference documentReference = FirebaseFirestore.getInstance().collection("users").document(firebaseUser.getUid());
+                DocumentReference documentReference = firebaseFirestore.collection("names").document(name);
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @SuppressLint("SetTextI18n")
                     @Override
@@ -401,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
             }
-        }
+        }).start();
     }
 
     //화면 객체 초기화
@@ -426,6 +431,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_header_name_text.setText(name + " ");
         nav_header_mail_text.setText(email + " ");
         probitmap();
+
+        ivTrophy = findViewById(R.id.iv_trophy);
 
         pieChart = findViewById(R.id.piechart);
 
@@ -477,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: 시작=============");
+        Log.d(TAG, "lifecycle onDestroy: 시작=============");
         System.gc();
         super.onDestroy();
     }
@@ -485,26 +492,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //어플 업데이트 관리
     private void Appupdatemanager() {
         appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
-        appUpdateManager
-                .getAppUpdateInfo()
-                .addOnSuccessListener(
-                        appUpdateInfo -> {
-                            // Checks that the platform will allow the specified type of update.
-                            if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
-                                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
-                            {
-                                // Request the update.
-                                try {
-                                    appUpdateManager.startUpdateFlowForResult(
-                                            appUpdateInfo,
-                                            AppUpdateType.IMMEDIATE,
-                                            this,
-                                            REQUEST_APP_UPDATE);
-                                } catch (IntentSender.SendIntentException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+        com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            // Checks that the platform will allow the specified type of update.
+            if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
+                    && appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE))
+            {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            IMMEDIATE,
+                            this,
+                            REQUEST_APP_UPDATE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     //하단 달력 설정
@@ -576,11 +581,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d(TAG, "lifecycle onStart: 시작=============");
 
         timegap =0;
 
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
+        });
+
+        ivTrophy.setOnClickListener(v -> {
+            myStartActivity2(Ranking_list.class);
         });
 
         btnsavelist.setVisibility(View.INVISIBLE);
@@ -638,7 +648,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = new Intent(this, c);
         startActivity(intent);
         overridePendingTransition(0, 0);
-        finish();
     }
 
     private void resetId() {
@@ -693,12 +702,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "lifecycle onPause: 시작=============");
         timegap = 0;
 
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
         adapter.setItem(roomdb.todoDao().search(todaydate));
+        todayitemsize = roomdb.todoDao().search(todaydate).size();
 
         editor.putLong("stoptime", 0);
+        editor.putInt("todayitemsize", todayitemsize);
         editor.apply();
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
@@ -720,6 +732,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d(TAG, "lifecycle onStop: 시작=============");
 
         //플레이 중이면 스레드 중지
         if(timerTask != null)
@@ -727,12 +740,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
+
+        if(timer!=null){
+            timer.cancel(); //스케쥴task과 타이머를 취소한다.
+            timer.purge(); //task큐의 모든 task를 제거한다.
+            timer=null;
+        }
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "lifecycle onResume: 시작=============");
+
+        //업데이트 가능 시, 연결해서 업데이트
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // If an in-app update is already running, resume the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            IMMEDIATE,
+                            this,
+                            REQUEST_APP_UPDATE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         calendar = Calendar.getInstance();
         //가로 달력 시작시, 선택날짜와 이동
@@ -740,9 +777,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
+
+        todayitemsize = pref.getInt("todayitemsize", 0);
         long stoptime = pref.getLong("stoptime", 0);
 
         timegap = (int)((now-stoptime)/1000);
+
     }
 
     //스와이프 기능 헬퍼 연결
@@ -758,11 +798,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
 
+                    //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-
                             roomdb.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();
@@ -814,8 +854,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    //자정마다 실행
-    public static void saveProgressAlarm(Context context){
+    //자정마다 실행 (리시버)
+    void saveProgressAlarm(Context context){
         //알람 매니저 생성
         AlarmManager saveProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         //리시브 받을 클래스 연결
@@ -825,60 +865,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 자정 시간
         Calendar resetCal = Calendar.getInstance();
         resetCal.setTimeInMillis(System.currentTimeMillis());
-        resetCal.set(Calendar.HOUR_OF_DAY, 23);
-        resetCal.set(Calendar.MINUTE, 55);
+        resetCal.set(Calendar.HOUR_OF_DAY, 0);
+        resetCal.set(Calendar.MINUTE, -5);
         resetCal.set(Calendar.SECOND, 0);
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()/*+AlarmManager.INTERVAL_DAY*/
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()));
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
 
         Log.d("resetAlarm", "onReceive ResetHour : " + setResetTime);
     }
-
-    /*private void listenerDoc(){
-
-        firebaseFirestore.collection("users")
-                .document(firebaseUser.getUid())
-                .collection("clubs")
-                .orderBy("set", Query.Direction.DESCENDING)
-
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("listen:error", e);
-                            return;
-                        }
-
-                        assert snapshots != null;
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    Log.w("ADDED","Data: " + dc.getDocument().getData());
-                                    clubItems.add(clubItems.size(), dc.getDocument().toObject(Club_Item.class));
-//                                    clubAdapter.notifyDataSetChanged();
-                                    break;
-                                case MODIFIED:
-                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    maketoast("this club is already exist.");
-//                                    clubAdapter.notifyDataSetChanged();
-                                    break;
-                                case REMOVED:
-                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
-                                    break;
-                            }
-                        }
-                        clubAdapter.notifyDataSetChanged();
-                    }
-                });
-    }*/
-
 }

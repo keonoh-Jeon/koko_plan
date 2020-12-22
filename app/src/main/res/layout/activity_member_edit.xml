@@ -73,7 +73,8 @@
                 android:layout_weight="1.5"
                 android:layout_height="50sp"
                 android:ems="10"
-                android:inputType="textPersonName"/>
+                android:inputType="textPersonName"
+                tools:ignore="HardcodedText,TextViewEdits" />
 
             <ImageView
                 android:id="@+id/edit_name"

@@ -42,8 +42,6 @@
             </intent-filter>
         </receiver>
 
-
-
         <activity
             android:name="com.koko_plan.main.EditHabbit"
             android:screenOrientation="portrait"
@@ -73,6 +71,10 @@
             android:name="com.koko_plan.member.MemberEditActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity"/>
+        <activity
+            android:name="com.koko_plan.server.Ranking_list"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />

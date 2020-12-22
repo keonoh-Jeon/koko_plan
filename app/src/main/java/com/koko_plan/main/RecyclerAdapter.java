@@ -55,6 +55,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     public static List<Todo> items = new ArrayList<>();
     public static TimerTask timerTask;
+    public static Timer timer;
     private Context mContext;
     private TodoDatabase roomdb;
     TodoDatabase itemsall;
@@ -155,7 +156,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private int index;
 
         ProgressBar progressBar;
-        Timer timer = new Timer();
         private boolean dailyNotify;
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -191,9 +191,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private void startTimerTask()
         {
             stopTimerTask();
-
             Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
 
+            timer = new Timer();
             timerTask = new TimerTask()
             {
                 int count = items.get(index).getCurtime() + timegap;
@@ -215,6 +215,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         public void run() {
                             if(getItemCount()>0) {
                                 if (items.get(index).getIsrunning()) {
+                                    Log.e(TAG, "run: getIsrunning " + items.get(index).getIsrunning());
                                     tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
                                     tvProgress.setText((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0) + " %");
                                     progressBar.setProgress((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0));
@@ -240,10 +241,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 timerTask.cancel();
                 timerTask = null;
             }
+
+
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
         public void onBind(Todo todo, int position){
+            Log.e(TAG, "lifecycle onBind: ");
             index = position;
             tvTitle.setText(todo.getTitle());
 
@@ -313,7 +317,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }*/
                 }
             }
-            if(todo.getIsrunning()) {
+            if(items.get(index).getIsrunning()) {
+                Log.e(TAG, "onBind: isrunning ?");
                 startTimerTask();
             }
 
@@ -774,4 +779,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
         popup.show();
     }*/
+
 }

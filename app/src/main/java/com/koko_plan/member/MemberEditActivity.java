@@ -37,6 +37,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.firebaseUser;
+
 public class MemberEditActivity extends AppCompatActivity {
 
     private static final String TAG = "MemberInitActivity";
@@ -87,9 +94,20 @@ public class MemberEditActivity extends AppCompatActivity {
         };
     }
 
+    @SuppressLint("SimpleDateFormat")
     public void OnClickHandler(View view)
     {
-        DatePickerDialog dialog = new DatePickerDialog(this, callbackMethod, 2020,  1, 1);
+        // 현재 날짜 구하기
+        Date date = new Date();
+        //날짜 표시 형식 지정
+        SimpleDateFormat yearformat = new SimpleDateFormat("yyyy");
+        SimpleDateFormat monthformat = new SimpleDateFormat("MM");
+        SimpleDateFormat dayformat = new SimpleDateFormat("dd");
+        int year = Integer.parseInt(yearformat.format(date));
+        int month = Integer.parseInt(monthformat.format(date));
+        int day = Integer.parseInt(dayformat.format(date));
+
+        DatePickerDialog dialog = new DatePickerDialog(this, callbackMethod, year,  month, day);
 
         dialog.show();
     }
@@ -205,9 +223,10 @@ public class MemberEditActivity extends AppCompatActivity {
         if (gender == null) gender = "male";
         if (name.length() > 0 && birthday.length() > 0) {
 
-            if(user != null) {
-                MemberInfo memberInfo = new MemberInfo(name, birthday, gender);
-                db.collection("users").document(user.getUid()).set(memberInfo)
+            if(firebaseUser != null) {
+                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid());
+                firebaseFirestore.collection("names").document(MainActivity.name)
+                        .set(memberInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -244,7 +263,7 @@ public class MemberEditActivity extends AppCompatActivity {
 
     private void listenerDoc(){
 
-        DocumentReference documentReference = FirebaseFirestore.getInstance().collection("users").document(user.getUid());
+        DocumentReference documentReference = FirebaseFirestore.getInstance().collection("names").document(MainActivity.name);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {

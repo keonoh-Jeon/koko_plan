@@ -5,11 +5,19 @@ public class MemberInfo {
     private String name;
     private String birthday;
     private String gender;
+    private String id;
 
-    public MemberInfo(String name, String birthday, String gender ){
+    public MemberInfo(String name, String birthday, String gender, String id){
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
+        this.id = id;
+    }
+    public String getId(){
+        return this.id;
+    }
+    public void setId(String id){
+        this.id = id;
     }
 
     public String getName(){
