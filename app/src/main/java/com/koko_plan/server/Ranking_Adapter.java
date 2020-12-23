@@ -2,6 +2,8 @@ package com.koko_plan.server;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +12,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.R;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
+import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.name;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHolder>
 {
@@ -24,9 +36,6 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     private ArrayList<Ranking_Item> rankingItems = null;
     private Ranking_ViewListener rankingViewListener = null;
     private Context activity;
-
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     public static String itemclub, itemddate, itemlocation;
     public static int itemloft, itemhole;
@@ -67,11 +76,30 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 
-        viewHolder.clubview.setText(rankingItems.get(i).getClub()+"");
-        viewHolder.clubloft.setText("loft"+"\n"+rankingItems.get(i).getLoft()+"");
-        if(rankingItems.get(i).getLoft() == 0) viewHolder.clubloft.setText("");
-        viewHolder.clubaver.setText(String.format("%.1f", rankingItems.get(i).getAverage()));
-        viewHolder.clubdist.setText(rankingItems.get(i).getSet()+"");
+        viewHolder.numberview.setText((i+1)+".");
+        viewHolder.nameview.setText(rankingItems.get(i).getName()+"");
+        DocumentReference documentReference = firebaseFirestore
+                .collection("names")
+                .document(rankingItems.get(i).getName());
+
+        Log.e(TAG, "onBindViewHolder: " + name);
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        if (document.exists()) {
+                            Log.e(TAG, "onComplete: "+ document.get(todaydate));
+                            viewHolder.progressview.setText(document.get(todaydate)+"");
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     @Override
@@ -89,8 +117,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         // 리스트 목록의 초기화 .... 미연의 충돌 방지
-        TextView clubview = null;
-        TextView clubloft = null;
+        TextView numberview = null;
+        TextView nameview = null;
+        TextView progressview = null;
         TextView clubaver = null;
         TextView clubdist = null;
 
@@ -98,10 +127,10 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         ViewHolder(View view) {
             super(view);
 
-            clubview = (TextView)view.findViewById(R.id.ci_title);
-            clubloft = (TextView)view.findViewById(R.id.ci_clubloft);
-            clubaver = (TextView)view.findViewById(R.id.ci_clubavdistance);
-            clubdist = (TextView)view.findViewById(R.id.ci_clubdistance);
+            numberview = (TextView)view.findViewById(R.id.rk_number);
+            nameview = (TextView)view.findViewById(R.id.rk_name);
+            progressview = (TextView)view.findViewById(R.id.rk_progress);
+
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -117,9 +146,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             rankingViewListener.onItemClick(v, pos);
                         }
 
-                        itemclub = rankingItems.get(pos).getClub();
+                        /*itemclub = rankingItems.get(pos).getClub();
                         itemloft = rankingItems.get(pos).getLoft();
-                        itemdist = rankingItems.get(pos).getSet();
+                        itemdist = rankingItems.get(pos).getSet();*/
 
                     }
                 }

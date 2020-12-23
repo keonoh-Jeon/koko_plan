@@ -31,83 +31,11 @@
 
         </LinearLayout>
 
-
-
-    <RadioGroup
-        android:id="@+id/rg_counter"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:layout_margin="5dp"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
-            tools:ignore="UselessLeaf" />
-
-
-        <RadioButton
-            android:id="@+id/rbtn_count"
-            android:text="횟수"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            tools:ignore="HardcodedText" />
-
-
-        <RadioButton
-            android:id="@+id/rbtn_time"
-            android:text="시간"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            tools:ignore="HardcodedText" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
-            tools:ignore="UselessLeaf" />
-    </RadioGroup>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
         android:layout_weight="4">
-
-        <LinearLayout
-            android:id="@+id/view_countinput"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:padding="5dp"
-            android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="회"
-                tools:ignore="HardcodedText" />
-
-            <NumberPicker
-                android:id="@+id/picker_count"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_margin="10dp"
-                >
-            </NumberPicker>
-        </LinearLayout>
-        </LinearLayout>
 
     <LinearLayout
         android:id="@+id/view_timeinput"
@@ -126,11 +54,12 @@
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="시"
+                android:text="횟수"
+                android:textStyle="bold"
                 tools:ignore="HardcodedText" />
 
             <NumberPicker
-                android:id="@+id/picker_hour"
+                android:id="@+id/picker_count"
                 android:layout_width="wrap_content"
                 android:layout_height="150dp"
                 android:layout_margin="10dp"  >
@@ -141,45 +70,77 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="#BBBBBB">
 
-            <TextView
-                android:layout_gravity="center"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="분"
-                tools:ignore="HardcodedText" />
+                android:orientation="vertical">
 
-            <NumberPicker
-                android:id="@+id/picker_min"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_margin="10dp"
-                >
-            </NumberPicker>
-        </LinearLayout>
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+                <NumberPicker
+                    android:id="@+id/picker_hour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_margin="10dp"  >
+                </NumberPicker>
 
-            <TextView
-                android:layout_gravity="center"
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="초"
-                tools:ignore="HardcodedText" />
+                android:orientation="vertical">
 
-            <NumberPicker
-                android:id="@+id/picker_sec"
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="분"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <NumberPicker
+                    android:id="@+id/picker_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_margin="10dp"
+                    >
+                </NumberPicker>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_margin="10dp"
-                >
-            </NumberPicker>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="초"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <NumberPicker
+                    android:id="@+id/picker_sec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_margin="10dp"
+                    >
+                </NumberPicker>
+
+            </LinearLayout>
         </LinearLayout>
+
+
 
 
     </LinearLayout>

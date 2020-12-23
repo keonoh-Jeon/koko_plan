@@ -1,36 +1,34 @@
 package com.koko_plan.server;
 
+import androidx.room.PrimaryKey;
+
 public class Ranking_Item
 {
-    private String club;
-    private int set, loft;
+    @PrimaryKey(autoGenerate = true)
+//    private int id;
+    private String name;
+    private int progress;
     private float average;
 
-    public int getSet()
+    /*public int getId(){ return id; }
+    public void setId(int id){ this.id = id;  }*/
+
+    public void setProgress(int progress)
     {
-        return set;
+        this.progress = progress;
     }
-    public void setSet(int set)
+    public int getProgress()
     {
-        this.set = set;
+        return progress;
     }
 
-    public int getLoft()
+    public String getName()
     {
-        return loft;
+        return name;
     }
-    public void setLoft(int loft)
+    public void setName(String name)
     {
-        this.loft = loft;
-    }
-
-    public String getClub()
-{
-    return club;
-}
-    public void setClub(String club)
-    {
-        this.club = club;
+        this.name = name;
     }
 
     public float getAverage()
@@ -41,6 +39,4 @@ public class Ranking_Item
     {
         this.average = average;
     }
-
-
 }

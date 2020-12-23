@@ -27,12 +27,11 @@ public class EditHabbit extends AppCompatActivity {
 
         et_habbittitle = (EditText) findViewById(R.id.et_habbittitle);
 
-        rg = (RadioGroup) findViewById(R.id.rg_counter);
 
         countPicker  = (NumberPicker) findViewById(R.id.picker_count);
         countPicker.setMinValue(0);
         countPicker.setMaxValue(100);
-        countPicker.setValue(0);
+        countPicker.setValue(1);
 
         hourPicker = (NumberPicker) findViewById(R.id.picker_hour);
         hourPicker.setMinValue(0);
@@ -48,33 +47,11 @@ public class EditHabbit extends AppCompatActivity {
         secPicker.setMinValue(0);
         secPicker.setMaxValue(60);
         secPicker.setValue(0);
-
-        time = findViewById(R.id.view_timeinput);
-        time.setVisibility(View.INVISIBLE);
-        counter = findViewById(R.id.view_countinput);
-        counter.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int id) {
-                switch (id) {
-                    case R.id.rbtn_count:
-                        counter.setVisibility(View.VISIBLE);
-                        time.setVisibility(View.INVISIBLE);
-                        break;
-                    case R.id.rbtn_time:
-                        counter.setVisibility(View.INVISIBLE);
-                        time.setVisibility(View.VISIBLE);
-                        break;
-                }
-//                editText.setText(select.getText());
-            }
-        });
     }
 
     public void mOnConfirm(View v){

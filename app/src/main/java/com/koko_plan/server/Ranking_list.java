@@ -34,6 +34,7 @@ import static com.koko_plan.main.MainActivity.todaydate;
 
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener
 {
+    private static final String TAG = "Ranking_list";
     private Context context = null;
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
@@ -41,7 +42,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     private String drive = null;
     private String uid = null;
 
-    public static String date, strClubtitle;
+    public static String date, progress;
     public static int strSet, set, strLoft;
 
     private TextView clubtitle, clubnumber;
@@ -93,8 +94,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     protected void onStart()
     {
         super.onStart();
-        Log.e("onStart: ", "start");
-
         listenerDoc();
     }
 
@@ -117,23 +116,24 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     private void initView()
     {
         ranking_items = new ArrayList<>();
-        Log.e("initView: ","재시작" );
 
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this);
-//        layoutManager2.setStackFromEnd(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
 
         RecyclerView recyclerView = findViewById(R.id.rv_rankinglist);
-        recyclerView.setLayoutManager(layoutManager2);
+        recyclerView.setLayoutManager(layoutManager);
 
         rankingAdapter = new Ranking_Adapter(ranking_items, this, this);
-        recyclerView.setLayoutManager(layoutManager2);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(rankingAdapter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ranking_items = new ArrayList<>();
+
+        ranking_items.removeAll(ranking_items);
+//        ranking_items = new ArrayList<>();
     }
     @Override
     protected void onResume() {
@@ -142,10 +142,10 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
     private void listenerDoc(){
 
+        Log.e(TAG, "listenerDoc: "+ name);
+
         firebaseFirestore
-                .collection("names")
-                .document(name)
-                .collection("dates")
+                .collection("names") // 목록화할 항목을 포함하는 컬렉션까지 표기
                 .orderBy(todaydate, Query.Direction.DESCENDING)
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -164,12 +164,13 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                 case ADDED:
                                     Log.w("ADDED","Data: " + dc.getDocument().getData());
                                     ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
-//                                    clubAdapter.notifyDataSetChanged();
+                                    Log.e(TAG, "onEvent: " +  dc.getDocument().get(todaydate));
+//                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case MODIFIED:
                                     Log.w("MODIFIED","Data: " + dc.getDocument().getData());
 //                                    maketoast("this club is already exist.");
-//                                    clubAdapter.notifyDataSetChanged();
+//                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case REMOVED:
                                     Log.w("REMOVED", "Data: " + dc.getDocument().getData());

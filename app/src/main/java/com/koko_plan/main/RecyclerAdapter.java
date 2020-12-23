@@ -55,7 +55,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     public static List<Todo> items = new ArrayList<>();
     public static TimerTask timerTask;
-    public static Timer timer;
     private Context mContext;
     private TodoDatabase roomdb;
     TodoDatabase itemsall;
@@ -192,8 +191,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         {
             stopTimerTask();
             Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
-
-            timer = new Timer();
+            Timer timer = new Timer();
             timerTask = new TimerTask()
             {
                 int count = items.get(index).getCurtime() + timegap;
@@ -216,6 +214,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             if(getItemCount()>0) {
                                 if (items.get(index).getIsrunning()) {
                                     Log.e(TAG, "run: getIsrunning " + items.get(index).getIsrunning());
+                                    Log.e(TAG, "run: timerTask " + timerTask);
                                     tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
                                     tvProgress.setText((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0) + " %");
                                     progressBar.setProgress((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0));
@@ -251,7 +250,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             index = position;
             tvTitle.setText(todo.getTitle());
 
-            if(todo.getCount() == 0){
+            if(todo.getCount() < 2){
                 tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
                 if(!items.get(index).getIsrunning()){
                     ivPlay.setVisibility(View.VISIBLE);
@@ -317,6 +316,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }*/
                 }
             }
+
             if(items.get(index).getIsrunning()) {
                 Log.e(TAG, "onBind: isrunning ?");
                 startTimerTask();
@@ -672,7 +672,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                     @SuppressLint("DefaultLocale")
                     String result = String.format("%02d:%02d:%02d", hourPicker.getValue(), minPicker.getValue(), secPicker.getValue());
-                    int totalsec = hourPicker.getValue()*60*60+minPicker.getValue()*60+secPicker.getValue();
+                    int totalsec = (hourPicker.getValue()*60*60+minPicker.getValue()*60+secPicker.getValue())*(items.get(position).getCount());
                     //제목 입력, DB추가
                     textView.setText(result);
                     new Thread(() -> {

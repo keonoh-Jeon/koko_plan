@@ -73,6 +73,7 @@
             tools:ignore="LockedOrientationActivity"/>
         <activity
             android:name="com.koko_plan.server.Ranking_list"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 

@@ -98,7 +98,6 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.items;
-import static com.koko_plan.main.RecyclerAdapter.timer;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -198,11 +197,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        //ItemTouchHelper 생성
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper.attachToRecyclerView(recyclerView);
-
         //달력추가
         try {
             EventCalendarMaker();
@@ -211,6 +205,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         initSwipe();
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper.attachToRecyclerView(recyclerView);
 
     }
 
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
                                 int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
 
-                                tvTodayProgress.setText("실행한 습관이 없습니다.");
+                                tvTodayProgress.setText("실행한 습관이 없슴");
 
                                 if(selecteditemsize > 0){
                                     new Thread(new Runnable() {
@@ -324,16 +323,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
                 Log.e(TAG, "onCalendarScroll: "+ "스크롤");
                 timegap = 0;
-                if(timerTask != null)
+                /*if(timerTask != null)
                 {
                     timerTask.cancel();
                     timerTask = null;
-                }
-                if(timer!=null){
-                    timer.cancel(); //스케쥴task과 타이머를 취소한다.
-                    timer.purge(); //task큐의 모든 task를 제거한다.
-                    timer=null;
-                }
+                }*/
             }
 
             @Override
@@ -585,6 +579,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         timegap =0;
 
+        roomdb.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onChanged(List<Todo> data) {
+                adapter.setItem(data);
+            }
+        });
+
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
         });
@@ -596,16 +598,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnsavelist.setVisibility(View.INVISIBLE);
         btnsavelist.setOnClickListener(v -> {
             timegap =0;
-            resetId();
+//            resetId();
             btnsavelist.setVisibility(View.INVISIBLE);
-        });
-
-        roomdb.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onChanged(List<Todo> data) {
-                adapter.setItem(data);
-            }
         });
 
         saveProgressAlarm(this);
@@ -627,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 boolean isrunning = data.getBooleanExtra("isrunning", false);
 
                 @SuppressLint("DefaultLocale")
-                int totalsec = hour*60*60+min*60+sec;
+                int totalsec = (hour*60*60+min*60+sec)*count;
 
                 new Thread(() -> {
                     int size = items.size()+1;
@@ -648,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = new Intent(this, c);
         startActivity(intent);
         overridePendingTransition(0, 0);
+        finish();
     }
 
     private void resetId() {
@@ -734,18 +729,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStop();
         Log.d(TAG, "lifecycle onStop: 시작=============");
 
-        //플레이 중이면 스레드 중지
+//플레이 중이면 스레드 중지
         if(timerTask != null)
         {
             timerTask.cancel();
             timerTask = null;
         }
 
-        if(timer!=null){
-            timer.cancel(); //스케쥴task과 타이머를 취소한다.
-            timer.purge(); //task큐의 모든 task를 제거한다.
-            timer=null;
-        }
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -770,6 +760,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+
 
         calendar = Calendar.getInstance();
         //가로 달력 시작시, 선택날짜와 이동
