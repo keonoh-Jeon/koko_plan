@@ -225,7 +225,9 @@ public class MemberEditActivity extends AppCompatActivity {
 
             if(firebaseUser != null) {
                 MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid());
-                firebaseFirestore.collection("names").document(MainActivity.name)
+                firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid())
                         .set(memberInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -263,7 +265,9 @@ public class MemberEditActivity extends AppCompatActivity {
 
     private void listenerDoc(){
 
-        DocumentReference documentReference = FirebaseFirestore.getInstance().collection("names").document(MainActivity.name);
+        DocumentReference documentReference = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(firebaseUser.getUid());
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -273,14 +277,13 @@ public class MemberEditActivity extends AppCompatActivity {
                         if (document.exists()) {
                             Log.d(TAG, "memberedit data: " + document.getData());
                             Profile_Item profileItem = document.toObject(Profile_Item.class);
-
                             assert profileItem != null;
                             birthday = profileItem.getBirthday(); // 히스토리 아이템 규격을 통해서 데이터 획득
                             name = profileItem.getName();
                             gender = profileItem.getGender();
 
                             gender1.setChecked(true);
-                            if(gender.equals("female")) gender2.setChecked(true);
+                            if(gender !=null && gender.equals("female")) gender2.setChecked(true);
 
                             tv_birthday.setText(birthday);
                             tv_name.setText(name);

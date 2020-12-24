@@ -15,11 +15,11 @@
 
         <TextView
             android:id="@+id/rk_number"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="거리"
+            android:hint="순위"
             android:textColor="#448AFF"
             android:textSize="20sp"
             tools:ignore="HardcodedText" />
@@ -29,19 +29,10 @@
             android:layout_weight="2.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="클럽"
+            android:hint="닉네임"
             android:textColor="#000000"
             android:textSize="20sp"
             tools:ignore="HardcodedText" />
-
-        <TextView
-            android:id="@+id/ci_clubloft"
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:textColor="#78A543"
-            android:textSize="10sp"
-            tools:ignore="SmallSp" />
 
         <TextView
             android:id="@+id/rk_progress"
@@ -50,7 +41,7 @@
             android:layout_weight="2"
             android:gravity="right"
             android:layout_marginRight="10dp"
-            android:hint="평균"
+            android:hint="성취율"
             android:textColor="#888A8A"
             android:textSize="20sp"
             tools:ignore="HardcodedText,RtlHardcoded" />

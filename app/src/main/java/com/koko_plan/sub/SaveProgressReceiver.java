@@ -53,8 +53,8 @@ public class SaveProgressReceiver extends BroadcastReceiver {
 
                     if (firebaseUser != null) {
                         firebaseFirestore
-                                .collection("names")
-                                .document(name)
+                                .collection("users")
+                                .document(firebaseUser.getUid())
                                 .collection("dates")
                                 .document(todaydate)
                                 .collection("habbits")

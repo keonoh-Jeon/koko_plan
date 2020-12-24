@@ -278,8 +278,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                                 dairyInfo.put(todaydate, today_progress);
 
                                                                 firebaseFirestore
-                                                                        .collection("names")
-                                                                        .document(name)
+                                                                        .collection("users")
+                                                                        .document(firebaseUser.getUid())
                                                                         .set(dairyInfo, SetOptions.merge())
                                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                             @Override
@@ -375,7 +375,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (firebaseUser == null) {
                 myStartActivity(Singup.class);
             } else {
-                DocumentReference documentReference = firebaseFirestore.collection("names").document(name);
+                DocumentReference documentReference = firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid());
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @SuppressLint("SetTextI18n")
                     @Override

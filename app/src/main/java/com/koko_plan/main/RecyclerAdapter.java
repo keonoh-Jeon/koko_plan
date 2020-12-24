@@ -108,7 +108,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @NonNull
     @Override
     public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rv_item, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.habbits_item, viewGroup, false);
         mContext = viewGroup.getContext();
         final ViewHolder holder = new ViewHolder(v);
 
@@ -272,7 +272,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 tvTime.setText(String.format("%d", todo.getCount()));
             }
 
-            if(todo.getCount() > 0) {
+            if(todo.getCount() > 1) {
                 int progress = (int) ((double)todo.getCurcount() / ((double)items.get(index).getCount()) *100.0);
                 tvCurTime.setText(""+todo.getCurcount());
                 tvProgress.setText(progress + " %");

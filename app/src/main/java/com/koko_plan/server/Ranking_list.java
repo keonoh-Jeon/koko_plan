@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -26,13 +28,14 @@ import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.sub.MySoundPlayer;
 
+import java.nio.file.Watchable;
 import java.util.ArrayList;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener
+public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, TextWatcher
 {
     private static final String TAG = "Ranking_list";
     private Context context = null;
@@ -47,6 +50,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
     private TextView clubtitle, clubnumber;
     private EditText clubset, clubloft;
+    private EditText searchnickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -115,6 +119,9 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @SuppressLint("SetTextI18n")
     private void initView()
     {
+        searchnickname = findViewById(R.id.et_searchnickname);
+        searchnickname.addTextChangedListener(this);
+
         ranking_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -145,7 +152,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         Log.e(TAG, "listenerDoc: "+ name);
 
         firebaseFirestore
-                .collection("names") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                 .orderBy(todaydate, Query.Direction.DESCENDING)
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -189,5 +196,20 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        rankingAdapter.getFilter().filter(charSequence.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
     }
 }

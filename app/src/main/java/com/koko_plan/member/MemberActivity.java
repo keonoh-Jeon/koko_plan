@@ -196,7 +196,9 @@ public class MemberActivity extends AppCompatActivity {
         if (!name.equals("name")  && !birthday.equals("birthday")) {
             if(firebaseUser != null) {
                 MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid());
-                firebaseFirestore.collection("names").document(MainActivity.name)
+                firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid())
                         .set(memberInfo)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

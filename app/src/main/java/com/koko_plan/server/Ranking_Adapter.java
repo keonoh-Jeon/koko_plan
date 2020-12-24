@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,13 +29,15 @@ import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHolder>
+public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHolder> implements Filterable
 {
     private Context context = null;
-    private ArrayList<Ranking_Item> rankingItems = null;
+    private ArrayList<Ranking_Item> unfilterList;
+    private ArrayList<Ranking_Item> filterList;
     private Ranking_ViewListener rankingViewListener = null;
     private Context activity;
 
@@ -45,13 +49,47 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     private int strSet, straver, strLoft;
 
 
-    public Ranking_Adapter(ArrayList<Ranking_Item> items, Context context, Ranking_ViewListener listener)
+    public Ranking_Adapter(ArrayList<Ranking_Item> unfilterList, Context context, Ranking_ViewListener listener)
     {
-        this.rankingItems = items;
+        this.unfilterList  = unfilterList;
+        this.filterList  = unfilterList;
         this.context = context;
         this.rankingViewListener = listener;
 
         firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String str = constraint.toString();
+                if (str.isEmpty()) {
+                    filterList = unfilterList;
+                } else {
+                    ArrayList<Ranking_Item> filteringList = new ArrayList<>();
+
+                    for (Ranking_Item item : unfilterList) {
+                        if(item.getName().toLowerCase().contains(str))
+                            filteringList.add(item);
+                    }
+
+                    filterList = filteringList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filterList;
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                filterList = (ArrayList<Ranking_Item>) results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     @NonNull
@@ -77,12 +115,13 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 
         viewHolder.numberview.setText((i+1)+".");
-        viewHolder.nameview.setText(rankingItems.get(i).getName()+"");
-        DocumentReference documentReference = firebaseFirestore
-                .collection("names")
-                .document(rankingItems.get(i).getName());
+        viewHolder.nameview.setText(filterList.get(i).getName());
 
-        Log.e(TAG, "onBindViewHolder: " + name);
+//        viewHolder.nameview.setText(filteredList.get(i).getName()+"");
+        DocumentReference documentReference = firebaseFirestore
+                .collection("users")
+                .document(filterList.get(i).getId());
+        Log.e(TAG, "onBindViewHolder: "  + firebaseUser.getUid() );
 
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -92,7 +131,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                     if (document != null) {
                         if (document.exists()) {
                             Log.e(TAG, "onComplete: "+ document.get(todaydate));
-                            viewHolder.progressview.setText(document.get(todaydate)+"");
+                            viewHolder.progressview.setText(document.get(todaydate)+"%");
                         }
                     }
                 } else {
@@ -104,14 +143,13 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
     @Override
     public int getItemCount()
-    {
-        // 목록화 할 아이템의 개수 확인
-        return rankingItems.size();
+    {   // 목록화 할 아이템의 개수 확인
+        return filterList.size();
     }
 
     void addItem(Ranking_Item clubItem) {
         // 외부에서 item을 추가시킬 함수입니다.
-        rankingItems.add(clubItem);
+        filterList.add(clubItem);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -294,5 +332,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         });
         popup.show();*/
     }
+
+
 
 }
