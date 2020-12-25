@@ -1,8 +1,7 @@
-package com.koko_plan.server;
+package com.koko_plan.server.goodtext;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.R;
-import com.koko_plan.main.MainActivity;
+import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.MySoundPlayer;
+import com.koko_plan.sub.RandomGoodText;
 
 import java.util.ArrayList;
 
@@ -33,123 +31,19 @@ import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHolder> implements Filterable
+public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.ViewHolder> implements Filterable
 {
-    private Context context = null;
-    private ArrayList<Ranking_Item> unfilterList;
-    private ArrayList<Ranking_Item> filterList;
-    private Ranking_ViewListener rankingViewListener = null;
-    private Context activity;
+    private Context context;
+    private ArrayList<GoodText_Item> unfilterList;
+    private ArrayList<GoodText_Item> filterList;
+    private GoodText_ViewListener goodText_viewListener;
 
-    public static String itemclub, itemddate, itemlocation;
-    public static int itemloft, itemhole;
-    public static float itemdist;
-
-    private String strClubtitle, strLocation;
-    private int strSet, straver, strLoft;
-
-
-    public Ranking_Adapter(ArrayList<Ranking_Item> unfilterList, Context context, Ranking_ViewListener listener)
+    public GoodText_Adapter(ArrayList<GoodText_Item> unfilterList, Context context, GoodText_ViewListener listener)
     {
         this.unfilterList  = unfilterList;
         this.filterList  = unfilterList;
         this.context = context;
-        this.rankingViewListener = listener;
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-    }
-
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                String str = constraint.toString();
-                if (str.isEmpty()) {
-                    filterList = unfilterList;
-                } else {
-                    ArrayList<Ranking_Item> filteringList = new ArrayList<>();
-
-                    for (Ranking_Item item : unfilterList) {
-                        if(item.getName().toLowerCase().contains(str))
-                            filteringList.add(item);
-                    }
-
-                    filterList = filteringList;
-                }
-
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = filterList;
-
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                filterList = (ArrayList<Ranking_Item>) results.values;
-                notifyDataSetChanged();
-            }
-        };
-    }
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
-    {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_ranking_item, viewGroup, false);
-        final ViewHolder holder = new ViewHolder(v);
-        /*v.findViewById(R.id.ci_menu).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MySoundPlayer.play(MySoundPlayer.CLICK);
-                showPopup(v, holder.getAdapterPosition());
-            }
-        });*/
-
-        return holder;
-    }
-
-    //뷰 홀더 :리스트에 나타내는 항목의 내용을 세팅
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-
-        viewHolder.numberview.setText((i+1)+".");
-        viewHolder.nameview.setText(filterList.get(i).getName());
-
-//        viewHolder.nameview.setText(filteredList.get(i).getName()+"");
-        DocumentReference documentReference = firebaseFirestore
-                .collection("users")
-                .document(filterList.get(i).getId());
-        Log.e(TAG, "onBindViewHolder: "  + firebaseUser.getUid() );
-
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            Log.e(TAG, "onComplete: "+ document.get(todaydate));
-                            viewHolder.progressview.setText(document.get(todaydate)+"%");
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount()
-    {   // 목록화 할 아이템의 개수 확인
-        return filterList.size();
-    }
-
-    void addItem(Ranking_Item clubItem) {
-        // 외부에서 item을 추가시킬 함수입니다.
-        filterList.add(clubItem);
+        this.goodText_viewListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -165,10 +59,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         ViewHolder(View view) {
             super(view);
 
-            numberview = (TextView)view.findViewById(R.id.rk_number);
+            numberview = (TextView)view.findViewById(R.id.tv_goodtextnumber);
             nameview = (TextView)view.findViewById(R.id.rk_name);
             progressview = (TextView)view.findViewById(R.id.rk_progress);
-
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -180,9 +73,22 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                     int pos = getAdapterPosition();
                     if (pos != RecyclerView.NO_POSITION)
                     {
-                        if(rankingViewListener != null) {
-                            rankingViewListener.onItemClick(v, pos);
+                        if(goodText_viewListener != null) {
+                            goodText_viewListener.onItemClick(v, pos);
                         }
+
+                        String text = RandomGoodText.make()+ "\n- "+ name;
+                        Log.e(TAG, "onClick: "+ text + "to " + filterList.get(pos).getId());
+
+                        getItemId();
+
+                        //커스텀 토스트 메시지 띄우기
+                        CustomToastMaker.show(context, text);
+                        Log.e(TAG, "onClick: " + context);
+
+                        SetMsgToUsers.send(text, filterList.get(pos).getId());
+
+
 
                         /*itemclub = rankingItems.get(pos).getClub();
                         itemloft = rankingItems.get(pos).getLoft();
@@ -205,6 +111,79 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
         }
     }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String str = constraint.toString();
+                if (str.isEmpty()) {
+                    filterList = unfilterList;
+                } else {
+                    ArrayList<GoodText_Item> filteringList = new ArrayList<>();
+
+                    for (GoodText_Item item : unfilterList) {
+                        if(item.getText().toLowerCase().contains(str))
+                            filteringList.add(item);
+                    }
+
+                    filterList = filteringList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filterList;
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                filterList = (ArrayList<GoodText_Item>) results.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
+    {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_goodtexts_item, viewGroup, false);
+        final ViewHolder holder = new ViewHolder(v);
+        /*v.findViewById(R.id.ci_menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MySoundPlayer.play(MySoundPlayer.CLICK);
+                showPopup(v, holder.getAdapterPosition());
+            }
+        });*/
+
+        return holder;
+    }
+
+    //뷰 홀더 :리스트에 나타내는 항목의 내용을 세팅
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+
+        viewHolder.numberview.setText((i+1)+".");
+        viewHolder.nameview.setText(filterList.get(i).getText());
+
+    }
+
+    @Override
+    public int getItemCount()
+    {   // 목록화 할 아이템의 개수 확인
+        return filterList.size();
+    }
+
+    void addItem(GoodText_Item clubItem) {
+        // 외부에서 item을 추가시킬 함수입니다.
+        filterList.add(clubItem);
+    }
+
+
 
     private void showPopup(View v, final int position){
 

@@ -1,4 +1,4 @@
-package com.koko_plan.server;
+package com.koko_plan.server.goodtext;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,11 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -28,19 +25,18 @@ import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.sub.MySoundPlayer;
 
-import java.nio.file.Watchable;
 import java.util.ArrayList;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, TextWatcher
+public class GoodText_list extends AppCompatActivity implements GoodText_ViewListener, TextWatcher
 {
     private static final String TAG = "Ranking_list";
     private Context context = null;
-    public static ArrayList<Ranking_Item> ranking_items = null;
-    private Ranking_Adapter rankingAdapter = null;
+    public static ArrayList<GoodText_Item> goodText_items = null;
+    private GoodText_Adapter goodText_adapter = null;
 
     private String drive = null;
     private String uid = null;
@@ -122,24 +118,24 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         searchnickname = findViewById(R.id.et_searchnickname);
         searchnickname.addTextChangedListener(this);
 
-        ranking_items = new ArrayList<>();
+        goodText_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
 
-        RecyclerView recyclerView = findViewById(R.id.rv_rankinglist);
+        RecyclerView recyclerView = findViewById(R.id.view_msg);
         recyclerView.setLayoutManager(layoutManager);
 
-        rankingAdapter = new Ranking_Adapter(ranking_items, this, this);
+        goodText_adapter = new GoodText_Adapter(goodText_items, this, this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(rankingAdapter);
+        recyclerView.setAdapter(goodText_adapter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        ranking_items.removeAll(ranking_items);
+        goodText_items.removeAll(goodText_items);
 //        ranking_items = new ArrayList<>();
     }
     @Override
@@ -170,7 +166,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             switch (dc.getType()) {
                                 case ADDED:
                                     Log.w("ADDED","Data: " + dc.getDocument().getData());
-                                    ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
+                                    goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
                                     Log.e(TAG, "onEvent: " +  dc.getDocument().get(todaydate));
 //                                    rankingAdapter.notifyDataSetChanged();
                                     break;
@@ -185,7 +181,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     break;
                             }
                         }
-                        rankingAdapter.notifyDataSetChanged();
+                        goodText_adapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -205,7 +201,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        rankingAdapter.getFilter().filter(charSequence.toString());
+        goodText_adapter.getFilter().filter(charSequence.toString());
     }
 
     @Override

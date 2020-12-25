@@ -60,16 +60,25 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.koko_plan.server.Ranking_list;
+import com.koko_plan.server.goodtext.GoodText_Adapter;
+import com.koko_plan.server.goodtext.GoodText_Item;
+import com.koko_plan.server.goodtext.GoodText_ViewListener;
+import com.koko_plan.server.goodtext.GoodText_list;
+import com.koko_plan.server.ranking.Ranking_Adapter;
+import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -100,7 +109,7 @@ import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import static com.koko_plan.main.RecyclerAdapter.items;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoodText_ViewListener {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_APP_UPDATE = 600;
@@ -116,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Bitmap profile;
 
     private RecyclerAdapter adapter;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, recyclerView2;
     private Paint p = new Paint();
 
     public static TodoDatabase roomdb;
@@ -151,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int today_progress;
     public static int todayitemsize;
 
+    public static ArrayList<GoodText_Item> goodText_items = null;
+    private GoodText_Adapter goodText_adapter = null;
+
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
@@ -183,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //날짜 표시 형식 지정
         dateformat = new SimpleDateFormat("yyyy-MM-dd");
         todaydate = dateformat.format(date);
+        selecteddata = todaydate;
 
         horizontalCalendarmaker(calendar);
 
@@ -211,7 +225,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //RecyclerView에 ItemTouchHelper 붙이기
         helper.attachToRecyclerView(recyclerView);
 
+        GoodTextListmaker();
     }
+
+    private void GoodTextListmaker() {
+
+        goodText_items = new ArrayList<>();
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+
+        RecyclerView recyclerView = findViewById(R.id.view_msg);
+        recyclerView.setLayoutManager(layoutManager);
+
+        goodText_adapter = new GoodText_Adapter(goodText_items, this, this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(goodText_adapter);
+
+
+    }
+
+
+
 
     private void horizontalCalendarmaker(Calendar calendar) {
         //가로 달력 추가
@@ -456,6 +491,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+
+    }
+
+    @Override
+    public void onDelete() {
+
+    }
+
+    @Override
+    public void onModify() {
+
+    }
+
     class Profilebitmap extends Thread {
         public void run() {
 
@@ -604,7 +654,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             btnsavelist.setVisibility(View.INVISIBLE);
         });
 
+        listenerDoc();
+
         saveProgressAlarm(this);
+    }
+
+    private void listenerDoc(){
+        Log.e(TAG, "listenerDoc: " + "실행" );
+        Log.e(TAG, "listenerDoc getUid(): " + firebaseUser.getUid());
+        Log.e(TAG, "listenerDoc: todaydate " + todaydate );
+        Log.e(TAG, "listenerDoc: " + "실행" );
+        Log.e(TAG, "listenerDoc: " + "실행" );
+
+        firebaseFirestore
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                .document(firebaseUser.getUid())
+                .collection("dates")
+                .document(todaydate)
+                .collection("messages")
+                .orderBy("randomnum", Query.Direction.DESCENDING)
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("listen:error", e);
+                            return;
+                        }
+
+                        assert snapshots != null;
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Log.w("ADDED", "Data: " + dc.getDocument().getData());
+                                    goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
+                                    Log.e(TAG, "listenerDoc: "+ dc.getDocument().getData());
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case MODIFIED:
+                                    Log.w("MODIFIED", "Data: " + dc.getDocument().getData());
+//                                    maketoast("this club is already exist.");
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case REMOVED:
+                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+                        goodText_adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     @Override

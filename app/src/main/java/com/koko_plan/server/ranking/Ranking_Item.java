@@ -1,4 +1,4 @@
-package com.koko_plan.server;
+package com.koko_plan.server.ranking;
 
 import androidx.room.PrimaryKey;
 

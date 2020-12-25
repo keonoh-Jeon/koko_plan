@@ -1,8 +1,8 @@
-package com.koko_plan.server;
+package com.koko_plan.server.goodtext;
 
 import android.view.View;
 
-public interface Ranking_ViewListener
+public interface GoodText_ViewListener
 {
     void onItemClick(View view, int position);
 

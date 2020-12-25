@@ -34,6 +34,7 @@ import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.DeviceBootReceiver;
 import com.koko_plan.R;
 import com.koko_plan.sub.ItemTouchHelperListener;
+import com.koko_plan.sub.MySoundPlayer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,9 +58,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public static TimerTask timerTask;
     private Context mContext;
     private TodoDatabase roomdb;
-    TodoDatabase itemsall;
-    private boolean isRunning;
-    private TextView tvCycle;
 
     public RecyclerAdapter(TodoDatabase roomdb) {
         this.roomdb = roomdb;
@@ -115,14 +113,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                MySoundPlayer.play(MySoundPlayer.CLICK);
+                MySoundPlayer.play(MySoundPlayer.CLICK);
                 showPopupCountTime(v, holder.getAdapterPosition());
             }
         });
         v.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                MySoundPlayer.play(MySoundPlayer.CLICK);
+                MySoundPlayer.play(MySoundPlayer.CLICK);
                 makedialogtitle(v, holder.getAdapterPosition());
             }
         });
