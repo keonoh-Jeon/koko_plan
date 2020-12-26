@@ -4,15 +4,12 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.SetOptions;
-import com.koko_plan.sub.RandomGoodText;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
-import static com.koko_plan.main.MainActivity.roomdb;
 import static com.koko_plan.main.MainActivity.todaydate;
 
 public class SetMsgToUsers {

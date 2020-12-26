@@ -17,12 +17,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.R;
 import com.koko_plan.server.goodtext.SetMsgToUsers;
 import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.MySoundPlayer;
-import com.koko_plan.sub.RandomGoodText;
+import com.koko_plan.server.goodtext.RandomGoodText;
 
 import java.util.ArrayList;
 
@@ -172,7 +171,8 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                         }
 
                         String text = RandomGoodText.make()+ "\n- "+ name;
-                        Log.e(TAG, "onClick: "+ text + "to " + filterList.get(pos).getId());
+                        Log.e(TAG, "onClick: make" + text);
+//                        Log.e(TAG, "onClick: make"+ text + "to " + filterList.get(pos).getId());
 
                         getItemId();
 
@@ -181,8 +181,6 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                         Log.e(TAG, "onClick: " + context);
 
                         SetMsgToUsers.send(text, filterList.get(pos).getId());
-
-
 
                         /*itemclub = rankingItems.get(pos).getClub();
                         itemloft = rankingItems.get(pos).getLoft();

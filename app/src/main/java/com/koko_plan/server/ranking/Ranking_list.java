@@ -11,23 +11,34 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
+import com.koko_plan.member.MemberActivity;
+import com.koko_plan.member.Profile_Item;
+import com.koko_plan.member.Singup;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.util.ArrayList;
 
+import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
@@ -96,6 +107,40 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     {
         super.onStart();
         listenerDoc();
+
+        //파이어베이스 필드 검색
+
+        new Thread(() -> {
+            DocumentReference documentReference = firebaseFirestore
+                    .collection("randomsource")
+                    .document("goodtexts");
+
+                    documentReference
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        private int i = 0;
+
+                        @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null) {
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
+                                int ramdomtextsize = document.getData().size();
+                                editor.putInt("ramdomtextsize", ramdomtextsize);
+                                editor.apply();
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+        }).start();
     }
 
     @Override
@@ -145,8 +190,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     }
 
     private void listenerDoc(){
-
-        Log.e(TAG, "listenerDoc: "+ name);
 
         firebaseFirestore
                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기

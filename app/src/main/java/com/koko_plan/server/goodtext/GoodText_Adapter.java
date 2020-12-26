@@ -13,23 +13,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.koko_plan.R;
 import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.MySoundPlayer;
-import com.koko_plan.sub.RandomGoodText;
 
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
-import static com.koko_plan.main.MainActivity.firebaseFirestore;
-import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.ViewHolder> implements Filterable
 {
@@ -87,8 +78,6 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                         Log.e(TAG, "onClick: " + context);
 
                         SetMsgToUsers.send(text, filterList.get(pos).getId());
-
-
 
                         /*itemclub = rankingItems.get(pos).getClub();
                         itemloft = rankingItems.get(pos).getLoft();
