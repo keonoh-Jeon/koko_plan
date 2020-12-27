@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:id="@+id/view_goodtexts"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#9F9F9F"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -13,38 +15,56 @@
         android:layout_height="match_parent"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/tv_goodtextnumber"
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="순위"
-            android:textColor="#448AFF"
-            android:textSize="10sp"
-            tools:ignore="HardcodedText" />
+            app:cardCornerRadius="20dp"
+            android:layout_gravity="center"
+            app:cardElevation="0dp"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/rk_name"
-            android:layout_weight="2.5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="닉네임"
-            android:textColor="#000000"
-            android:textSize="10sp"
-            tools:ignore="HardcodedText" />
+            <ImageView
+                android:id="@+id/iv_profileimager"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"/>
 
-        <TextView
-            android:id="@+id/rk_progress"
-            android:layout_width="0dp"
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:gravity="right"
-            android:layout_marginRight="10dp"
-            android:hint="성취율"
-            android:textColor="#888A8A"
-            android:textSize="10sp"
-            tools:ignore="HardcodedText,RtlHardcoded" />
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:layout_marginRight="10dp"
+                android:hint="성취율"
+                android:textColor="#888A8A"
+                android:textSize="10sp"
+                tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+
+            <TextView
+                android:id="@+id/tv_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="로딩 중..."
+                android:textColor="#000000"
+                android:textSize="15sp"
+                tools:ignore="HardcodedText,SmallSp" />
+
+        </LinearLayout>
+
+
+
+
 
     </LinearLayout>
 

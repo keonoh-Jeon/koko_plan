@@ -76,8 +76,6 @@ import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
-import com.koko_plan.server.goodtext.GoodText_list;
-import com.koko_plan.server.ranking.Ranking_Adapter;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
@@ -118,10 +116,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static FirebaseFirestore firebaseFirestore;
     public static FirebaseUser firebaseUser;
+    @SuppressLint("StaticFieldLeak")
+    public static Button btnsavelist;
 
     public static String name, email;
     private String inputname;
-    private String photourl;
+    public static String photourl;
     public static Bitmap profile;
 
     private RecyclerAdapter adapter;
@@ -135,21 +135,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static SharedPreferences.Editor editor;
 
     private View btnPlus;
-    @SuppressLint("StaticFieldLeak")
-    public static Button btnsavelist;
 
     public static int lastsec, timegap, totalprogress, curtime;
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
 
-    int cur, total;
+    private int cur, total;
 
     public static String todaydate;
     private SimpleDateFormat dateformat;
 
     ItemTouchHelper helper;
-    private String selecteddata;
+    public static String selecteddata;
     private Date date;
     private AppUpdateManager appUpdateManager;
     private ImageView nav_header_photo_image, ivTrophy;
@@ -162,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static ArrayList<GoodText_Item> goodText_items = null;
     private GoodText_Adapter goodText_adapter = null;
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -241,12 +238,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         goodText_adapter = new GoodText_Adapter(goodText_items, this, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(goodText_adapter);
-
-
     }
-
-
-
 
     private void horizontalCalendarmaker(Calendar calendar) {
         //가로 달력 추가
@@ -578,17 +570,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 pnt.setTextSize(20);
                 String str = String.valueOf(today_progress)+"%";
                 canvas.drawText(str, 10,20, pnt);
-
             }
 
             @Override
             public void setAlpha(int i) {
-
             }
 
             @Override
             public void setColorFilter(@Nullable ColorFilter colorFilter) {
-
             }
 
             /**
@@ -627,7 +616,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "lifecycle onStart: 시작=============");
 
         timegap =0;
 
@@ -660,19 +648,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void listenerDoc(){
-        Log.e(TAG, "listenerDoc: " + "실행" );
-        Log.e(TAG, "listenerDoc getUid(): " + firebaseUser.getUid());
-        Log.e(TAG, "listenerDoc: todaydate " + todaydate );
-        Log.e(TAG, "listenerDoc: " + "실행" );
-        Log.e(TAG, "listenerDoc: " + "실행" );
 
         firebaseFirestore
                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                 .document(firebaseUser.getUid())
                 .collection("dates")
-                .document(todaydate)
+                .document(selecteddata)
                 .collection("messages")
-                .orderBy("randomnum", Query.Direction.DESCENDING)
+                .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
+                .whereEqualTo("randomnum", 1) // 파이어베이스 쿼리 해당 필드 필터
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
@@ -691,7 +675,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 case ADDED:
                                     Log.w("ADDED", "Data: " + dc.getDocument().getData());
                                     goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
-                                    Log.e(TAG, "listenerDoc: "+ dc.getDocument().getData());
 //                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case MODIFIED:
@@ -826,7 +809,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     editor.apply();
                 }
             }
+            goodText_items.removeAll(goodText_items);
         }).start();
+
+
     }
 
     @Override

@@ -28,9 +28,6 @@
                 android:layout_marginBottom="50sp"
                 tools:ignore="HardcodedText" />
 
-
-
-
         <ImageView
             android:id="@+id/nhtv_image"
             android:layout_width="100sp"

@@ -89,14 +89,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/view_msg"
-                        android:layout_margin="10dp"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        tools:ignore="ScrollViewSize" />
-
                 </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/view_msg"
+                    android:layout_margin="10dp"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:nestedScrollingEnabled="false"
+                    tools:ignore="ScrollViewSize" />
 
             </LinearLayout>
 

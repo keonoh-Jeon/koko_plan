@@ -53,13 +53,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     private String drive = null;
     private String uid = null;
 
-    public static String date, progress;
-    public static int strSet, set, strLoft;
-
-    private TextView clubtitle, clubnumber;
-    private EditText clubset, clubloft;
-    private EditText searchnickname;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -161,7 +154,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @SuppressLint("SetTextI18n")
     private void initView()
     {
-        searchnickname = findViewById(R.id.et_searchnickname);
+        EditText searchnickname = findViewById(R.id.et_searchnickname);
         searchnickname.addTextChangedListener(this);
 
         ranking_items = new ArrayList<>();

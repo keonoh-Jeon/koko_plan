@@ -14,8 +14,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:ignore="MissingConstraints,UselessParent"
             android:background="#737372"
@@ -75,20 +74,13 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.2"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp">
 
                 <TextView
                     android:text="닉네임 검색"
-                    android:layout_weight="2.5"
+                    android:layout_weight="3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
@@ -97,35 +89,32 @@
 
                 <EditText
                     android:id="@+id/et_searchnickname"
-                    android:layout_weight="2"
+                    android:layout_weight="6"
                     android:layout_width="0dp"
-                    android:hint="입력"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="#78A543"
-                    android:textSize="10sp"
+                    android:textSize="20sp"
                     tools:ignore="HardcodedText,SmallSp" />
 
                 <ImageView
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:src="@drawable/magnifier"
                     tools:ignore="ContentDescription" />
-
-            </LinearLayout>
-
-
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2">
+            android:layout_weight="9">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_rankinglist"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent">
+                android:layout_width="match_parent"
+                android:nestedScrollingEnabled="false">
             </androidx.recyclerview.widget.RecyclerView>
 
 
@@ -134,7 +123,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.18"
+            android:layout_weight="1"
             android:gravity="bottom">
 
             <com.google.android.gms.ads.AdView

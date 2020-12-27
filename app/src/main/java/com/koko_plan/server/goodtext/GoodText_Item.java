@@ -7,11 +7,26 @@ public class GoodText_Item
     @PrimaryKey(autoGenerate = true)
     private String id;
     private String text;
+    private String from;
+    private String time;
     private int progress;
+    private int randomnum;
     private float average;
+
+    public String getFrom(){ return from; }
+    public void setFrom(String from){ this.from = from;  }
+
+    public String getTime(){ return time; }
+    public void setTime(String time){ this.time = time;  }
 
     public String getId(){ return id; }
     public void setId(String id){ this.id = id;  }
+
+    public void setRandomnum(int randomnum)
+    {
+        this.randomnum = randomnum;
+    }
+    public int getRandomnum()  {     return randomnum;   }
 
     public void setProgress(int progress)
     {

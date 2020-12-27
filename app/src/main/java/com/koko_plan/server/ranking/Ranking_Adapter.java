@@ -23,7 +23,9 @@ import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.server.goodtext.RandomGoodText;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -158,6 +160,11 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
             view.setOnClickListener(new View.OnClickListener() {
 
+                private Date date;
+                private String time;
+                private SimpleDateFormat timeformat;
+
+                @SuppressLint("SimpleDateFormat")
                 @Override
                 public void onClick(View v) {
 
@@ -170,17 +177,21 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             rankingViewListener.onItemClick(v, pos);
                         }
 
-                        String text = RandomGoodText.make()+ "\n- "+ name;
-                        Log.e(TAG, "onClick: make" + text);
+                        // 현재 날짜 구하기
+                        date = new Date();
+                        //날짜 표시 형식 지정
+                        timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        time = timeformat.format(date);
+
+                        String text = RandomGoodText.make(context, filterList.get(pos).getId(), time)+ "\n- "+ name;
 //                        Log.e(TAG, "onClick: make"+ text + "to " + filterList.get(pos).getId());
 
                         getItemId();
 
                         //커스텀 토스트 메시지 띄우기
-                        CustomToastMaker.show(context, text);
-                        Log.e(TAG, "onClick: " + context);
+//                        CustomToastMaker.show(context, text);
 
-                        SetMsgToUsers.send(text, filterList.get(pos).getId());
+//                        SetMsgToUsers.send(text, filterList.get(pos).getId());
 
                         /*itemclub = rankingItems.get(pos).getClub();
                         itemloft = rankingItems.get(pos).getLoft();
