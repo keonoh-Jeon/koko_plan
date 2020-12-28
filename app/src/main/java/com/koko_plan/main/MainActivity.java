@@ -76,6 +76,9 @@ import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
+import com.koko_plan.server.habbitlist.HabbitList_Adapter;
+import com.koko_plan.server.habbitlist.HabbitList_Item;
+import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
@@ -107,7 +110,7 @@ import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import static com.koko_plan.main.RecyclerAdapter.items;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoodText_ViewListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoodText_ViewListener, HabbitList_ViewListener {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_APP_UPDATE = 600;
@@ -158,8 +161,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int today_progress;
     public static int todayitemsize;
 
+    public static ArrayList<HabbitList_Item> habbitListItems = null;
+    private HabbitList_Adapter habbitListAdapter = null;
+
     public static ArrayList<GoodText_Item> goodText_items = null;
     private GoodText_Adapter goodText_adapter = null;
+
+    private TextView goodtextsize;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
@@ -208,6 +216,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        HabbitListmaker();
+
         //달력추가
         try {
             EventCalendarMaker();
@@ -223,6 +233,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         helper.attachToRecyclerView(recyclerView);
 
         GoodTextListmaker();
+    }
+
+    private void HabbitListmaker() {
+
+        habbitListItems = new ArrayList<>();
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+
+        RecyclerView recyclerView = findViewById(R.id.rv_view2);
+        recyclerView.setLayoutManager(layoutManager);
+
+        habbitListAdapter = new HabbitList_Adapter(habbitListItems, this, this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(habbitListAdapter);
     }
 
     private void GoodTextListmaker() {
@@ -269,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         runOnUiThread(new Runnable(){
                             @Override
                             public void run() {
-//                                items.clear();
                                 adapter.setItem(roomdb.todoDao().search(selecteddata));
                                 int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
 
@@ -467,6 +491,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //효과음 초기화
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        goodtextsize = findViewById(R.id.tv_goodtextsize);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -614,6 +640,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onStart() {
         super.onStart();
@@ -639,11 +666,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnsavelist.setVisibility(View.INVISIBLE);
         btnsavelist.setOnClickListener(v -> {
             timegap =0;
-//            resetId();
+            resetId();
             btnsavelist.setVisibility(View.INVISIBLE);
         });
 
         listenerDoc();
+
+
 
         saveProgressAlarm(this);
     }
@@ -692,6 +721,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             }
                             goodText_adapter.notifyDataSetChanged();
+                            goodtextsize.setText(goodText_items.size() + "개");
                         }
                     });
         }

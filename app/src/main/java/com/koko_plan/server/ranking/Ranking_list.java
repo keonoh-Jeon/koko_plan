@@ -1,6 +1,7 @@
 package com.koko_plan.server.ranking;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -50,14 +51,13 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
 
-    private String drive = null;
-    private String uid = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking_list);
+
+
 
         // 뷰 초기화
         initView();
@@ -219,6 +219,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
                         }
                         rankingAdapter.notifyDataSetChanged();
+
                     }
                 });
     }

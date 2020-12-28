@@ -1,6 +1,7 @@
 package com.koko_plan.server.ranking;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,12 +41,18 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     private ArrayList<Ranking_Item> filterList;
     private Ranking_ViewListener rankingViewListener;
 
+    private ProgressDialog pd;
+
     public Ranking_Adapter(ArrayList<Ranking_Item> unfilterList, Context context, Ranking_ViewListener listener)
     {
         this.unfilterList  = unfilterList;
         this.filterList  = unfilterList;
         this.context = context;
         this.rankingViewListener = listener;
+
+        //로딩 화면 만들기
+        pd = null;
+        pd = ProgressDialog.show(context, "순위 불러 오는 중......", "잠시만 기다려 주세요.");
     }
 
     @Override
@@ -87,6 +94,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_ranking_item, viewGroup, false);
         final ViewHolder holder = new ViewHolder(v);
+
+
+
         /*v.findViewById(R.id.ci_menu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,6 +138,8 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                 }
             }
         });
+
+        if (pd!= null) pd.dismiss();
     }
 
     @Override

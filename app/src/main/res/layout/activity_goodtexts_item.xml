@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#9F9F9F"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -46,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:layout_marginRight="10dp"
-                android:hint="성취율"
+                android:hint="받은 시간"
                 android:textColor="#888A8A"
                 android:textSize="10sp"
                 tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
