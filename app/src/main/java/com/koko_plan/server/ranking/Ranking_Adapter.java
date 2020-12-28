@@ -161,8 +161,8 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
             view.setOnClickListener(new View.OnClickListener() {
 
                 private Date date;
-                private String time;
-                private SimpleDateFormat timeformat;
+                private String time, day;
+                private SimpleDateFormat timeformat, dayformat;
 
                 @SuppressLint("SimpleDateFormat")
                 @Override
@@ -181,9 +181,11 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                         date = new Date();
                         //날짜 표시 형식 지정
                         timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        dayformat = new SimpleDateFormat("yyyy-MM-dd");
                         time = timeformat.format(date);
+                        day = dayformat.format(date);
 
-                        String text = RandomGoodText.make(context, filterList.get(pos).getId(), time)+ "\n- "+ name;
+                        String text = RandomGoodText.make(context, filterList.get(pos).getId(), day, time)+ "\n- "+ name;
 //                        Log.e(TAG, "onClick: make"+ text + "to " + filterList.get(pos).getId());
 
                         getItemId();

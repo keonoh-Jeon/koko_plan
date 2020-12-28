@@ -19,13 +19,14 @@ import static com.koko_plan.main.MainActivity.todaydate;
 
 public class SetMsgToUsers {
 
-    public static void send(String time, String text, String touser) {
+    public static void send(String day, String time, String text, String touser) {
 
         int randomnum = RandomGoodText.getTextnum();
 
         new Thread(() -> {
             //파이어베이스 저장 (리스트 목록 만들기)
             Map<String, Object> GoodTextList = new HashMap<>();
+            GoodTextList.put("day", day);
             GoodTextList.put("time", time);
             GoodTextList.put("randomnum", randomnum);
             GoodTextList.put("from", photourl);

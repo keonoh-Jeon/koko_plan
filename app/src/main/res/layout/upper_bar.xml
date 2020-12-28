@@ -17,7 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="#0063B2"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <LinearLayout
@@ -32,18 +32,17 @@
                     android:layout_gravity="center"
                     android:layout_width="0dp"
                     android:layout_weight="8"
+                    android:textColor="#9CC3D5"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,SpUsage" />
 
                 <Button
                     android:id="@+id/btn_savelist"
                     android:text="순서저장"
-                    android:layout_margin="10dp"
-                    android:background="#CDDC39"
-                    android:textColor="#0C4943"
+                    android:background="@drawable/button_background"
+                    android:textColor="#0063B2"
                     android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 

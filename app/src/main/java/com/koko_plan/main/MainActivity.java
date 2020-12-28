@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }*/
 
                                 piechartmaker();
+
                             }
                         });
                     }
@@ -649,48 +650,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerDoc(){
 
-        firebaseFirestore
-                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                .document(firebaseUser.getUid())
-                .collection("dates")
-                .document(selecteddata)
-                .collection("messages")
-                .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
-                .whereEqualTo("randomnum", 1) // 파이어베이스 쿼리 해당 필드 필터
+        if(firebaseFirestore !=null) {
 
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("dates")
+                    .document(selecteddata)
+                    .collection("messages")
+                    .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
+                    .whereEqualTo("day", selecteddata) // 파이어베이스 쿼리 해당 필드 필터
 
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("listen:error", e);
-                            return;
-                        }
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-                        assert snapshots != null;
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot snapshots,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("listen:error", e);
+                                return;
+                            }
 
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    Log.w("ADDED", "Data: " + dc.getDocument().getData());
-                                    goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
+                            assert snapshots != null;
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.w("ADDED", "Data: " + dc.getDocument().getData());
+                                        goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case MODIFIED:
-                                    Log.w("MODIFIED", "Data: " + dc.getDocument().getData());
+                                        break;
+                                    case MODIFIED:
+                                        Log.w("MODIFIED", "Data: " + dc.getDocument().getData());
 //                                    maketoast("this club is already exist.");
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case REMOVED:
-                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+                                        break;
+                                    case REMOVED:
+                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
 //                                    clubAdapter.notifyDataSetChanged();
-                                    break;
+                                        break;
+                                }
                             }
+                            goodText_adapter.notifyDataSetChanged();
                         }
-                        goodText_adapter.notifyDataSetChanged();
-                    }
-                });
+                    });
+        }
+
     }
 
     @Override

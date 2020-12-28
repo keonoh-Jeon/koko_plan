@@ -1,6 +1,7 @@
 package com.koko_plan.member;
 
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +52,9 @@ public class Singup extends AppCompatActivity {
         findViewById(R.id.emailsignup).setOnClickListener(btnClickListener);
         findViewById(R.id.gotoLogin).setOnClickListener(btnClickListener);
         findViewById(R.id.sign_in_button).setOnClickListener(btnClickListener);
+
+        MySoundPlayer.initSounds(getApplicationContext());
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     protected void onPause() {
@@ -89,6 +93,8 @@ public class Singup extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         updateUI(user);
+
+
     }
 
     @Override
