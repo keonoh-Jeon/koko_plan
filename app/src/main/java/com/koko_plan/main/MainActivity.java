@@ -503,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         recyclerView = findViewById(R.id.rv_habbitview);
-        recyclerView.setVisibility(View.GONE);
+//        recyclerView.setVisibility(View.GONE);
         recyclerView2 = findViewById(R.id.rv_habbitview2);
         recyclerView2.setVisibility(View.GONE);
         recyclerView3 = findViewById(R.id.rv_msg);
@@ -638,13 +638,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
 
+                Log.e(TAG, "onChange month: "+ month );
+
                 //변수를 동적으로 만드는 방법
                 Map<String, Calendar> map = new HashMap<String, Calendar>();
-                for (int i = 1; i < 4; i++) {
+                for (int i = 1; i <= lastday; i++) {
                     map.put("calendar"+i, Calendar.getInstance());
-
                     String str = year + "-" + month + "-" + i;
-                    Log.e(TAG, "onChange: "+ str);
                     try {
                         date = sdf.parse(str);
                     } catch (ParseException e) {
@@ -652,42 +652,78 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     assert date != null;
                     map.get("calendar" + i).setTime(date);
+                    Log.e(TAG, "onChange: " +  map.get("calendar" + i));
 
-                    Log.e(TAG, "onChange: "+ map.get("calendar" + i));
+                    DocumentReference documentReference = firebaseFirestore
+                            .collection("users")
+                            .document(firebaseUser.getUid());
 
-                    events.add(new EventDay(map.get("calendar" + i), new Drawable() {
-                        @Override
-                        public void draw(@NonNull Canvas canvas) {
-                            //캔버스 바탕 설정
-                            canvas.drawColor(Color.RED);
-                            Paint pnt= new Paint();
-                            //가로로 설정
-                            pnt.setAntiAlias(true);
-                            pnt.setColor(Color.BLACK);
-                            pnt.setTextSize(20);
-                            String str = today_progress + "%";
-                            canvas.drawText(str, 10,20, pnt);
-                        }
+                    int finalI = i;
+                    int finalI1 = i;
+                    documentReference
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-                        @Override
-                        public void setAlpha(int i) {
-                        }
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document != null) {
+                                            if (document.exists()) {
+                                                Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
+                                                if(document.get(str)!=null){
+                                                    Log.e(TAG, "onChange map.get: "+ ("calendar" + finalI) );
+                                                    events.add(new EventDay(map.get("calendar" + finalI1), new Drawable() {
+                                                        @Override
+                                                        public void draw(@NonNull Canvas canvas) {
+                                                            //캔버스 바탕 설정
+                                                            Paint pnt= new Paint();
+                                                            //가로로 설정
+                                                            pnt.setAntiAlias(true);
+                                                            pnt.setColor(Color.LTGRAY);
+                                                            String st = document.get(str)+"%";
+                                                            canvas.drawRect(0,0,canvas.getWidth()*Integer.parseInt(String.valueOf(document.get(str)))/100,53, pnt);
 
-                        @Override
-                        public void setColorFilter(@Nullable ColorFilter colorFilter) {
-                        }
+                                                            Paint pnt2= new Paint();
+                                                            pnt.setAntiAlias(true);
+                                                            pnt2.setColor(Color.RED);
+                                                            pnt2.setTextSize(30);
+                                                            canvas.drawText(st, 0, canvas.getHeight()-10, pnt2);
+                                                        }
 
-                        /**
-                         * @deprecated
-                         */
-                        @SuppressLint("WrongConstant")
-                        @Override
-                        public int getOpacity() {
-                            return 0;
-                        }
-                    }));
+                                                        @Override
+                                                        public void setAlpha(int i) {
+                                                        }
+
+                                                        @Override
+                                                        public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                                                        }
+
+                                                        /**
+                                                         * @deprecated
+                                                         */
+                                                        @SuppressLint("WrongConstant")
+                                                        @Override
+                                                        public int getOpacity() {
+                                                            return 0;
+                                                        }
+                                                    }));
+                                                }
+                                                calendarView.setEvents(events);
+                                            } else {
+                                                Log.d(TAG, "No such document");
+                                            }
+                                        }
+                                    } else {
+                                        Log.d(TAG, "get failed with ", task.getException());
+                                    }
+                                }
+                            });
+
+
                 }
-                calendarView.setEvents(events);
+
             }
         });
 

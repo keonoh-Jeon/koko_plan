@@ -102,7 +102,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         listenerDoc();
 
         //파이어베이스 필드 검색
-
         new Thread(() -> {
             DocumentReference documentReference = firebaseFirestore
                     .collection("randomsource")
