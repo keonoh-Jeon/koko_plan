@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
 import com.koko_plan.sub.CustomToastMaker;
+import com.koko_plan.sub.ItemTouchHelperListener;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.name;
 
-public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.ViewHolder> implements Filterable
+public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.ViewHolder> implements Filterable, ItemTouchHelperListener
 {
     private Context context;
     private ArrayList<GoodText_Item> unfilterList;
@@ -61,6 +62,16 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
         this.filterList  = unfilterList;
         this.context = context;
         this.goodText_viewListener = listener;
+    }
+
+    @Override
+    public boolean onItemMove(int from_position, int to_position) {
+        return false;
+    }
+
+    @Override
+    public void onItemSwipe(int position) {
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener

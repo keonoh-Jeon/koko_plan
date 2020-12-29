@@ -433,7 +433,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //                String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ss초 ", Locale.getDefault()).format(currentDateTime);
                 String date_text = lesthour + "시간 " + lestmin +"분 " + lestsec+"초";
                 if(totalsec>0)
-                Toast.makeText(mContext,date_text + "뒤에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext,date_text + "뒤에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
 
                 //  Preference에 설정한 값 저장
                 editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());

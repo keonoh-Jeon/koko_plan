@@ -7,6 +7,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ScrollingView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -27,6 +28,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -35,6 +37,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.InputDevice;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -43,15 +46,18 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.applandeo.materialcalendarview.CalendarUtils;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
+import com.applandeo.materialcalendarview.listeners.OnCalendarPageChangeListener;
 import com.applandeo.materialcalendarview.listeners.OnDayClickListener;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -94,12 +100,16 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
@@ -128,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Bitmap profile;
 
     private RecyclerAdapter adapter;
-    private RecyclerView recyclerView, recyclerView2;
+    private RecyclerView recyclerView, recyclerView2, recyclerView3;
     private Paint p = new Paint();
 
     public static TodoDatabase roomdb;
@@ -149,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String todaydate;
     private SimpleDateFormat dateformat;
 
-    ItemTouchHelper helper;
+    ItemTouchHelper helper, helper2;
     public static String selecteddata;
     private Date date;
     private AppUpdateManager appUpdateManager;
@@ -169,7 +179,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TextView goodtextsize;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private List<EventDay> events;
+    private CalendarView calendarView;
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,25 +218,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         horizontalCalendarmaker(calendar);
 
-        //리사이클러뷰 초기화
-        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        //데이터베이스 지정
-        roomdb = TodoDatabase.getDatabase(this);
-        adapter = new RecyclerAdapter(roomdb);
-        //리사이클러뷰 옵션 적용용
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
-
+        HabbitTodayListmaker();
         HabbitListmaker();
 
         //달력추가
-        try {
-            EventCalendarMaker();
-        } catch (OutOfDateRangeException e) {
-            e.printStackTrace();
-        }
+
+        Calendar calendar = Calendar.getInstance();
+        EventCalendarMaker(calendar);
 
         initSwipe();
 
@@ -233,36 +234,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         helper.attachToRecyclerView(recyclerView);
 
         GoodTextListmaker();
+
+        //ItemTouchHelper 생성
+        helper2 = new ItemTouchHelper(new ItemTouchHelperCallback(goodText_adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper2.attachToRecyclerView(recyclerView);
+    }
+
+    private void HabbitTodayListmaker() {
+        //리사이클러뷰 초기화
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        //데이터베이스 지정
+        roomdb = TodoDatabase.getDatabase(this);
+        adapter = new RecyclerAdapter(roomdb);
+        //리사이클러뷰 옵션 적용용
+
+        recyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     private void HabbitListmaker() {
 
         habbitListItems = new ArrayList<>();
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
 
-        RecyclerView recyclerView = findViewById(R.id.rv_view2);
-        recyclerView.setLayoutManager(layoutManager);
-
         habbitListAdapter = new HabbitList_Adapter(habbitListItems, this, this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(habbitListAdapter);
+        recyclerView2.setLayoutManager(layoutManager);
+        recyclerView2.setLayoutManager(layoutManager);
+        recyclerView2.setAdapter(habbitListAdapter);
     }
 
     private void GoodTextListmaker() {
 
         goodText_items = new ArrayList<>();
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
 
-        RecyclerView recyclerView = findViewById(R.id.view_msg);
-        recyclerView.setLayoutManager(layoutManager);
-
         goodText_adapter = new GoodText_Adapter(goodText_items, this, this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(goodText_adapter);
+        recyclerView3.setLayoutManager(layoutManager);
+        recyclerView3.setLayoutManager(layoutManager);
+        recyclerView3.setAdapter(goodText_adapter);
     }
 
     private void horizontalCalendarmaker(Calendar calendar) {
@@ -350,13 +364,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         }
                                     }).start();
                                 }
-
                                 //달력추가
-                                try {
-                                    EventCalendarMaker();
-                                } catch (OutOfDateRangeException e) {
-                                    e.printStackTrace();
-                                }
+                                EventCalendarMaker(date);
 
                                 /*for(int i=0 ; i < selecteditemsize ; i++){
                                     Log.e(TAG, "onDateSelected: " + roomdb.todoDao().search(selecteddata).get(i).getDate());
@@ -492,6 +501,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        recyclerView = findViewById(R.id.rv_habbitview);
+        recyclerView.setVisibility(View.GONE);
+        recyclerView2 = findViewById(R.id.rv_habbitview2);
+        recyclerView2.setVisibility(View.GONE);
+        recyclerView3 = findViewById(R.id.rv_msg);
+
+        calendarView = findViewById(R.id.calendarView2);
+
         goodtextsize = findViewById(R.id.tv_goodtextsize);
     }
 
@@ -578,14 +595,109 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //하단 달력 설정
-    private void EventCalendarMaker() throws OutOfDateRangeException {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void EventCalendarMaker(Calendar calendar){
 
         // https://github.com/Applandeo/Material-Calendar-View
 
-        List<EventDay> events = new ArrayList<>();
+        CalendarEvents(calendar);
+//or
+        /*events.add(new EventDay(calendar2, new Drawable()));
+//or if you want to specify event label color
+        events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
 
-        Calendar calendar2 = Calendar.getInstance();
-        events.add(new EventDay(calendar2, new Drawable() {
+
+        try {
+            calendarView.setDate(date);
+        } catch (OutOfDateRangeException e) {
+            e.printStackTrace();
+        }
+
+        //달력클릭
+        calendarView.setOnDayClickListener(new OnDayClickListener() {
+
+            @Override
+            public void onDayClick(EventDay eventDay) {
+                Calendar clickedDayCalendar = eventDay.getCalendar();
+                horizontalCalendar.selectDate(clickedDayCalendar, true);
+                selecteddata = dateformat.format(clickedDayCalendar.getTime());
+                scrollview.scrollTo(0,0);
+            }
+        });
+
+        calendarView.setOnPreviousPageChangeListener(new OnCalendarPageChangeListener() {
+            @Override
+            public void onChange() {
+                Log.e(TAG, "onChange: " + "시작");
+
+                int year = calendarView.getCurrentPageDate().get(Calendar.YEAR);
+                int month = calendarView.getCurrentPageDate().get(Calendar.MONTH)+1;
+                // 해당 달력 마지막 날짜
+                int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+
+                List<EventDay> events = new ArrayList<>();
+
+                for(int i = 1 ; i <= 3 ; i++) {
+                    String str = year + "-" + month + "-" + i;
+                    Log.e(TAG, "onChange: "+ str);
+                    try {
+                        date = sdf.parse(str);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    assert date != null;
+                    calendar.setTime(date);
+
+                    events.add(new EventDay(calendar, new Drawable() {
+                        @Override
+                        public void draw(@NonNull Canvas canvas) {
+                            //캔버스 바탕 설정
+                            canvas.drawColor(Color.RED);
+                            Paint pnt= new Paint();
+                            //가로로 설정
+                            pnt.setAntiAlias(true);
+                            pnt.setColor(Color.BLACK);
+                            pnt.setTextSize(20);
+                            String str = today_progress + "%";
+                            canvas.drawText(str, 10,20, pnt);
+                        }
+
+                        @Override
+                        public void setAlpha(int i) {
+                        }
+
+                        @Override
+                        public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                        }
+
+                        /**
+                         * @deprecated
+                         */
+                        @SuppressLint("WrongConstant")
+                        @Override
+                        public int getOpacity() {
+                            return 0;
+                        }
+                    }));
+
+                }
+                calendarView.setEvents(events);
+            }
+        });
+
+        calendarView.setOnForwardPageChangeListener(new OnCalendarPageChangeListener() {
+            @Override
+            public void onChange() {
+
+                Log.e(TAG, "EventCalendarMaker: "+ calendarView.getCurrentPageDate().get(Calendar.MONTH));
+            }
+        });
+    }
+
+    private void CalendarEvents(Calendar calendar) {
+        events = new ArrayList<>();
+        events.add(new EventDay(calendar, new Drawable() {
             @Override
             public void draw(@NonNull Canvas canvas) {
                 //캔버스 바탕 설정
@@ -595,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 pnt.setAntiAlias(true);
                 pnt.setColor(Color.BLACK);
                 pnt.setTextSize(20);
-                String str = String.valueOf(today_progress)+"%";
+                String str = today_progress + "%";
                 canvas.drawText(str, 10,20, pnt);
             }
 
@@ -616,28 +728,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return 0;
             }
         }));
-
-//or
-        /*events.add(new EventDay(calendar2, new Drawable()));
-//or if you want to specify event label color
-        events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
-
-        CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView2);
         calendarView.setEvents(events);
-        calendarView.setDate(date);
-        Log.e(TAG, "EventCalendarMaker: " + date);
-
-        //달력클릭
-        calendarView.setOnDayClickListener(new OnDayClickListener() {
-
-            @Override
-            public void onDayClick(EventDay eventDay) {
-                Calendar clickedDayCalendar = eventDay.getCalendar();
-                horizontalCalendar.selectDate(clickedDayCalendar, true);
-                selecteddata = dateformat.format(clickedDayCalendar.getTime());
-                scrollview.scrollTo(0,0);
-            }
-        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -679,8 +770,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerDoc(){
 
-        if(firebaseFirestore !=null) {
-
+        if(firebaseUser != null) {
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
@@ -692,6 +782,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
+                        @SuppressLint("SetTextI18n")
                         @Override
                         public void onEvent(@Nullable QuerySnapshot snapshots,
                                             @Nullable FirebaseFirestoreException e) {
