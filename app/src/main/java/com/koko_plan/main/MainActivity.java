@@ -111,6 +111,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
@@ -626,6 +627,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         calendarView.setOnPreviousPageChangeListener(new OnCalendarPageChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onChange() {
                 Log.e(TAG, "onChange: " + "시작");
@@ -636,9 +638,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
 
-                List<EventDay> events = new ArrayList<>();
+                //변수를 동적으로 만드는 방법
+                Map<String, Calendar> map = new HashMap<String, Calendar>();
+                for (int i = 1; i < 4; i++) {
+                    map.put("calendar"+i, Calendar.getInstance());
 
-                for(int i = 1 ; i <= 3 ; i++) {
                     String str = year + "-" + month + "-" + i;
                     Log.e(TAG, "onChange: "+ str);
                     try {
@@ -647,9 +651,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         e.printStackTrace();
                     }
                     assert date != null;
-                    calendar.setTime(date);
+                    map.get("calendar" + i).setTime(date);
 
-                    events.add(new EventDay(calendar, new Drawable() {
+                    Log.e(TAG, "onChange: "+ map.get("calendar" + i));
+
+                    events.add(new EventDay(map.get("calendar" + i), new Drawable() {
                         @Override
                         public void draw(@NonNull Canvas canvas) {
                             //캔버스 바탕 설정
@@ -680,7 +686,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             return 0;
                         }
                     }));
-
                 }
                 calendarView.setEvents(events);
             }
