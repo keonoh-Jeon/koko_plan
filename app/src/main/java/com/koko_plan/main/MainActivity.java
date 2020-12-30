@@ -172,9 +172,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int today_progress;
     public static int todayitemsize;
 
-    public static ArrayList<HabbitList_Item> habbitListItems = null;
-    private HabbitList_Adapter habbitListAdapter = null;
-
     public static ArrayList<GoodText_Item> goodText_items = null;
     private GoodText_Adapter goodText_adapter = null;
 
@@ -219,8 +216,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         horizontalCalendarmaker(calendar);
 
-        HabbitTodayListmaker();
-        HabbitListmaker();
+        //리사이클러뷰 초기화
+        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        //데이터베이스 지정
+        roomdb = TodoDatabase.getDatabase(this);
+        adapter = new RecyclerAdapter(roomdb);
+        //리사이클러뷰 옵션 적용용
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
+//        HabbitTodayListmaker();
+//        HabbitListmaker();
 
         //달력추가
 
@@ -243,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void HabbitTodayListmaker() {
+        recyclerView = findViewById(R.id.rv_view);
         //리사이클러뷰 초기화
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         //데이터베이스 지정
@@ -250,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter = new RecyclerAdapter(roomdb);
         //리사이클러뷰 옵션 적용용
 
-        recyclerView.setVisibility(View.VISIBLE);
+//        recyclerView.setVisibility(View.VISIBLE);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -258,14 +267,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void HabbitListmaker() {
 
-        habbitListItems = new ArrayList<>();
+        /*habbitListItems = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
 
         habbitListAdapter = new HabbitList_Adapter(habbitListItems, this, this);
         recyclerView2.setLayoutManager(layoutManager);
-        recyclerView2.setLayoutManager(layoutManager);
-        recyclerView2.setAdapter(habbitListAdapter);
+        recyclerView2.setAdapter(habbitListAdapter);*/
     }
 
     private void GoodTextListmaker() {
@@ -325,13 +333,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 public void run() {
                                                     cur = 0;
                                                     for(int i=0 ; i < selecteditemsize ; i++) {
-                                                        if(adapter.getItems().get(i).getCurtime()>0){
-                                                            int curtime = (int) ((double)adapter.getItems().get(i).getCurtime() / ((double)adapter.getItems().get(i).getTotalsec()) * 100.0);
+                                                            int curtime = (int) ((double)roomdb.todoDao().search(selecteddata).get(i).getCurtime() / ((double)roomdb.todoDao().search(selecteddata).get(i).getTotalsec()) * 100.0);
                                                             cur += curtime;
-                                                        } else {
-                                                            int count = (int) ((double)adapter.getItems().get(i).getCurcount() / ((double)adapter.getItems().get(i).getCount()) * 100.0);
-                                                            cur += count;
-                                                        }
                                                     }
                                                     today_progress = cur/selecteditemsize;
                                                     tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
@@ -502,10 +505,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        recyclerView = findViewById(R.id.rv_habbitview);
+
 //        recyclerView.setVisibility(View.GONE);
-        recyclerView2 = findViewById(R.id.rv_habbitview2);
-        recyclerView2.setVisibility(View.GONE);
+//        recyclerView2 = findViewById(R.id.rv_habbitview2);
+//        recyclerView2.setVisibility(View.GONE);
         recyclerView3 = findViewById(R.id.rv_msg);
 
         calendarView = findViewById(R.id.calendarView2);
@@ -630,146 +633,106 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onChange() {
-                Log.e(TAG, "onChange: " + "시작");
-
-                int year = calendarView.getCurrentPageDate().get(Calendar.YEAR);
-                int month = calendarView.getCurrentPageDate().get(Calendar.MONTH)+1;
-                // 해당 달력 마지막 날짜
-                int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-
-                Log.e(TAG, "onChange month: "+ month );
-
-                //변수를 동적으로 만드는 방법
-                Map<String, Calendar> map = new HashMap<String, Calendar>();
-                for (int i = 1; i <= lastday; i++) {
-                    map.put("calendar"+i, Calendar.getInstance());
-                    String str = year + "-" + month + "-" + i;
-                    try {
-                        date = sdf.parse(str);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    assert date != null;
-                    map.get("calendar" + i).setTime(date);
-                    Log.e(TAG, "onChange: " +  map.get("calendar" + i));
-
-                    DocumentReference documentReference = firebaseFirestore
-                            .collection("users")
-                            .document(firebaseUser.getUid());
-
-                    int finalI = i;
-                    int finalI1 = i;
-                    documentReference
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
-                                @SuppressLint("SetTextI18n")
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot document = task.getResult();
-                                        if (document != null) {
-                                            if (document.exists()) {
-                                                Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
-                                                if(document.get(str)!=null){
-                                                    Log.e(TAG, "onChange map.get: "+ ("calendar" + finalI) );
-                                                    events.add(new EventDay(map.get("calendar" + finalI1), new Drawable() {
-                                                        @Override
-                                                        public void draw(@NonNull Canvas canvas) {
-                                                            //캔버스 바탕 설정
-                                                            Paint pnt= new Paint();
-                                                            //가로로 설정
-                                                            pnt.setAntiAlias(true);
-                                                            pnt.setColor(Color.LTGRAY);
-                                                            String st = document.get(str)+"%";
-                                                            canvas.drawRect(0,0,canvas.getWidth()*Integer.parseInt(String.valueOf(document.get(str)))/100,53, pnt);
-
-                                                            Paint pnt2= new Paint();
-                                                            pnt.setAntiAlias(true);
-                                                            pnt2.setColor(Color.RED);
-                                                            pnt2.setTextSize(30);
-                                                            canvas.drawText(st, 0, canvas.getHeight()-10, pnt2);
-                                                        }
-
-                                                        @Override
-                                                        public void setAlpha(int i) {
-                                                        }
-
-                                                        @Override
-                                                        public void setColorFilter(@Nullable ColorFilter colorFilter) {
-                                                        }
-
-                                                        /**
-                                                         * @deprecated
-                                                         */
-                                                        @SuppressLint("WrongConstant")
-                                                        @Override
-                                                        public int getOpacity() {
-                                                            return 0;
-                                                        }
-                                                    }));
-                                                }
-                                                calendarView.setEvents(events);
-                                            } else {
-                                                Log.d(TAG, "No such document");
-                                            }
-                                        }
-                                    } else {
-                                        Log.d(TAG, "get failed with ", task.getException());
-                                    }
-                                }
-                            });
-
-
-                }
-
+                showcalendardayprogress();
             }
         });
 
         calendarView.setOnForwardPageChangeListener(new OnCalendarPageChangeListener() {
             @Override
             public void onChange() {
-
-                Log.e(TAG, "EventCalendarMaker: "+ calendarView.getCurrentPageDate().get(Calendar.MONTH));
+                showcalendardayprogress();
             }
         });
     }
 
-    private void CalendarEvents(Calendar calendar) {
+    private void showcalendardayprogress() {
         events = new ArrayList<>();
-        events.add(new EventDay(calendar, new Drawable() {
-            @Override
-            public void draw(@NonNull Canvas canvas) {
-                //캔버스 바탕 설정
-                canvas.drawColor(Color.RED);
-                Paint pnt= new Paint();
-                //가로로 설정
-                pnt.setAntiAlias(true);
-                pnt.setColor(Color.BLACK);
-                pnt.setTextSize(20);
-                String str = today_progress + "%";
-                canvas.drawText(str, 10,20, pnt);
-            }
+        int year = calendarView.getCurrentPageDate().get(Calendar.YEAR);
+        int month = calendarView.getCurrentPageDate().get(Calendar.MONTH)+1;
+        // 해당 달력 마지막 날짜
+        int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
 
-            @Override
-            public void setAlpha(int i) {
+        //변수를 동적으로 만드는 방법
+        Map<String, Calendar> map = new HashMap<String, Calendar>();
+        for (int i = 1; i <= lastday; i++) {
+            map.put("calendar"+i, Calendar.getInstance());
+            String str = year + "-" + month + "-" + i;
+            try {
+                date = sdf.parse(str);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
+            assert date != null;
+            map.get("calendar" + i).setTime(date);
 
-            @Override
-            public void setColorFilter(@Nullable ColorFilter colorFilter) {
-            }
+            DocumentReference documentReference = firebaseFirestore
+                    .collection("users")
+                    .document(firebaseUser.getUid());
 
-            /**
-             * @deprecated
-             */
-            @SuppressLint("WrongConstant")
-            @Override
-            public int getOpacity() {
-                return 0;
-            }
-        }));
-        calendarView.setEvents(events);
+            int finalI = i;
+            documentReference
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null) {
+                                    if (document.exists() && document.get(str)!=null) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + map.get("calendar" + finalI));
+                                        events.add(new EventDay(map.get("calendar" + finalI), new Drawable() {
+                                            @SuppressLint("CanvasSize")
+                                            @Override
+                                            public void draw(@NonNull Canvas canvas) {
+                                                //캔버스 바탕 설정
+                                                Paint pnt= new Paint();
+                                                //가로로 설정
+                                                pnt.setAntiAlias(true);
+                                                pnt.setColor(Color.LTGRAY);
+                                                String st = document.get(str)+"%";
+                                                canvas.drawRect(0,0,canvas.getWidth()*Integer.parseInt(String.valueOf(document.get(str)))/100,53, pnt);
+
+                                                Paint pnt2= new Paint();
+                                                pnt.setAntiAlias(true);
+                                                pnt2.setColor(Color.RED);
+                                                pnt2.setTextSize(30);
+                                                canvas.drawText(st, 0, canvas.getHeight()-10, pnt2);
+                                            }
+
+                                            @Override
+                                            public void setAlpha(int i) {
+                                            }
+
+                                            @Override
+                                            public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                                            }
+
+                                            /**
+                                             * @deprecated
+                                             */
+                                            @SuppressLint("WrongConstant")
+                                            @Override
+                                            public int getOpacity() {
+                                                return 0;
+                                            }
+                                        }));
+                                        calendarView.setEvents(events);
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                    }
+                                }
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
+                            }
+                        }
+                    });
+        }
+    }
+    private void CalendarEvents(Calendar calendar) {
+        showcalendardayprogress();
     }
 
     @SuppressLint("SetTextI18n")
