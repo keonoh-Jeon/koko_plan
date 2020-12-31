@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center_vertical"
-    android:background="@drawable/back2"
     tools:context=".member.Singup">
 
     <LinearLayout
@@ -36,9 +35,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="50dp"
-            android:text="KOKO GPS"
+            android:text="KOKO HABBIT"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="#FFC107"
             android:textSize="35sp"
             tools:ignore="HardcodedText" />
 

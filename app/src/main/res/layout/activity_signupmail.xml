@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center_vertical"
-    android:background="@drawable/back7"
     tools:context=".member.Singup">
 
     <LinearLayout
@@ -32,27 +31,33 @@
 
         <EditText
             android:hint="E-mail"
+            android:textColorHint="#000000"
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:hint="password"
+            android:textColorHint="#000000"
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:hint="password"
+            android:textColorHint="#000000"
             android:id="@+id/passwordCheckEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/signUpButton"

@@ -61,12 +61,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:text="습관 비중 추이"
-                        android:background="#03A9F4"
-                        tools:ignore="HardcodedText" />
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="습관 비중 추이"
+                            android:background="#03A9F4"
+                            tools:ignore="HardcodedText" />
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"/>
+
+                    </LinearLayout>
+
 
                 </RelativeLayout>
 
@@ -103,7 +116,8 @@
                             android:text="몇개"
                             android:id="@+id/tv_goodtextsize"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText" />
 
                     </LinearLayout>
 

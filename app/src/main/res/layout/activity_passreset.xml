@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center_vertical"
-    android:background="@drawable/back6"
     tools:context=".member.Singup">
 
     <LinearLayout
@@ -24,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="비밀번호 재지정"
-            android:textColor="#C9C9C9"
+            android:textColor="#673AB7"
             android:layout_marginTop="100dp"
             android:layout_marginBottom="50dp"
             tools:ignore="HardcodedText" />
@@ -32,8 +31,8 @@
 
         <EditText
             android:hint="E-mail"
-            android:textColorHint="#FFFFFF"
-            android:textColor="#FFFFFF"
+            android:textColorHint="#3F51B5"
+            android:textColor="#3F51B5"
             android:id="@+id/passwordResetText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

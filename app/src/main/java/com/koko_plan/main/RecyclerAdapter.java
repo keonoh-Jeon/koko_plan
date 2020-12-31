@@ -91,9 +91,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         }
         notifyItemMoved(fromPosition, toPosition);
-
         btnsavelist.setVisibility(View.VISIBLE);
-
         return true;
     }
 

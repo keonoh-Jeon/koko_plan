@@ -19,9 +19,12 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textSize="20dp"
-        android:textColor="#EAD5D5"
-        android:background="#BC2C2C"
+        android:background="@drawable/goodtext_background"
+        android:textColor="#F9EBDE"
+        android:fontFamily="@font/font"
         android:text="Toast massage"
+        android:textStyle="bold"
+        android:padding="20sp"
         tools:ignore="HardcodedText,SpUsage" />
 
 </RelativeLayout>

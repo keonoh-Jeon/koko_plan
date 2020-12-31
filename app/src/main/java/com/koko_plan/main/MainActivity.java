@@ -7,7 +7,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ScrollingView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -28,7 +27,6 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -37,7 +35,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.InputDevice;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -46,14 +43,16 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.applandeo.materialcalendarview.CalendarUtils;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
 import com.applandeo.materialcalendarview.listeners.OnCalendarPageChangeListener;
 import com.applandeo.materialcalendarview.listeners.OnDayClickListener;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
@@ -94,6 +93,7 @@ import com.koko_plan.member.Profile_Item;
 import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.SaveProgressReceiver;
+import com.koko_plan.sub.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static FirebaseFirestore firebaseFirestore;
     public static FirebaseUser firebaseUser;
+
     @SuppressLint("StaticFieldLeak")
     public static Button btnsavelist;
 
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Bitmap profile;
 
     private RecyclerAdapter adapter;
-    private RecyclerView recyclerView, recyclerView2, recyclerView3;
+    private RecyclerView recyclerView, recyclerView3;
     private Paint p = new Paint();
 
     public static TodoDatabase roomdb;
@@ -181,13 +182,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CalendarView calendarView;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    @SuppressLint({"CommitPrefEdits", "SimpleDateFormat", "SetTextI18n"})
+    @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigator_main);
-        Log.e(TAG, "lifecycle onCreate: ");
+
+        Utils.setStatusBarColor(this, Utils.StatusBarColorType.GREEN_STATUS_BAR);
 
         //어플 업데이트 매니저
         Appupdatemanager();
@@ -196,16 +198,85 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
 
+        //파이어베이스 초기화
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동
         initprofile();
+
+        // 파이어베이스 회원 정보 모으기
         getprofile();
 
         //객체 초기화
         InitializeView();
 
         // 현재 날짜 구하기
+        gettodaydate();
+
+        // 가로 달력 구현
+        horizontalCalendarmaker(calendar);
+
+        // 할일 목록 만들기(리사이클러뷰)
+        HabbitTodayListmaker();
+
+        LineChartMaker();
+
+//        HabbitTodayListmaker();
+//        HabbitListmaker();
+
+        //하단 프로세스 달력추가
+        EventCalendarMaker(calendar);
+
+        initSwipe();
+
+        GoodTextListmaker();
+    }
+
+    private void LineChartMaker() {
+        LineChart lineChart = (LineChart) findViewById(R.id.chart);
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(4f, 0));
+        entries.add(new Entry(8f, 1));
+        entries.add(new Entry(6f, 2));
+        entries.add(new Entry(2f, 3));
+        entries.add(new Entry(18f, 4));
+        entries.add(new Entry(9f, 5));
+        entries.add(new Entry(16f, 6));
+        entries.add(new Entry(5f, 7));
+        entries.add(new Entry(3f, 8));
+        entries.add(new Entry(7f, 10));
+        entries.add(new Entry(9f, 11));
+
+        LineDataSet dataset = new LineDataSet(entries, "# of Calls");
+
+        ArrayList<String> labels = new ArrayList<String>();
+        labels.add("January");
+        labels.add("February");
+        labels.add("March");
+        labels.add("April");
+        labels.add("May");
+        labels.add("June");
+        labels.add("July");
+        labels.add("August");
+        labels.add("September");
+        labels.add("October");
+        labels.add("November");
+        labels.add("December");
+
+        LineData data = new LineData(labels, dataset);
+        dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
+        /*dataset.setDrawCubic(true); //선 둥글게 만들기
+        dataset.setDrawFilled(true); //그래프 밑부분 색칠*/
+
+        lineChart.setData(data);
+        lineChart.animateY(5000);
+
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private void gettodaydate() {
         date = new Date();
         calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -213,11 +284,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dateformat = new SimpleDateFormat("yyyy-MM-dd");
         todaydate = dateformat.format(date);
         selecteddata = todaydate;
+    }
 
-        horizontalCalendarmaker(calendar);
-
-        //리사이클러뷰 초기화
-        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
+    private void HabbitTodayListmaker() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         //데이터베이스 지정
         roomdb = TodoDatabase.getDatabase(this);
@@ -226,43 +295,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-
-//        HabbitTodayListmaker();
-//        HabbitListmaker();
-
-        //달력추가
-
-        Calendar calendar = Calendar.getInstance();
-        EventCalendarMaker(calendar);
-
-        initSwipe();
 
         //ItemTouchHelper 생성
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
         //RecyclerView에 ItemTouchHelper 붙이기
         helper.attachToRecyclerView(recyclerView);
-
-        GoodTextListmaker();
-
-        //ItemTouchHelper 생성
-        helper2 = new ItemTouchHelper(new ItemTouchHelperCallback(goodText_adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper2.attachToRecyclerView(recyclerView);
-    }
-
-    private void HabbitTodayListmaker() {
-        recyclerView = findViewById(R.id.rv_view);
-        //리사이클러뷰 초기화
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        //데이터베이스 지정
-        roomdb = TodoDatabase.getDatabase(this);
-        adapter = new RecyclerAdapter(roomdb);
-        //리사이클러뷰 옵션 적용용
-
-//        recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
     }
 
     private void HabbitListmaker() {
@@ -286,6 +323,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView3.setLayoutManager(layoutManager);
         recyclerView3.setLayoutManager(layoutManager);
         recyclerView3.setAdapter(goodText_adapter);
+
+        //ItemTouchHelper 생성
+        helper2 = new ItemTouchHelper(new ItemTouchHelperCallback(goodText_adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper2.attachToRecyclerView(recyclerView3);
     }
 
     private void horizontalCalendarmaker(Calendar calendar) {
@@ -434,7 +476,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-// 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동.
     private void initprofile() {
         new Thread(() -> {
             if (firebaseUser == null) {
@@ -494,26 +535,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         probitmap();
 
         ivTrophy = findViewById(R.id.iv_trophy);
-
+        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
         pieChart = findViewById(R.id.piechart);
 
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
-        //효과음 초기화
-        MySoundPlayer.initSounds(getApplicationContext());
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-
 //        recyclerView.setVisibility(View.GONE);
 //        recyclerView2 = findViewById(R.id.rv_habbitview2);
 //        recyclerView2.setVisibility(View.GONE);
         recyclerView3 = findViewById(R.id.rv_msg);
 
+        goodtextsize = findViewById(R.id.tv_goodtextsize);
         calendarView = findViewById(R.id.calendarView2);
 
-        goodtextsize = findViewById(R.id.tv_goodtextsize);
+        //효과음 초기화
+        MySoundPlayer.initSounds(getApplicationContext());
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -529,21 +568,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }catch (InterruptedException e){
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-
-    }
-
-    @Override
-    public void onDelete() {
-
-    }
-
-    @Override
-    public void onModify() {
-
     }
 
     class Profilebitmap extends Thread {
@@ -569,10 +593,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onItemClick(View view, int position) {
+
+    }
+
+    @Override
+    public void onDelete() {
+
+    }
+
+    @Override
+    public void onModify() {
+
+    }
+
+    @Override
     protected void onDestroy() {
-        Log.d(TAG, "lifecycle onDestroy: 시작=============");
-        System.gc();
         super.onDestroy();
+        System.gc();
     }
 
     //어플 업데이트 관리
@@ -750,13 +788,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        btnPlus.setOnClickListener(v -> {
-            myStartActivity(EditHabbit.class);
-        });
+        btnPlus.setOnClickListener(v -> myStartActivity(EditHabbit.class));
 
-        ivTrophy.setOnClickListener(v -> {
-            myStartActivity2(Ranking_list.class);
-        });
+        ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
 
         btnsavelist.setVisibility(View.INVISIBLE);
         btnsavelist.setOnClickListener(v -> {
@@ -892,6 +926,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 total += items.get(i).getTotalsec();
             }
 
+            double percentage = total/(24*3600.0)*100;
+
             //하루 24 남은 시간
             NoOfTotalsec.add(new Entry(24 * 3600 - total, 0));
             PieDataSet dataSet = new PieDataSet(NoOfTotalsec, "... Hour Of habbits");
@@ -907,8 +943,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             pieChart.setData(data);
             dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
             pieChart.animateXY(2000, 2000);
-            pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", total / (24 * 3600.0) * 100) + "%");
+            pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
 
+            savefieldtofirebase(percentage);
+
+        }
+    }
+
+    private void savefieldtofirebase(double d) {
+        if(name!=null){
+            //파이어베이스 저장
+            new Thread(() -> {
+                if(firebaseUser != null) {
+                    Map<String, Object> dairyInfo = new HashMap<>();
+                    dairyInfo.put(todaydate, today_progress);
+
+                    firebaseFirestore
+                            .collection("users")
+                            .document(firebaseUser.getUid())
+                            .set(dairyInfo, SetOptions.merge())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
+                }
+            }).start();
         }
     }
 
@@ -982,8 +1047,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
-        calendar = Calendar.getInstance();
         //가로 달력 시작시, 선택날짜와 이동
         horizontalCalendar.selectDate(calendar, true);
 

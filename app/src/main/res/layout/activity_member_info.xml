@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center_vertical"
-    android:background="@drawable/back4"
     tools:context=".member.MemberActivity">
 
     <LinearLayout
@@ -24,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="회원 정보"
-            android:textColor="#FFFFFF"
+            android:textColor="#3F51B5"
             android:layout_marginTop="50dp"
             tools:ignore="HardcodedText" />
 
@@ -34,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="(아래 정보는 앱 기능 향상에 활용됩니다)"
-            android:textColor="#FFFFFF"
+            android:textColor="#673AB7"
             android:layout_marginBottom="50dp"
             tools:ignore="HardcodedText" />
 
