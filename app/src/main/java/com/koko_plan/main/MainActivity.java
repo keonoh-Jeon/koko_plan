@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private View btnPlus;
 
-    public static int lastsec, timegap, totalprogress, curtime;
+    public static int lastsec, timegap, totalprogress;
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private LineDataSet dataset;
 
-    private ArrayList<Entry> entries;
+    private float entries0;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -226,8 +226,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListmaker();
 
-        LineChartMaker();
-
 //        HabbitTodayListmaker();
 //        HabbitListmaker();
 
@@ -237,83 +235,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         GoodTextListmaker();
     }
 
-    class LineCharentries extends Thread {
-        public void run() {
-
-            entries = new ArrayList<>();
-
-
-            for(int i=0 ; i < 1; i++){
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, i-9);
-
-                DocumentReference documentReference = firebaseFirestore
-                        .collection("users")
-                        .document(firebaseUser.getUid())
-                        .collection("dates")
-                        .document(dateformat.format(cal.getTime()));
-                Log.e(TAG, "LineChartMaker: " +  dateformat.format(cal.getTime()));
-
-                int finalI = i;
-                documentReference
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document != null) {
-                                        if (document.exists()) {
-                                            Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
-                                            /*double percent = (double) document.get("percentage");
-                                            entries.add(new Entry((float) percent, 0));*/
-                                            Log.e(TAG, "run: 순서" + "먼저  " + finalI);
-
-                                            entries.add(new Entry(4f, 0));
-
-
-                                        } else {
-                                            Log.d(TAG, "No such document");
-                                        }
-                                    }
-                                } else {
-                                    Log.d(TAG, "get failed with ", task.getException());
-                                }
-                            }
-                        });
-            }
-//        entries.add(new Entry(4f, 0));
-
-        }
-    }
-
     @SuppressLint("Range")
     private void LineChartMaker() {
 
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
 
-        LineCharentries thread = new LineCharentries();
-            thread.start();
+        ArrayList<Entry> entries = new ArrayList<>();
 
-            try{
-                thread.join();
-
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
-
-
-        entries.add(new Entry(8f, 1));
-        entries.add(new Entry(6f, 2));
-        entries.add(new Entry(2f, 3));
-        entries.add(new Entry(18f, 4));
-        entries.add(new Entry(9f, 5));
-        entries.add(new Entry(16f, 6));
-        entries.add(new Entry(5f, 7));
-        entries.add(new Entry(3f, 8));
-        entries.add(new Entry(7f, 10));
+        for(int i=0 ; i < 10; i++){
+            entries.add(new Entry(pref.getFloat("entries"+i, 0), i));
+        }
 
         dataset = new LineDataSet(entries, "");
 
@@ -325,15 +256,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         LineData data = new LineData(labels, dataset);
-        dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
-        /*dataset.setDrawCubic(true); //선 둥글게 만들기
-        dataset.setDrawFilled(true); //그래프 밑부분 색칠*/
-
-        Log.e(TAG, "run: 순서" + "다음");
+//        dataset.setColors(ColorTemplate.VORDIPLOM_COLORS); //
+        /*dataset.setDrawCubic(true); //선 둥글게 만들기*/
+        dataset.setDrawFilled(true);//그래프 밑부분 색칠
 
         lineChart.setData(data);
         lineChart.setAlpha(0.5f);
-        lineChart.animateY(5000);
+        lineChart.setDescription("하루 중 습관 비중 추이");
+        lineChart.animateY(3000);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -361,8 +291,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
         //RecyclerView에 ItemTouchHelper 붙이기
         helper.attachToRecyclerView(recyclerView);
-
-
     }
 
     private void HabbitListmaker() {
@@ -481,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }*/
 
                                 piechartmaker();
+
+                                LineChartMaker();
 
                             }
                         });
@@ -993,7 +923,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //하루 24 남은 시간
             NoOfTotalsec.add(new Entry(24 * 3600 - total, 0));
-            PieDataSet dataSet = new PieDataSet(NoOfTotalsec, "... Hour Of habbits");
+            PieDataSet dataSet = new PieDataSet(NoOfTotalsec, "");
 
             //차트 항목 타이틀 지정
             ArrayList title = new ArrayList();
@@ -1006,6 +936,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             pieChart.setData(data);
             dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
             pieChart.animateXY(2000, 2000);
+            pieChart.setDescription("");
             pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
 
             savefieldtofirebase(percentage);
@@ -1072,7 +1003,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             goodText_items.removeAll(goodText_items);
         }).start();
 
+        savehabbitportion();
+    }
 
+    private void savehabbitportion() {
+
+        new Thread(() -> {
+        for(int i=0 ; i < 10; i++) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, i - 9);
+
+            DocumentReference documentReference = firebaseFirestore
+                    .collection("users")
+                    .document(firebaseUser.getUid())
+                    .collection("dates")
+                    .document(dateformat.format(cal.getTime()));
+
+            int finalI = i;
+            documentReference
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null) {
+                                    if (document.exists()) {
+                                        Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
+                                        double percent = (double) document.get("percentage");
+                                        editor.putFloat("entries" + finalI, (float) percent);
+                                        editor.apply();
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                    }
+                                }
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
+                            }
+                        }
+                    });
+        }
+        }).start();
     }
 
     @Override
@@ -1086,7 +1059,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
-
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})

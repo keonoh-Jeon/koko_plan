@@ -58,14 +58,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             tools:ignore="ScrollViewSize" />
+
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
+                            android:padding="50dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
                     </FrameLayout>
-
-
 
                 </RelativeLayout>
 
