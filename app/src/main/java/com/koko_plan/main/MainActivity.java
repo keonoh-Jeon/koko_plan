@@ -181,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<EventDay> events;
     private CalendarView calendarView;
 
+    private LineDataSet dataset;
+
+    private ArrayList<Entry> entries;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
     @Override
@@ -217,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 가로 달력 구현
         horizontalCalendarmaker(calendar);
 
+        initSwipe();
+
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListmaker();
 
@@ -228,16 +234,77 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
 
-        initSwipe();
-
         GoodTextListmaker();
     }
 
+    class LineCharentries extends Thread {
+        public void run() {
+
+            entries = new ArrayList<>();
+
+
+            for(int i=0 ; i < 1; i++){
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, i-9);
+
+                DocumentReference documentReference = firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid())
+                        .collection("dates")
+                        .document(dateformat.format(cal.getTime()));
+                Log.e(TAG, "LineChartMaker: " +  dateformat.format(cal.getTime()));
+
+                int finalI = i;
+                documentReference
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document != null) {
+                                        if (document.exists()) {
+                                            Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
+                                            /*double percent = (double) document.get("percentage");
+                                            entries.add(new Entry((float) percent, 0));*/
+                                            Log.e(TAG, "run: 순서" + "먼저  " + finalI);
+
+                                            entries.add(new Entry(4f, 0));
+
+
+                                        } else {
+                                            Log.d(TAG, "No such document");
+                                        }
+                                    }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
+                                }
+                            }
+                        });
+            }
+//        entries.add(new Entry(4f, 0));
+
+        }
+    }
+
+    @SuppressLint("Range")
     private void LineChartMaker() {
+
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
 
-        ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(4f, 0));
+        LineCharentries thread = new LineCharentries();
+            thread.start();
+
+            try{
+                thread.join();
+
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
+
         entries.add(new Entry(8f, 1));
         entries.add(new Entry(6f, 2));
         entries.add(new Entry(2f, 3));
@@ -247,32 +314,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         entries.add(new Entry(5f, 7));
         entries.add(new Entry(3f, 8));
         entries.add(new Entry(7f, 10));
-        entries.add(new Entry(9f, 11));
 
-        LineDataSet dataset = new LineDataSet(entries, "# of Calls");
+        dataset = new LineDataSet(entries, "");
 
         ArrayList<String> labels = new ArrayList<String>();
-        labels.add("January");
-        labels.add("February");
-        labels.add("March");
-        labels.add("April");
-        labels.add("May");
-        labels.add("June");
-        labels.add("July");
-        labels.add("August");
-        labels.add("September");
-        labels.add("October");
-        labels.add("November");
-        labels.add("December");
+        for(int i=0 ; i < 10; i++){
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, i-9);
+            labels.add(dateformat.format(cal.getTime()));
+        }
 
         LineData data = new LineData(labels, dataset);
         dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
         /*dataset.setDrawCubic(true); //선 둥글게 만들기
         dataset.setDrawFilled(true); //그래프 밑부분 색칠*/
 
-        lineChart.setData(data);
-        lineChart.animateY(5000);
+        Log.e(TAG, "run: 순서" + "다음");
 
+        lineChart.setData(data);
+        lineChart.setAlpha(0.5f);
+        lineChart.animateY(5000);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -300,6 +361,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
         //RecyclerView에 ItemTouchHelper 붙이기
         helper.attachToRecyclerView(recyclerView);
+
+
     }
 
     private void HabbitListmaker() {
@@ -950,18 +1013,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void savefieldtofirebase(double d) {
+    private void savefieldtofirebase(double percentage) {
         if(name!=null){
             //파이어베이스 저장
             new Thread(() -> {
                 if(firebaseUser != null) {
-                    Map<String, Object> dairyInfo = new HashMap<>();
-                    dairyInfo.put(todaydate, today_progress);
+                    Map<String, Object> percentInfo = new HashMap<>();
+                    percentInfo.put("percentage", percentage);
 
                     firebaseFirestore
                             .collection("users")
                             .document(firebaseUser.getUid())
-                            .set(dairyInfo, SetOptions.merge())
+                            .collection("dates")
+                            .document(todaydate)
+                            .set(percentInfo)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -1078,6 +1143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "run: "+ "onSwiped");
                             roomdb.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();

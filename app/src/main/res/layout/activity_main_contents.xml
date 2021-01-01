@@ -49,11 +49,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/piechart"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        tools:ignore="ScrollViewSize" />
+                        android:layout_height="300dp">
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/piechart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:ignore="ScrollViewSize" />
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                    </FrameLayout>
+
+
 
                 </RelativeLayout>
 
@@ -73,10 +85,7 @@
                             android:background="#03A9F4"
                             tools:ignore="HardcodedText" />
 
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/chart"
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"/>
+
 
                     </LinearLayout>
 
