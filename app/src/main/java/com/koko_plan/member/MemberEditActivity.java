@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,15 +33,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
@@ -54,6 +62,7 @@ public class MemberEditActivity extends AppCompatActivity {
     private RadioButton gender1, gender2;
     private FirebaseUser user;
     FirebaseFirestore db;
+    private EditText et;
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -156,24 +165,19 @@ public class MemberEditActivity extends AppCompatActivity {
 //                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     AlertDialog.Builder ad = new AlertDialog.Builder(MemberEditActivity.this);
                     ad.setTitle("Nickname");
-                    final EditText et = new EditText(MemberEditActivity.this);
+                    et = new EditText(MemberEditActivity.this);
                     et.setText("  " + name);
                     ad.setView(et);
                     ad.setPositiveButton("cancel", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            dialog.dismiss();
-                            // Event
-                        }
+                        public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
                     });
 
                     ad.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             name = et.getText().toString();
-                            tv_name.setText(name);
-                            dialog.dismiss();
+                            checknickname(dialog, name.replaceAll(" ", ""));
                         }
                     });
 
@@ -183,6 +187,64 @@ public class MemberEditActivity extends AppCompatActivity {
             }
         }
     };
+
+    //닉네임 중복 여부 체크
+    private void checknickname(DialogInterface dialog, String nick){
+
+        firebaseFirestore
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                    private boolean duplication;
+
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("listen:error", e);
+                            return;                        }
+
+                        duplication = false;
+                        String nickname = "이름 기입";
+
+                        assert snapshots != null;
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    if(Objects.equals(dc.getDocument().getData().get("name"), nick)
+                                            && !Objects.equals(dc.getDocument().getData().get("id"), firebaseUser.getUid())){
+
+                                        startToast("같은 닉네임이 존재합니다.");
+                                        duplication = true;
+                                    }
+                                    break;
+                                case MODIFIED:
+                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+//                                    maketoast("this club is already exist.");
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case REMOVED:
+                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+
+                        if(duplication) {
+                            nickname = "";
+                        } else {
+                            nickname = et.getText().toString();
+                        }
+                        tv_name.setText(nickname);
+                        String strColor = "#000000";
+                        tv_name.setTextColor(Color.parseColor(strColor));
+                        dialog.dismiss();
+                    }
+                });
+    }
 
     @Override
     public void onBackPressed() {
@@ -228,7 +290,7 @@ public class MemberEditActivity extends AppCompatActivity {
                 firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid())
-                        .set(memberInfo)
+                        .set(memberInfo, SetOptions.merge())
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -268,6 +330,7 @@ public class MemberEditActivity extends AppCompatActivity {
         DocumentReference documentReference = FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(firebaseUser.getUid());
+
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {

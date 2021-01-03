@@ -14,10 +14,8 @@ import com.koko_plan.R;
 
 public class EditHabbit extends AppCompatActivity {
 
-    RadioGroup rg;
     EditText et_habbittitle;
     NumberPicker countPicker, hourPicker, minPicker, secPicker;
-    View time, counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +24,6 @@ public class EditHabbit extends AppCompatActivity {
         setContentView(R.layout.add_habbit);
 
         et_habbittitle = (EditText) findViewById(R.id.et_habbittitle);
-
 
         countPicker  = (NumberPicker) findViewById(R.id.picker_count);
         countPicker.setMinValue(0);

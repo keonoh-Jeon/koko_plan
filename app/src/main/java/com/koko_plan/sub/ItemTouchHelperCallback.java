@@ -23,12 +23,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         return true; }
 
 
-
-
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
         return listener.onItemMove(viewHolder.getAdapterPosition(),target.getAdapterPosition());
-
     }
 
     @Override

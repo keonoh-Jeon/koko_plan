@@ -122,7 +122,7 @@
 
                         <TextView
                             android:textSize="15sp"
-                            android:text="몇개"
+                            android:text=" 0개"
                             android:id="@+id/tv_goodtextsize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

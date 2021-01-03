@@ -30,6 +30,8 @@ public class SetMsgToUsers {
             GoodTextList.put("time", time);
             GoodTextList.put("randomnum", randomnum);
             GoodTextList.put("from", photourl);
+            GoodTextList.put("fromid", firebaseUser.getUid());
+
 
             if (firebaseUser != null) {
                 firebaseFirestore

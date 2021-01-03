@@ -76,6 +76,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void setItem(List<Todo> data) {
         items = data;
         notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
 //todo
@@ -186,7 +187,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private void startTimerTask()
         {
             stopTimerTask();
-            Log.e(TAG, "startTimerTask run: getcurtime 현재 저장 불러오기 " + items.get(index).getCurtime());
             Timer timer = new Timer();
             timerTask = new TimerTask()
             {
@@ -196,8 +196,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 {
                     count++;
                     lastsec = count;
-
-                    Log.e(TAG, "startTimerTask run: " + count);
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;
@@ -209,8 +207,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         public void run() {
                             if(getItemCount()>0) {
                                 if (items.get(index).getIsrunning()) {
-                                    Log.e(TAG, "run: getIsrunning " + items.get(index).getIsrunning());
-                                    Log.e(TAG, "run: timerTask " + timerTask);
                                     tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
                                     tvProgress.setText((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0) + " %");
                                     progressBar.setProgress((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0));
@@ -236,8 +232,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 timerTask.cancel();
                 timerTask = null;
             }
-
-
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})

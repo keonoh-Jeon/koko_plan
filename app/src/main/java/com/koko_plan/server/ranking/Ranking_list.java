@@ -57,8 +57,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking_list);
 
-
-
         // 뷰 초기화
         initView();
 
@@ -136,9 +134,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-
-    }
+    public void onItemClick(View view, int position) {    }
 
     @Override
     public void onDelete() {

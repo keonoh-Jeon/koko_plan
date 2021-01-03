@@ -3,41 +3,61 @@ package com.koko_plan.member;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
+import com.koko_plan.server.ranking.Ranking_Adapter;
+import com.koko_plan.server.ranking.Ranking_Item;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class MemberActivity extends AppCompatActivity {
 
@@ -47,12 +67,14 @@ public class MemberActivity extends AppCompatActivity {
     private String name;
     private String gender;
     private TextView tv_name;
+    private EditText et;
 
     private RadioButton gender1, gender2;
 
     private TextView textView_Date;
     private DatePickerDialog.OnDateSetListener callbackMethod;
     private int curyear, curmonth, curday;
+    private Ranking_Adapter rankingAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +150,7 @@ public class MemberActivity extends AppCompatActivity {
                     MySoundPlayer.play(MySoundPlayer.CLICK);
                     AlertDialog.Builder ad = new AlertDialog.Builder(MemberActivity.this);
                     ad.setTitle("Nickname");
-                    final EditText et = new EditText(MemberActivity.this);
+                    et = new EditText(MemberActivity.this);
                     et.setText("  " + MainActivity.name);
                     if(MainActivity.name == null) et.setText("  ");
                     ad.setView(et);
@@ -142,18 +164,70 @@ public class MemberActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             name = et.getText().toString();
-                            tv_name.setText(name);
-                            String strColor = "#000000";
-                            tv_name.setTextColor(Color.parseColor(strColor));
-                            dialog.dismiss();
+                            checknickname(dialog, name.replaceAll(" ", ""));
                         }
                     });
                     ad.show();
-
                     break;
             }
         }
     };
+
+    //닉네임 중복 여부 체크
+    private void checknickname(DialogInterface dialog, String nick){
+
+        firebaseFirestore
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                    private boolean duplication;
+
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("listen:error", e);
+                            return;                        }
+
+                        duplication = false;
+                        String nickname = "이름 기입";
+
+                        assert snapshots != null;
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    if(Objects.equals(dc.getDocument().getData().get("name"), nick)){
+                                        startToast("같은 닉네임이 존재합니다.");
+                                        duplication = true;
+                                    }
+                                    break;
+                                case MODIFIED:
+                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+//                                    maketoast("this club is already exist.");
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case REMOVED:
+                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+
+                        if(duplication) {
+                            nickname = "";
+                        } else {
+                            nickname = et.getText().toString();
+                        }
+                        tv_name.setText(nickname);
+                        String strColor = "#000000";
+                        tv_name.setTextColor(Color.parseColor(strColor));
+                        dialog.dismiss();
+                    }
+                });
+    }
 
     @Override
     public void onBackPressed() {

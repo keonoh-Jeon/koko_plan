@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
@@ -42,6 +43,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
@@ -81,6 +86,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
+import com.koko_plan.server.goodtext.SetMsgToUsers;
 import com.koko_plan.server.habbitlist.HabbitList_Adapter;
 import com.koko_plan.server.habbitlist.HabbitList_Item;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
@@ -94,6 +100,8 @@ import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.Utils;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -184,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LineDataSet dataset;
 
     private float entries0;
+    private FirebaseCrashlytics crashlytics;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -205,6 +214,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //파이어베이스 초기화
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.log("my message");
+        crashlytics.log("E/TAG: my message");
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
         // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동
         initprofile();
@@ -222,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         horizontalCalendarmaker(calendar);
 
         initSwipe();
+        initSwipe2();
+
 
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListmaker();
@@ -233,6 +248,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EventCalendarMaker(calendar);
 
         GoodTextListmaker();
+
+
+
     }
 
     @SuppressLint("Range")
@@ -372,10 +390,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     today_progress = cur/selecteditemsize;
                                                     tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
 
-                                                    if(name!=null){
+                                                    if(firebaseUser!=null){
                                                         //파이어베이스 저장
                                                         new Thread(() -> {
-                                                            if(firebaseUser != null) {
                                                                 Map<String, Object> dairyInfo = new HashMap<>();
                                                                 dairyInfo.put(todaydate, today_progress);
 
@@ -393,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                                             public void onFailure(@NonNull Exception e) {
                                                                             }
                                                                         });
-                                                            }
                                                         }).start();
                                                     }
                                                 }
@@ -477,6 +493,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 DocumentReference documentReference = firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid());
+
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @SuppressLint("SetTextI18n")
                     @Override
@@ -484,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document != null) {
-                                if (document.exists()) {
+                                if (document.exists() && document.getData().get("name")!=null) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                     Profile_Item profileItem = document.toObject(Profile_Item.class);
                                     assert profileItem != null;
@@ -635,18 +652,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // https://github.com/Applandeo/Material-Calendar-View
 
+        try {
+            calendarView.setDate(calendar);
+        } catch (OutOfDateRangeException e) {
+            e.printStackTrace();
+        }
+
         CalendarEvents(calendar);
 //or
         /*events.add(new EventDay(calendar2, new Drawable()));
 //or if you want to specify event label color
         events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
 
-
-        try {
-            calendarView.setDate(date);
-        } catch (OutOfDateRangeException e) {
-            e.printStackTrace();
-        }
 
         //달력클릭
         calendarView.setOnDayClickListener(new OnDayClickListener() {
@@ -688,7 +705,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Map<String, Calendar> map = new HashMap<String, Calendar>();
         for (int i = 1; i <= lastday; i++) {
             map.put("calendar"+i, Calendar.getInstance());
-            String str = year + "-" + month + "-" + i;
+            @SuppressLint("DefaultLocale") String str = year+"-"+String.format("%02d",month)+"-"+String.format("%02d",i);
             try {
                 date = sdf.parse(str);
             } catch (ParseException e) {
@@ -727,7 +744,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 canvas.drawRect(0,0,canvas.getWidth()*Integer.parseInt(String.valueOf(document.get(str)))/100,53, pnt);
 
                                                 Paint pnt2= new Paint();
-                                                pnt.setAntiAlias(true);
+                                                pnt2.setAntiAlias(true);
                                                 pnt2.setColor(Color.RED);
                                                 pnt2.setTextSize(30);
                                                 canvas.drawText(st, 0, canvas.getHeight()-10, pnt2);
@@ -773,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         timegap =0;
 
-        roomdb.todoDao().getAll(dateformat.format(date.getTime())).observe(this, new Observer<List<Todo>>() {
+        roomdb.todoDao().getAll(todaydate).observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
@@ -781,7 +798,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        btnPlus.setOnClickListener(v -> myStartActivity(EditHabbit.class));
+        btnPlus.setOnClickListener(v -> {
+            myStartActivity(EditHabbit.class);
+        });
 
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
 
@@ -793,8 +812,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         listenerDoc();
-
-
 
         saveProgressAlarm(this);
     }
@@ -844,10 +861,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                             goodText_adapter.notifyDataSetChanged();
                             goodtextsize.setText(goodText_items.size() + "개");
+                            Log.e(TAG, "onEvent: " + goodText_items.size());
                         }
                     });
         }
-
     }
 
     @Override
@@ -1138,9 +1155,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         //오른쪽으로 밀었을 때
 
                     } else {
-                        p.setColor(Color.parseColor("#D32F2F"));
+                        p.setColor(Color.parseColor("#22741C"));
                         RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                         c.drawRect(background, p);
+
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
+
                         /*
                          * icon 추가할 수 있음.
                          */
@@ -1154,6 +1175,119 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    //스와이프 기능 헬퍼 연결
+    private void initSwipe2() {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+
+                //왼쪽으로 밀었을때.
+                if (direction == ItemTouchHelper.LEFT) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getDay());
+
+                            firebaseFirestore
+                                    .collection("users")
+                                    .document(firebaseUser.getUid())
+                                    .collection("dates")
+                                    .document(goodText_items.get(position).getDay())
+                                    .collection("messages")
+                                    .document(goodText_items.get(position).getTime())
+                                    .delete()
+
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            goodText_items.remove(position);
+                                            goodText_adapter.notifyItemRemoved(position);
+                                        }
+                                    })
+
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
+                            Log.d(TAG, "run: "+ "onSwiped");
+                        }
+                    }).start();
+
+                } else {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e(TAG, "run: initSwipe2" + "오른쪽");
+                            SetMsgToUsers.send(goodText_items.get(position).getDay(), goodText_items.get(position).getTime(), String.valueOf(goodText_items.get(position).getRandomnum()), goodText_items.get(position).getFromid());
+
+
+                        }
+                    }).start();
+                }
+
+
+
+                /*if (direction == ItemTouchHelper.RIGHT) {
+                    Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getDay());
+                    Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getTime());
+
+                    SetMsgToUsers.send(goodText_items.get(position).getDay(), goodText_items.get(position).getTime(), String.valueOf(goodText_items.get(position).getRandomnum()), goodText_items.get(position).getFromid());
+
+                }*/
+
+
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+                Bitmap icon;
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ) {
+
+                    View itemView = viewHolder.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    float width = height / 3;
+
+                    if (dX > 0) {
+                        //오른쪽으로 밀었을 때
+                        p.setColor(Color.parseColor("#5D5D5D"));
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.sendicon);
+                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
+
+                    } else {
+                        p.setColor(Color.parseColor("#5D5D5D"));
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
+                        /*
+                         * icon 추가할 수 있음.
+                         */
+//                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon); //vector 불가!
+//                         RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+//                        c.drawBitmap(icon, null, icon_dest, p);
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView3);
     }
 
     private void getprofile() {
