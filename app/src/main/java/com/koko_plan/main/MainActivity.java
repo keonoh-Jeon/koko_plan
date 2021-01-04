@@ -27,6 +27,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -45,6 +46,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.components.Legend;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
@@ -86,11 +88,13 @@ import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
+import com.koko_plan.server.goodtext.RandomGoodText;
 import com.koko_plan.server.goodtext.SetMsgToUsers;
 import com.koko_plan.server.habbitlist.HabbitList_Adapter;
 import com.koko_plan.server.habbitlist.HabbitList_Item;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
+import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -114,6 +118,7 @@ import java.time.DayOfWeek;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -149,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private RecyclerAdapter adapter;
     private RecyclerView recyclerView, recyclerView3;
-    private Paint p = new Paint();
 
     public static TodoDatabase roomdb;
     private ScrollView scrollview;
@@ -163,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
+
+    private SimpleDateFormat timeformat, dayformat;
+
+    private String time, day;
 
     private int cur, total;
 
@@ -264,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             entries.add(new Entry(pref.getFloat("entries"+i, 0), i));
         }
 
-        dataset = new LineDataSet(entries, "");
+        dataset = new LineDataSet(entries, "하루 중, 습관 비중 추이");
 
         ArrayList<String> labels = new ArrayList<String>();
         for(int i=0 ; i < 10; i++){
@@ -274,13 +282,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         LineData data = new LineData(labels, dataset);
-//        dataset.setColors(ColorTemplate.VORDIPLOM_COLORS); //
+        dataset.setColors(Collections.singletonList(Color.parseColor("#A4193D"))); //
         /*dataset.setDrawCubic(true); //선 둥글게 만들기*/
-        dataset.setDrawFilled(true);//그래프 밑부분 색칠
+        dataset.setDrawFilled(true); //그래프 밑부분 색칠
+        dataset.setFillColor(Color.parseColor("#FFDFB9")); //아래 채워질 색상
+        dataset.setCircleColor(Color.parseColor("#A4193D")); //포인트 색상
+
+        Legend legend = lineChart.getLegend(); //레전드 설정 (차트 밑에 색과 라벨을 나타내는 설정)
+        legend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);//하단 왼쪽에 설정
+//        legend.setTextColor(ContextCompat.getColor(getContext(), R.color.textColor)); // 레전드 컬러 설정
 
         lineChart.setData(data);
-        lineChart.setAlpha(0.5f);
-        lineChart.setDescription("하루 중 습관 비중 추이");
+        lineChart.setDescription("");
         lineChart.animateY(3000);
     }
 
@@ -704,8 +717,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //변수를 동적으로 만드는 방법
         Map<String, Calendar> map = new HashMap<String, Calendar>();
         for (int i = 1; i <= lastday; i++) {
-            map.put("calendar"+i, Calendar.getInstance());
-            @SuppressLint("DefaultLocale") String str = year+"-"+String.format("%02d",month)+"-"+String.format("%02d",i);
+            map.put("calendar" + i, Calendar.getInstance());
+            @SuppressLint("DefaultLocale") String str = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", i);
             try {
                 date = sdf.parse(str);
             } catch (ParseException e) {
@@ -714,69 +727,72 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             assert date != null;
             map.get("calendar" + i).setTime(date);
 
-            DocumentReference documentReference = firebaseFirestore
-                    .collection("users")
-                    .document(firebaseUser.getUid());
+            if (firebaseUser != null) {
 
-            int finalI = i;
-            documentReference
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                DocumentReference documentReference = firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid());
 
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document != null) {
-                                    if (document.exists() && document.get(str)!=null) {
-                                        Log.d(TAG, "DocumentSnapshot data: " + map.get("calendar" + finalI));
-                                        events.add(new EventDay(map.get("calendar" + finalI), new Drawable() {
-                                            @SuppressLint("CanvasSize")
-                                            @Override
-                                            public void draw(@NonNull Canvas canvas) {
-                                                //캔버스 바탕 설정
-                                                Paint pnt= new Paint();
-                                                //가로로 설정
-                                                pnt.setAntiAlias(true);
-                                                pnt.setColor(Color.LTGRAY);
-                                                String st = document.get(str)+"%";
-                                                canvas.drawRect(0,0,canvas.getWidth()*Integer.parseInt(String.valueOf(document.get(str)))/100,53, pnt);
+                int finalI = i;
+                documentReference
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-                                                Paint pnt2= new Paint();
-                                                pnt2.setAntiAlias(true);
-                                                pnt2.setColor(Color.RED);
-                                                pnt2.setTextSize(30);
-                                                canvas.drawText(st, 0, canvas.getHeight()-10, pnt2);
-                                            }
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document != null) {
+                                        if (document.exists() && document.get(str) != null) {
+                                            Log.d(TAG, "DocumentSnapshot data: " + map.get("calendar" + finalI));
+                                            events.add(new EventDay(map.get("calendar" + finalI), new Drawable() {
+                                                @SuppressLint("CanvasSize")
+                                                @Override
+                                                public void draw(@NonNull Canvas canvas) {
+                                                    //캔버스 바탕 설정
+                                                    Paint pnt = new Paint();
+                                                    //가로로 설정
+                                                    pnt.setAntiAlias(true);
+                                                    pnt.setColor(Color.LTGRAY);
+                                                    String st = document.get(str) + "%";
+                                                    canvas.drawRect(0, 0, canvas.getWidth() * Integer.parseInt(String.valueOf(document.get(str))) / 100, 53, pnt);
 
-                                            @Override
-                                            public void setAlpha(int i) {
-                                            }
+                                                    Paint pnt2 = new Paint();
+                                                    pnt2.setAntiAlias(true);
+                                                    pnt2.setColor(Color.RED);
+                                                    pnt2.setTextSize(30);
+                                                    canvas.drawText(st, 0, canvas.getHeight() - 10, pnt2);
+                                                }
 
-                                            @Override
-                                            public void setColorFilter(@Nullable ColorFilter colorFilter) {
-                                            }
+                                                @Override
+                                                public void setAlpha(int i) {
+                                                }
 
-                                            /**
-                                             * @deprecated
-                                             */
-                                            @SuppressLint("WrongConstant")
-                                            @Override
-                                            public int getOpacity() {
-                                                return 0;
-                                            }
-                                        }));
-                                        calendarView.setEvents(events);
-                                    } else {
-                                        Log.d(TAG, "No such document");
+                                                @Override
+                                                public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                                                }
+
+                                                /**
+                                                 * @deprecated
+                                                 */
+                                                @SuppressLint("WrongConstant")
+                                                @Override
+                                                public int getOpacity() {
+                                                    return 0;
+                                                }
+                                            }));
+                                            calendarView.setEvents(events);
+                                        } else {
+                                            Log.d(TAG, "No such document");
+                                        }
                                     }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
                                 }
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
                             }
-                        }
-                    });
+                        });
+            }
         }
     }
     private void CalendarEvents(Calendar calendar) {
@@ -923,6 +939,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //원형 차트 만들기
+    @SuppressLint("DefaultLocale")
     private void piechartmaker() {
 
         pieChart.setData(null);
@@ -954,10 +971,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
             pieChart.animateXY(2000, 2000);
             pieChart.setDescription("");
+            pieChart.setAlpha(0.8f);
             pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
 
             savefieldtofirebase(percentage);
-
         }
     }
 
@@ -993,7 +1010,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "lifecycle onPause: 시작=============");
         timegap = 0;
 
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
@@ -1030,37 +1046,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, i - 9);
 
-            DocumentReference documentReference = firebaseFirestore
-                    .collection("users")
-                    .document(firebaseUser.getUid())
-                    .collection("dates")
-                    .document(dateformat.format(cal.getTime()));
+            if (firebaseUser != null) {
+                DocumentReference documentReference = firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid())
+                        .collection("dates")
+                        .document(dateformat.format(cal.getTime()));
 
-            int finalI = i;
-            documentReference
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                int finalI = i;
+                documentReference
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document != null) {
-                                    if (document.exists()) {
-                                        Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
-                                        double percent = (double) document.get("percentage");
-                                        editor.putFloat("entries" + finalI, (float) percent);
-                                        editor.apply();
-                                    } else {
-                                        Log.d(TAG, "No such document");
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document != null) {
+                                        if (document.exists()) {
+                                            Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
+                                            double percent = (double) document.get("percentage");
+                                            editor.putFloat("entries" + finalI, (float) percent);
+                                            editor.apply();
+                                        } else {
+                                            Log.d(TAG, "No such document");
+                                        }
                                     }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
                                 }
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
                             }
-                        }
-                    });
+                        });
+            }
         }
         }).start();
     }
@@ -1153,21 +1171,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     if (dX > 0) {
                         //오른쪽으로 밀었을 때
-
-                    } else {
-                        p.setColor(Color.parseColor("#22741C"));
+                        Paint p = new Paint();
+                        p.setColor(Color.parseColor("#317773"));
                         RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                         c.drawRect(background, p);
 
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.shareicon);
                         c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
 
+                    } else if (dX < 0) {
+                        //배경
+                        Paint p = new Paint();
+                        p.setColor(Color.parseColor("#FFE67C"));
+                        RectF background = new RectF((float) itemView.getRight() , (float) itemView.getTop(), (float) itemView.getRight() + dX, (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        //텍스트
+                        Paint p2 = new Paint();
+                        String text = "삭제";
+                        p2.setColor(Color.parseColor("#295F2E"));
+                        p2.setTextSize(30);
+                        p2.setAntiAlias(true);
+                        //텍스트 높이
+                        Rect bounds = new Rect();
+                        p2.getTextBounds(text, 0, text.length(), bounds);
+                        int textheight = bounds.height();
+                        //비트맵
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
+                        c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*
                          * icon 추가할 수 있음.
                          */
-                        //icon = BitmapFactory.decodeResource(getResources(), R.drawable.icon_png); //vector 불가!
-                        // RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
-                        //c.drawBitmap(icon, null, icon_dest, p);
+//                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon); //vector 불가!
+//                         RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+//                        c.drawBitmap(icon, null, icon_dest, p);
                     }
                 }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -1179,7 +1216,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //스와이프 기능 헬퍼 연결
     private void initSwipe2() {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT  | ItemTouchHelper.RIGHT ) {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -1195,58 +1232,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                            runOnUiThread(new Runnable() {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void run() {
+                                    firebaseFirestore
+                                            .collection("users")
+                                            .document(firebaseUser.getUid())
+                                            .collection("dates")
+                                            .document(goodText_items.get(position).getDay())
+                                            .collection("messages")
+                                            .document(goodText_items.get(position).getTime())
+                                            .delete()
 
-                            Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getDay());
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    goodText_items.remove(position);
+                                                    goodText_adapter.notifyItemRemoved(position);
+                                                }
+                                            })
 
-                            firebaseFirestore
-                                    .collection("users")
-                                    .document(firebaseUser.getUid())
-                                    .collection("dates")
-                                    .document(goodText_items.get(position).getDay())
-                                    .collection("messages")
-                                    .document(goodText_items.get(position).getTime())
-                                    .delete()
-
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            goodText_items.remove(position);
-                                            goodText_adapter.notifyItemRemoved(position);
-                                        }
-                                    })
-
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                        }
-                                    });
-                            Log.d(TAG, "run: "+ "onSwiped");
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+                                    goodtextsize.setText(goodText_items.size()-1 + "개");
+                                }
+                            });
                         }
                     }).start();
 
                 } else {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.e(TAG, "run: initSwipe2" + "오른쪽");
-                            SetMsgToUsers.send(goodText_items.get(position).getDay(), goodText_items.get(position).getTime(), String.valueOf(goodText_items.get(position).getRandomnum()), goodText_items.get(position).getFromid());
+                    if(!goodText_items.get(position).getFromid().equals(firebaseUser.getUid())){
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                                runOnUiThread(new Runnable() {
+                                    @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
+                                    @Override
+                                    public void run() {
 
+                                        // 현재 날짜 구하기
+                                        date = new Date();
+                                        //날짜 표시 형식 지정
+                                        timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        dayformat = new SimpleDateFormat("yyyy-MM-dd");
+                                        time = timeformat.format(date);
+                                        day = dayformat.format(date);
 
-                        }
-                    }).start();
+                                        RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time);
+                                        goodText_adapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        }).start();
+                    } else {
+                        startToast("본인에게는 선물이 불가합니다.");
+                        goodText_adapter.notifyDataSetChanged();
+                    }
                 }
-
-
-
-                /*if (direction == ItemTouchHelper.RIGHT) {
-                    Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getDay());
-                    Log.e(TAG, "run: initSwipe2" + goodText_items.get(position).getTime());
-
-                    SetMsgToUsers.send(goodText_items.get(position).getDay(), goodText_items.get(position).getTime(), String.valueOf(goodText_items.get(position).getRandomnum()), goodText_items.get(position).getFromid());
-
-                }*/
-
-
             }
 
             @Override
@@ -1254,27 +1302,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 Bitmap icon;
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE ) {
-
                     View itemView = viewHolder.itemView;
                     float height = (float) itemView.getBottom() - (float) itemView.getTop();
                     float width = height / 3;
 
-                    if (dX > 0) {
-                        //오른쪽으로 밀었을 때
-                        p.setColor(Color.parseColor("#5D5D5D"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                    if (dX > 0) { //오른쪽으로 밀었을 때
+                        //배경
+                        Paint p = new Paint();
+                        p.setColor(Color.parseColor("#B1624E"));
+                        RectF background = new RectF((float) itemView.getLeft() + dX, (float) itemView.getTop(), (float) itemView.getLeft(), (float) itemView.getBottom());
                         c.drawRect(background, p);
+                        //텍스트
+                        Paint p2 = new Paint();
+                        String text = "명언 답장";
+                        p2.setColor(Color.parseColor("#5CC8D7"));
+                        p2.setTextSize(30);
+                        p2.setAntiAlias(true);
+                        //텍스트 높이
+                        Rect bounds = new Rect();
+                        p2.getTextBounds(text, 0, text.length(), bounds);
+                        int textheight = bounds.height();
+                        //비트맵
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.shareicon);
+                        c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
+                        c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.sendicon);
-                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
-
-                    } else {
-                        p.setColor(Color.parseColor("#5D5D5D"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                    } else if (dX < 0) {
+                        //배경
+                        Paint p = new Paint();
+                        p.setColor(Color.parseColor("#FFE67C"));
+                        RectF background = new RectF((float) itemView.getRight() , (float) itemView.getTop(), (float) itemView.getRight() + dX, (float) itemView.getBottom());
                         c.drawRect(background, p);
-
+                        //텍스트
+                        Paint p2 = new Paint();
+                        String text = "삭제";
+                        p2.setColor(Color.parseColor("#295F2E"));
+                        p2.setTextSize(30);
+                        p2.setAntiAlias(true);
+                        //텍스트 높이
+                        Rect bounds = new Rect();
+                        p2.getTextBounds(text, 0, text.length(), bounds);
+                        int textheight = bounds.height();
+                        //비트맵
                         Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
-                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
+                        c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
+                        c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*
                          * icon 추가할 수 있음.
                          */
@@ -1288,6 +1360,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView3);
+    }
+
+    private void startToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
     }
 
     private void getprofile() {

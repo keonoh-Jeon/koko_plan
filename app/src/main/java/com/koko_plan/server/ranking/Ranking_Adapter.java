@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,8 +20,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.koko_plan.R;
-import com.koko_plan.server.goodtext.SetMsgToUsers;
-import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.server.goodtext.RandomGoodText;
 
@@ -94,8 +93,6 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_ranking_item, viewGroup, false);
         final ViewHolder holder = new ViewHolder(v);
-
-
 
         /*v.findViewById(R.id.ci_menu).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,27 +186,24 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             rankingViewListener.onItemClick(v, pos);
                         }
 
-                        // 현재 날짜 구하기
-                        date = new Date();
-                        //날짜 표시 형식 지정
-                        timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        dayformat = new SimpleDateFormat("yyyy-MM-dd");
-                        time = timeformat.format(date);
-                        day = dayformat.format(date);
+                        if(!filterList.get(pos).getId().equals(firebaseUser.getUid())) {
+                            // 현재 날짜 구하기
+                            date = new Date();
+                            //날짜 표시 형식 지정
+                            timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            dayformat = new SimpleDateFormat("yyyy-MM-dd");
+                            time = timeformat.format(date);
+                            day = dayformat.format(date);
 
-                        String text = RandomGoodText.make(context, filterList.get(pos).getId(), day, time)+ "\n- "+ name;
+                            RandomGoodText.make(context, filterList.get(pos).getId(), day, time);
 //                        Log.e(TAG, "onClick: make"+ text + "to " + filterList.get(pos).getId());
 
-                        getItemId();
+                            getItemId();
+                        } else {
+                            Toast.makeText(context, "본인에게는 선물이 불가합니다.", Toast.LENGTH_SHORT).show();
+                            notifyDataSetChanged();
+                        }
 
-                        //커스텀 토스트 메시지 띄우기
-//                        CustomToastMaker.show(context, text);
-
-//                        SetMsgToUsers.send(text, filterList.get(pos).getId());
-
-                        /*itemclub = rankingItems.get(pos).getClub();
-                        itemloft = rankingItems.get(pos).getLoft();
-                        itemdist = rankingItems.get(pos).getSet();*/
 
                     }
                 }

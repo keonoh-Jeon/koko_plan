@@ -47,17 +47,14 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp">
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="300dp">
 
-                        <com.github.mikephil.charting.charts.PieChart
-                            android:id="@+id/piechart"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            tools:ignore="ScrollViewSize" />
 
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
@@ -65,32 +62,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/piechart"
+                            android:layout_marginTop="20dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:ignore="ScrollViewSize" />
                     </FrameLayout>
 
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="습관 비중 추이"
-                            android:background="#03A9F4"
-                            tools:ignore="HardcodedText" />
-
-
-
-                    </LinearLayout>
-
-
-                </RelativeLayout>
+                <TextView
+                    android:text="월간 성취율"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/elandchoice"
+                    android:textColor="#3162C7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    tools:ignore="HardcodedText" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"

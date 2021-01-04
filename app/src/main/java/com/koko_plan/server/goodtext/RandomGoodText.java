@@ -10,20 +10,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.koko_plan.main.MainActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.koko_plan.member.MemberActivity;
-import com.koko_plan.member.Profile_Item;
 import com.koko_plan.sub.CustomToastMaker;
 
-import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
-import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.pref;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class RandomGoodText {
 
@@ -31,7 +22,7 @@ public class RandomGoodText {
     private static String text;
     private static int randomNum;
 
-    public static String make(Context context, String userid, String day, String time){
+    public static void make(Context context, String userid, String day, String time){
 
         int ramdomtextsize = pref.getInt("ramdomtextsize",0);
         randomNum = (int)(Math.random() * ramdomtextsize);
@@ -61,8 +52,6 @@ public class RandomGoodText {
                 }
             }
         });
-
-        return text;
     }
 
     public static int getTextnum(){

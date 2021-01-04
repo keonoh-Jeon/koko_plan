@@ -32,7 +32,6 @@ public class SetMsgToUsers {
             GoodTextList.put("from", photourl);
             GoodTextList.put("fromid", firebaseUser.getUid());
 
-
             if (firebaseUser != null) {
                 firebaseFirestore
                         .collection("users")
