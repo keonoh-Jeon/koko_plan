@@ -16,6 +16,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
 
+        <activity android:name="com.koko_plan.sub.intro"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6976973682401259~2221750415" />
@@ -28,11 +36,6 @@
 
         <activity android:name=".main.MainActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <receiver android:name=".sub.DeviceBootReceiver"

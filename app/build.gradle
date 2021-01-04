@@ -89,8 +89,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-
-
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
+    //블러처리
+    implementation 'com.github.mmin18:realtimeblurview:1.2.1'
+
+    //로티 애니메이션 처리
+    implementation 'com.airbnb.android:lottie:3.4.0'
 }

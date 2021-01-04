@@ -44,6 +44,15 @@
                     android:layout_width="match_parent"
                     tools:ignore="ScrollViewSize" />
 
+                <TextView
+                    android:text="습관 하루 비중 추이"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/elandchoice"
+                    android:textColor="#FF9800"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    tools:ignore="HardcodedText" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -54,7 +63,6 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="300dp">
-
 
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
@@ -68,6 +76,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             tools:ignore="ScrollViewSize" />
+
+                        <com.github.mmin18.widget.RealtimeBlurView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:realtimeBlurRadius="5dp"
+                            app:realtimeOverlayColor="#88FFFFFF"/>
+
                     </FrameLayout>
 
                 </RelativeLayout>
@@ -104,7 +119,7 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:text="받은 명언  "
+                            android:text="선물 받은 명언  "
                             android:textSize="15sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -126,13 +141,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_msg"
-                        android:layout_margin="10dp"
-                        android:layout_height="match_parent"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        tools:ignore="ScrollViewSize" />
+                        android:layout_height="wrap_content">
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_msg"
+                            android:layout_margin="10dp"
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:nestedScrollingEnabled="false"
+                            tools:ignore="ScrollViewSize" />
+
+                        <com.github.mmin18.widget.RealtimeBlurView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:realtimeBlurRadius="5dp"
+                            app:realtimeOverlayColor="#88FFFFFF"/>
+
+                    </FrameLayout>
+
+
 
                 </RelativeLayout>
 

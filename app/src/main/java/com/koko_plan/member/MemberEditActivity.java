@@ -216,19 +216,15 @@ public class MemberEditActivity extends AppCompatActivity {
                                 case ADDED:
                                     if(Objects.equals(dc.getDocument().getData().get("name"), nick)
                                             && !Objects.equals(dc.getDocument().getData().get("id"), firebaseUser.getUid())){
-
                                         startToast("같은 닉네임이 존재합니다.");
                                         duplication = true;
                                     }
                                     break;
                                 case MODIFIED:
                                     Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    maketoast("this club is already exist.");
-//                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case REMOVED:
                                     Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
                                     break;
                             }
                         }

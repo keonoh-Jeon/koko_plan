@@ -14,21 +14,22 @@
             android:icon="@drawable/profile"
             tools:ignore="HardcodedText"
             android:title="프로필" />
-        <!--<item
-            android:id="@+id/nav_history"
-            android:icon="@drawable/nav_scoreboard"
-            tools:ignore="HardcodedText"
-            android:title="스코어 카드" />
         <item
-            android:id="@+id/nav_clublist"
-            android:icon="@drawable/clublist"
+            android:id="@+id/totallisticon"
+            android:icon="@drawable/list"
             tools:ignore="HardcodedText"
-            android:title="나의 클럽" />
+            android:title="전체 습관 보기" />
         <item
-            android:id="@+id/nav_help"
-            android:icon="@drawable/help"
+            android:id="@+id/primium"
+            android:icon="@drawable/medal"
             tools:ignore="HardcodedText"
-            android:title="도움" />-->
+            android:title="프리미엄 구매" />
+        <item
+            android:id="@+id/recommend"
+            android:icon="@drawable/share"
+            tools:ignore="HardcodedText"
+            android:title="어플 추천" />
+
 
     </group>
 
