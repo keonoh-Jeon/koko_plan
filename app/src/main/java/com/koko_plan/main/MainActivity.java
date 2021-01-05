@@ -937,19 +937,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 new Thread(() -> {
 
-                        //파이어베이스 저장
-                        //저장 리스트 목록 만들기
-                        Map<String, Object> todayprogresslist = new HashMap<>();
-                        todayprogresslist.put("date", todaydate);
-                        todayprogresslist.put("habbittitle", habbittitle);
-                        todayprogresslist.put("totalsec", totalsec);
+                    //파이어베이스 저장
+                    //저장 리스트 목록 만들기
+                    Map<String, Object> todayprogresslist = new HashMap<>();
+                    todayprogresslist.put("start", todaydate);
+                    todayprogresslist.put("totalsec", totalsec);
+                    todayprogresslist.put("habbittitle", habbittitle);
+                    todayprogresslist.put("curtime", totalsec);
 
                         if (firebaseUser != null) {
                             assert habbittitle != null;
                             firebaseFirestore
                                     .collection("users")
                                     .document(firebaseUser.getUid())
-                                    .collection("totalhabbits")
+                                    .collection("total")
                                     .document(habbittitle)
 
                                     .set(todayprogresslist)
@@ -987,10 +988,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(items.size() > 0) {
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
-                    Log.e(TAG, "resetId: get" + adapter.getItems().get(i).getNum());
                     if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
                     adapter.getItems().get(i).setNum((i+1));
-                    Log.e(TAG, "resetId: set" + adapter.getItems().get(i).getNum());
                     roomdb.todoDao().update(adapter.getItems().get(i));
                 }
             }).start();
@@ -1050,6 +1049,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             .document(firebaseUser.getUid())
                             .collection("dates")
                             .document(todaydate)
+
                             .set(percentInfo)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

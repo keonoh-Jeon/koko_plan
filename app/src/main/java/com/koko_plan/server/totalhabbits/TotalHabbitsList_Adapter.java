@@ -124,7 +124,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         DocumentReference documentReference = firebaseFirestore
                 .collection("users")
                 .document(firebaseUser.getUid())
-                .collection("totalhabbits")
+                .collection("total")
                 .document(totalHabbitsList_items.get(i).getHabbittitle());
 
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {

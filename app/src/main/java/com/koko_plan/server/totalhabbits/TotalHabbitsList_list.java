@@ -144,7 +144,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         firebaseFirestore
                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                 .document(firebaseUser.getUid())
-                .collection("totalhabbits")
+                .collection("total")
 //                .orderBy("doing", Query.Direction.DESCENDING)
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {

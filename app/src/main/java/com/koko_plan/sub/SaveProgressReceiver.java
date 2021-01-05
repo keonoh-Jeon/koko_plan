@@ -54,10 +54,11 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                         firebaseFirestore
                                 .collection("users")
                                 .document(firebaseUser.getUid())
+                                .collection("totalhabbits")
+                                .document(habbit)
                                 .collection("dates")
                                 .document(todaydate)
-                                .collection("habbits")
-                                .document(habbit)
+
                                 .set(todayprogresslist)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

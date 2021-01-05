@@ -36,8 +36,6 @@ public class SetMsgToUsers {
                 firebaseFirestore
                         .collection("users")
                         .document(touser)
-                        .collection("dates")
-                        .document(todaydate)
                         .collection("messages")
                         .document(time)
                         .set(GoodTextList)
