@@ -145,9 +145,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         return filterList.size();
     }
 
-    void addItem(Ranking_Item clubItem) {
+    void addItem(Ranking_Item ranking_item) {
         // 외부에서 item을 추가시킬 함수입니다.
-        filterList.add(clubItem);
+        filterList.add(ranking_item);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener

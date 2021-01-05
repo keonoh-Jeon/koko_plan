@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -47,6 +49,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.components.Legend;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
@@ -94,6 +98,7 @@ import com.koko_plan.server.habbitlist.HabbitList_Adapter;
 import com.koko_plan.server.habbitlist.HabbitList_Item;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
+import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
 import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
@@ -102,6 +107,7 @@ import com.koko_plan.member.MemberEditActivity;
 import com.koko_plan.member.Profile_Item;
 import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
+import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.Utils;
 
@@ -257,8 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         GoodTextListmaker();
 
-
-
+        RequestReview.show(this);
     }
 
     @SuppressLint("Range")
@@ -480,6 +485,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(MemberEditActivity.class);
 
+        } else if (id == R.id.recommend) {
+            MySoundPlayer.play(MySoundPlayer.CLICK);
+
+            Intent msg = new Intent(Intent.ACTION_SEND);
+            msg.addCategory(Intent.CATEGORY_DEFAULT);
+            msg.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=KOKO_HABBIT");
+            msg.putExtra(Intent.EXTRA_TITLE, "코코 습관 추천하기");
+            msg.setType("text/plain");
+            startActivity(Intent.createChooser(msg, "앱을 선택해 주세요"));
+
+        } else if (id == R.id.totallisticon) {
+            MySoundPlayer.play(MySoundPlayer.CLICK);
+            myStartActivity(TotalHabbitsList_list.class);
+
             // Handle the camera action
         } /*else if (id == R.id.nav_history) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
@@ -564,6 +583,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
+
+        //배너 광고 표기
+        AdView adBanner = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adBanner.loadAd(adRequest);
+
+        AdView adBanner2 = findViewById(R.id.adView2);
+        AdRequest adRequest2 = new AdRequest.Builder().build();
+        adBanner2.loadAd(adRequest2);
 
 //        recyclerView.setVisibility(View.GONE);
 //        recyclerView2 = findViewById(R.id.rv_habbitview2);
@@ -905,6 +933,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int size = items.size()+1;
                     Todo todo = new Todo(size+1, todaydate, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     roomdb.todoDao().insert(todo);
+                }).start();
+
+                new Thread(() -> {
+
+                        //파이어베이스 저장
+                        //저장 리스트 목록 만들기
+                        Map<String, Object> todayprogresslist = new HashMap<>();
+                        todayprogresslist.put("date", todaydate);
+                        todayprogresslist.put("habbittitle", habbittitle);
+                        todayprogresslist.put("totalsec", totalsec);
+
+                        if (firebaseUser != null) {
+                            assert habbittitle != null;
+                            firebaseFirestore
+                                    .collection("users")
+                                    .document(firebaseUser.getUid())
+                                    .collection("totalhabbits")
+                                    .document(habbittitle)
+
+                                    .set(todayprogresslist)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
+                        }
                 }).start();
             }
         }

@@ -87,6 +87,15 @@
 
                 </RelativeLayout>
 
+                <com.google.android.gms.ads.AdView
+                    xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/adView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    ads:adSize="BANNER"
+                    ads:adUnitId="@string/google_ads_banner_api_key">
+                </com.google.android.gms.ads.AdView>
+
                 <TextView
                     android:text="월간 성취율"
                     android:textSize="20sp"
@@ -111,6 +120,15 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
+                    <com.google.android.gms.ads.AdView
+                        xmlns:ads="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/adView2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ads:adSize="BANNER"
+                        ads:adUnitId="@string/google_ads_banner_api_key">
+                    </com.google.android.gms.ads.AdView>
 
                     <LinearLayout
                         android:layout_width="wrap_content"

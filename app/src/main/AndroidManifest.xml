@@ -83,6 +83,11 @@
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
 
+        <activity
+            android:name="com.koko_plan.server.totalhabbits.TotalHabbitsList_list"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
     </application>
 
 </manifest>

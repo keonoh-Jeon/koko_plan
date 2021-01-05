@@ -29,11 +29,11 @@ android {
         debug {
             resValue "string", "google_ads_banner_api_key", "ca-app-pub-3940256099942544/6300978111"
             resValue "string", "google_ads_reward_api_key", "ca-app-pub-3940256099942544/5224354917"
+
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            resValue "string", "google_maps_key", "AIzaSyA_fqjuyODHAV_LD-T1tM2oU85qfFzYrW8"
             resValue "string", "google_ads_banner_api_key", "ca-app-pub-6976973682401259/6071928722"
             resValue "string", "google_ads_reward_api_key", "ca-app-pub-6976973682401259/3597754723"
         }

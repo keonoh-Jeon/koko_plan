@@ -25,7 +25,6 @@ public class MySoundPlayer {
 
     // sound media initialize
     public static void initSounds(Context context) {
-
         AudioAttributes attributes = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             attributes = new AudioAttributes.Builder()
@@ -38,7 +37,6 @@ public class MySoundPlayer {
                     .setAudioAttributes(attributes)
                     .build();
         }
-
         soundPoolMap = new HashMap<Integer, Integer>(8);
         soundPoolMap.put(CAMERA, soundPool.load(context, CAMERA, 1));
         soundPoolMap.put(PUTTING, soundPool.load(context, PUTTING, 2));

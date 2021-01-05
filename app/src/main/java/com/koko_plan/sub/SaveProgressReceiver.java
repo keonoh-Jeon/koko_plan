@@ -28,7 +28,6 @@ public class SaveProgressReceiver extends BroadcastReceiver {
     @SuppressLint("SimpleDateFormat")
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e(TAG, "onReceive: " + "save progress" );
         saveprogresstofirebase();
     }
 
