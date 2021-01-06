@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initSwipe();
         initSwipe2();
 
-
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListmaker();
 
@@ -918,13 +917,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-
                 String habbittitle = data.getStringExtra("habbittitle");
                 int count = data.getIntExtra("count", 0);
                 int hour = data.getIntExtra("hour", 0);
                 int min = data.getIntExtra("min", 0);
                 int sec = data.getIntExtra("sec", 0);
                 boolean isrunning = data.getBooleanExtra("isrunning", false);
+                String habbitroutine = data.getStringExtra("habbitroutine");
+                boolean monday = data.getBooleanExtra("monday", false);
+                boolean tuesday = data.getBooleanExtra("tuesday", false);
+                boolean wednesday = data.getBooleanExtra("wednesday", false);
+                boolean thursday = data.getBooleanExtra("thursday", false);
+                boolean friday = data.getBooleanExtra("friday", false);
+                boolean saturday = data.getBooleanExtra("saturday", false);
+                boolean sunday = data.getBooleanExtra("sunday", false);
 
                 @SuppressLint("DefaultLocale")
                 int totalsec = (hour*60*60+min*60+sec)*count;
@@ -943,7 +949,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     todayprogresslist.put("start", todaydate);
                     todayprogresslist.put("totalsec", totalsec);
                     todayprogresslist.put("habbittitle", habbittitle);
+                    todayprogresslist.put("habbitroutine", habbitroutine);
                     todayprogresslist.put("curtime", totalsec);
+                    todayprogresslist.put("monday", monday);
+                    todayprogresslist.put("tuesday", tuesday);
+                    todayprogresslist.put("wednesday", wednesday);
+                    todayprogresslist.put("thursday", thursday);
+                    todayprogresslist.put("friday", friday);
+                    todayprogresslist.put("saturday", saturday);
+                    todayprogresslist.put("sunday", sunday);
 
                         if (firebaseUser != null) {
                             assert habbittitle != null;
@@ -1458,7 +1472,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
-
-        Log.d("resetAlarm", "onReceive ResetHour : " + setResetTime);
     }
 }

@@ -2,6 +2,14 @@ package com.koko_plan.server.totalhabbits;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,10 +29,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.koko_plan.R;
-import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.sub.ItemTouchHelperListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
@@ -58,12 +68,23 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
     {
         // 리스트 목록의 초기화 .... 미연의 충돌 방지
         TextView tvtitle = null;
-        TextView timeview = null;
+        TextView tvroutine = null;
+        TextView tvstartdate = null;
+        TextView tv1count = null;
+        TextView tv1counttime = null;
+        TextView tvtotalcount = null;
+        TextView tvtotalsec = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
             super(view);
             tvtitle = (TextView)view.findViewById(R.id.tv_totalhabbitlistTitle);
+            tvroutine = (TextView)view.findViewById(R.id.tv_routine);
+            tvstartdate = (TextView)view.findViewById(R.id.tv_startdate);
+            tv1count = (TextView)view.findViewById(R.id.tv_1count);
+            tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
+            tvtotalcount = (TextView)view.findViewById(R.id.tv_totalcount);
+            tvtotalsec = (TextView)view.findViewById(R.id.tv_totalsec);
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -128,6 +149,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                 .document(totalHabbitsList_items.get(i).getHabbittitle());
 
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @SuppressLint("SetTextI18n")
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -136,8 +158,38 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                     if (document != null) {
                         if (document.exists()) {
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            text = (String) Objects.requireNonNull(document.getData()).get("habbittitle");
-                            viewHolder.tvtitle.setText(text);
+
+                            viewHolder.tvtitle.setText((String) Objects.requireNonNull(document.getData()).get("habbittitle"));
+                            if(Objects.equals(document.getData().get("habbitroutine"), "매일")) {
+                                viewHolder.tvroutine.setText((String) document.getData().get("habbitroutine"));
+                            } else {
+                                String routine = "매주 ";
+                                if((Boolean) document.getData().get("monday")) {
+                                    routine = routine + " 월";
+                                }
+                                if((Boolean) document.getData().get("tuesday")) {
+                                    routine = routine + " 화";
+                                }
+                                if((Boolean) document.getData().get("wednesday")) {
+                                    routine = routine + " 수";
+                                }
+                                if((Boolean) document.getData().get("thursday")) {
+                                    routine = routine + " 목";
+                                }
+                                if((Boolean) document.getData().get("friday")) {
+                                    routine = routine + " 금";
+                                }
+                                if((Boolean) document.getData().get("saturday")) {
+                                    routine = routine + " 토";
+                                }
+                                if((Boolean) document.getData().get("sunday")) {
+                                    routine = routine + " 일";
+                                }
+                                viewHolder.tvroutine.setText(routine);
+                            }
+
+                            viewHolder.tvstartdate.setText("시작 일자:" + (String) Objects.requireNonNull(document.getData()).get("start"));
+
                         } else {
                             Log.d(TAG, "No such document");
                         }
@@ -159,5 +211,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         // 외부에서 item을 추가시킬 함수입니다.
         totalHabbitsList_items.add(totalHabbitsList_item);
     }
+
+
 
 }

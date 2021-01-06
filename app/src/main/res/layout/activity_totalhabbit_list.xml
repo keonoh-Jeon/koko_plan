@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:ignore="MissingConstraints,UselessParent"
-            android:background="#8A8A1C"
+            android:background="#F5D042"
             android:layout_marginBottom="5dp"
             android:gravity="center">
 
@@ -47,7 +47,7 @@
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:text="전체 습관 리스트"
-                    android:textColor="#B9B8B8"
+                    android:textColor="#0A174E"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:ignore="HardcodedText" />
