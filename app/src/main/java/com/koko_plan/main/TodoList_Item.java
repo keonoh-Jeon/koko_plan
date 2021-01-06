@@ -10,10 +10,12 @@ public class TodoList_Item
     private String text;
     private String from;
     private String fromid;
+    private String habbittitle;
     private String time;
     private String day;
     private int progress;
     private int count;
+    private int num;
     private int curcount;
     private int randomnum;
     private int curtime;
@@ -28,11 +30,17 @@ public class TodoList_Item
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }
 
+    public String getHabbittitle(){ return habbittitle; }
+    public void setHabbittitle(String habbittitle){ this.habbittitle = habbittitle; }
+
     public String getFromid(){ return fromid; }
     public void setFromid(String fromid){ this.fromid = fromid;  }
 
     public int getCount(){ return count; }
     public void setCount(int count){ this.count = count; }
+
+    public int getNum(){ return num; }
+    public void setNum(int num){ this.num = num; }
 
     public int getTotalsec(){ return totalsec; }
     public void setTotalsec(int totalsec){ this.totalsec = totalsec; }

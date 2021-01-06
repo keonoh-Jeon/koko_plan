@@ -42,6 +42,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -137,10 +138,9 @@ import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
-import static com.koko_plan.main.RecyclerAdapter.items;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoodText_ViewListener, HabbitList_ViewListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_APP_UPDATE = 600;
@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int today_progress;
     public static int todayitemsize;
 
+    public static ArrayList<TodoList_Item> todoListItems = null;
     public static ArrayList<GoodText_Item> goodText_items = null;
     private GoodText_Adapter goodText_adapter = null;
 
@@ -313,14 +314,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void HabbitTodayListmaker() {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        /*RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         //데이터베이스 지정
         roomdb = TodoDatabase.getDatabase(this);
         adapter = new RecyclerAdapter(roomdb);
         //리사이클러뷰 옵션 적용용
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);*/
+
+        todoListItems = new ArrayList<>();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        adapter = new RecyclerAdapter(todoListItems, this, this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(goodText_adapter);
 
         //ItemTouchHelper 생성
         helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
@@ -385,12 +394,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         runOnUiThread(new Runnable(){
                             @Override
                             public void run() {
-                                adapter.setItem(roomdb.todoDao().search(selecteddata));
-                                int selecteditemsize = roomdb.todoDao().search(selecteddata).size();
+                                /*adapter.setItem(roomdb.todoDao().search(selecteddata));
+                                int selecteditemsize = roomdb.todoDao().search(selecteddata).size();*/
 
                                 tvTodayProgress.setText("실행한 습관이 없슴");
 
-                                if(selecteditemsize > 0){
+                                if(todoListItems.size() > 0){
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -400,11 +409,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 @Override
                                                 public void run() {
                                                     cur = 0;
-                                                    for(int i=0 ; i < selecteditemsize ; i++) {
+                                                    for(int i=0 ; i < todoListItems.size() ; i++) {
                                                             int curtime = (int) ((double)roomdb.todoDao().search(selecteddata).get(i).getCurtime() / ((double)roomdb.todoDao().search(selecteddata).get(i).getTotalsec()) * 100.0);
                                                             cur += curtime;
                                                     }
-                                                    today_progress = cur/selecteditemsize;
+                                                    today_progress = cur/todoListItems.size();
                                                     tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
 
                                                     if(firebaseUser!=null){
@@ -833,13 +842,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         timegap =0;
 
-        roomdb.todoDao().getAll(todaydate).observe(this, new Observer<List<Todo>>() {
+        /*roomdb.todoDao().getAll(todaydate).observe(this, new Observer<List<Todo>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Todo> data) {
                 adapter.setItem(data);
             }
-        });
+        });*/
 
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
@@ -936,7 +945,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int totalsec = (hour*60*60+min*60+sec)*count;
 
                 new Thread(() -> {
-                    int size = items.size()+1;
+                    int size = todoListItems.size()+1;
                     Todo todo = new Todo(size+1, todaydate, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
                     roomdb.todoDao().insert(todo);
                 }).start();
@@ -999,12 +1008,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void resetId() {
 
-        if(items.size() > 0) {
+        if(todoListItems.size() > 0) {
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
                     adapter.getItems().get(i).setNum((i+1));
-                    roomdb.todoDao().update(adapter.getItems().get(i));
+//                    roomdb.todoDao().update(adapter.getItems().get(i));
                 }
             }).start();
         }
@@ -1022,7 +1031,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             total = 0;
             for (int i = 0; i < adapter.getItemCount(); i++) {
                 NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
-                total += items.get(i).getTotalsec();
+                total += todoListItems.get(i).getTotalsec();
             }
 
             double percentage = total/(24*3600.0)*100;
@@ -1086,8 +1095,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         timegap = 0;
 
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
-        adapter.setItem(roomdb.todoDao().search(todaydate));
-        todayitemsize = roomdb.todoDao().search(todaydate).size();
+//        adapter.setItem(roomdb.todoDao().search(todaydate));
+        todayitemsize = todoListItems.size();
 
         editor.putLong("stoptime", 0);
         editor.putInt("todayitemsize", todayitemsize);
@@ -1096,9 +1105,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                if(items.get(i).getIsrunning()) {
-                    items.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(adapter.getItems().get(i));
+                if(todoListItems.get(i).getIsrunning()) {
+                    todoListItems.get(i).setCurtime(lastsec-1);
+
+//                    roomdb.todoDao().update(adapter.getItems().get(i));
 
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
@@ -1224,7 +1234,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         @Override
                         public void run() {
                             Log.d(TAG, "run: "+ "onSwiped");
-                            roomdb.todoDao().delete(adapter.getItems().get(position));
+//                            roomdb.todoDao().delete(adapter.getItems().get(position));
                         }
                     }).start();
                 }else {

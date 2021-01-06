@@ -30,8 +30,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.koko_plan.server.totalhabbits.TotalHabbitsList_Item;
-import com.koko_plan.server.totalhabbits.TotalHabbitsList_ViewListener;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.DeviceBootReceiver;
 import com.koko_plan.R;
@@ -44,7 +43,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,6 +51,7 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.btnsavelist;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.lastsec;
 import static com.koko_plan.main.MainActivity.timegap;
 import static com.koko_plan.main.MainActivity.totalprogress;
@@ -285,6 +284,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 new Thread(() -> {
                     for(int i=0; i<index; i++){
                         if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                        firebaseFirestore.
                         roomdb.todoDao().update(todoListItems.get(i));
                     }
                     for(int i=(index+1); i <todoListItems.size() ; i++){
@@ -439,6 +439,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 new Thread(() -> {
                     todoListItems.get(index).setCurtime(lastsec);
                     roomdb.todoDao().update(items.get(index));
+
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("curtime", lastsec);
+
+                    firebaseFirestore
+                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
+                            .set(data, SetOptions.merge());
                 }).start();
 
                 timerTask.cancel();
@@ -450,8 +457,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             isRunning = !isRunning;
             new Thread(() -> {
-                todoListItems.get(index).setIsrunning(isRunning);
-                roomdb.todoDao().update(todoListItems.get(index));
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("isrunning", isRunning);
+                firebaseFirestore
+                        .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
+                        .set(data, SetOptions.merge());
+
             }).start();
         }
 
@@ -470,16 +482,28 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
-                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(todoListItems.get(i));
+                    if(todoListItems.get(i).getIsrunning()) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data, SetOptions.merge());
+                    }
                 }
                 for(int i=(index+1); i <todoListItems.size() ; i++){
-                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(todoListItems.get(i));
-                }
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("curtime", lastsec-1);
+                    firebaseFirestore
+                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                            .set(data, SetOptions.merge());
 
-                todoListItems.get(index).setCurcount(cur);
-                roomdb.todoDao().update(todoListItems.get(index));
+                }
+                Map<String, Object> data = new HashMap<>();
+                data.put("curcount", cur);
+
+                firebaseFirestore
+                        .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
+                        .set(data, SetOptions.merge());
 
             }).start();
         }
@@ -505,8 +529,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 todoListItems.get(index).setCurcount(finalCurcount);
                 roomdb.todoDao().update(todoListItems.get(index));
+
+                datasettofirebase("curcount", finalCurcount, index ,"total");
+
+
             }).start();
         }
+    }
+
+    private void datasettofirebase(String str, int ob, int index, String path){
+        Map<String, Object> data = new HashMap<>();
+        data.put(str, ob);
+
+        firebaseFirestore
+                .collection("users").document(firebaseUser.getUid()).collection(path).document(todoListItems.get(index).getHabbittitle())
+                .set(data, SetOptions.merge());
     }
 
 
@@ -536,6 +573,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return holder;
     }
 
+
+
     @Override
     public void onBindViewHolder(RecyclerAdapter.ViewHolder viewHolder, int position) {
         viewHolder.onBind(todoListItems.get(position),position);
@@ -545,6 +584,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         Log.e(TAG, "onDetachedFromRecyclerView: ");
+    }
+
+    public ArrayList<TodoList_Item> getItems() {
+        return todoListItems;}
+
+    public void setItem(ArrayList<TodoList_Item> data) {
+        todoListItems = data;
+        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
 
