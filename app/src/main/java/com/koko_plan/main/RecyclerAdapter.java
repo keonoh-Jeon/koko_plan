@@ -30,6 +30,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.koko_plan.server.totalhabbits.TotalHabbitsList_Item;
+import com.koko_plan.server.totalhabbits.TotalHabbitsList_ViewListener;
 import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.DeviceBootReceiver;
 import com.koko_plan.R;
@@ -41,54 +43,45 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.btnsavelist;
 import static com.koko_plan.main.MainActivity.editor;
+import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.lastsec;
 import static com.koko_plan.main.MainActivity.timegap;
 import static com.koko_plan.main.MainActivity.totalprogress;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
-    public static List<Todo> items = new ArrayList<>();
+    private ArrayList<TodoList_Item> todoListItems;
+    private TodoList_ViewListener todoListViewListener;
     public static TimerTask timerTask;
     private Context mContext;
-    private TodoDatabase roomdb;
 
-    public RecyclerAdapter(TodoDatabase roomdb) {
-        this.roomdb = roomdb;
+    public RecyclerAdapter(ArrayList<TodoList_Item> todoListItems, Context context, TodoList_ViewListener listener)
+    {
+        this.todoListItems  = todoListItems;
+        this.mContext = context;
+        this.todoListViewListener = listener;
     }
 
-    @Override
-    public int getItemCount() {
-        return items.size();}
-
-    public void addItem(Todo todo){
-        items.add(todo); }
-
-    public List<Todo> getItems() {
-        return items;}
-
-    public void setItem(List<Todo> data) {
-        items = data;
-        notifyDataSetChanged();
-//        notifyDataSetChanged();
-    }
 
 //todo
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(items, i, i + 1);
+                Collections.swap(todoListItems, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(items, i, i - 1);
+                Collections.swap(todoListItems, i, i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
@@ -99,42 +92,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public void onItemSwipe(int position) {
 
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @NonNull
-    @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.habbits_item_today, viewGroup, false);
-        mContext = viewGroup.getContext();
-        final ViewHolder holder = new ViewHolder(v);
-
-        v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MySoundPlayer.play(MySoundPlayer.CLICK);
-                showPopupCountTime(v, holder.getAdapterPosition());
-            }
-        });
-        v.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MySoundPlayer.play(MySoundPlayer.CLICK);
-                makedialogtitle(v, holder.getAdapterPosition());
-            }
-        });
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerAdapter.ViewHolder viewHolder, int position) {
-        viewHolder.onBind(items.get(position),position);
-    }
-
-    @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        Log.e(TAG, "onDetachedFromRecyclerView: ");
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -190,7 +147,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             Timer timer = new Timer();
             timerTask = new TimerTask()
             {
-                int count = items.get(index).getCurtime() + timegap;
+                int count = todoListItems.get(index).getCurtime() + timegap;
                 @Override
                 public void run()
                 {
@@ -206,10 +163,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         @Override
                         public void run() {
                             if(getItemCount()>0) {
-                                if (items.get(index).getIsrunning()) {
+                                if (todoListItems.get(index).getIsrunning()) {
                                     tvCurTime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
-                                    tvProgress.setText((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0) + " %");
-                                    progressBar.setProgress((int) ((double) count / ((double) items.get(index).getTotalsec()) * 100.0));
+                                    tvProgress.setText((int) ((double) count / ((double) todoListItems.get(index).getTotalsec()) * 100.0) + " %");
+                                    progressBar.setProgress((int) ((double) count / ((double) todoListItems.get(index).getTotalsec()) * 100.0));
                                 }
                             }
                         }
@@ -235,14 +192,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
 
         @SuppressLint({"SetTextI18n", "DefaultLocale"})
-        public void onBind(Todo todo, int position){
+        public void onBind(TodoList_Item todo, int position){
             Log.e(TAG, "lifecycle onBind: ");
             index = position;
             tvTitle.setText(todo.getTitle());
 
             if(todo.getCount() < 2){
                 tvTime.setText(String.format("%02d:%02d:%02d", todo.getHour(), todo.getMin(), todo.getSec()));
-                if(!items.get(index).getIsrunning()){
+                if(!todoListItems.get(index).getIsrunning()){
                     ivPlay.setVisibility(View.VISIBLE);
                     ivPause.setVisibility(View.GONE);
                 } else {
@@ -263,7 +220,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
 
             if(todo.getCount() > 1) {
-                int progress = (int) ((double)todo.getCurcount() / ((double)items.get(index).getCount()) *100.0);
+                int progress = (int) ((double)todo.getCurcount() / ((double)todoListItems.get(index).getCount()) *100.0);
                 tvCurTime.setText(""+todo.getCurcount());
                 tvProgress.setText(progress + " %");
                 progressBar.setProgress(progress);
@@ -283,7 +240,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     int sec = curtime % 60;
                     tvCurTime.setText(String.format("%02d:%02d:%02d", hour, min, sec));
 
-                    int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
+                    int progress = (int) ((double)todo.getCurtime() / ((double)todoListItems.get(index).getTotalsec()) *100.0);
                     tvProgress.setText(progress + " %");
                     progressBar.setProgress(progress);
                     /*if(progress>=100) {
@@ -295,7 +252,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 } else {
                     tvCurTime.setText("00:00:00");
-                    int progress = (int) ((double)todo.getCurtime() / ((double)items.get(index).getTotalsec()) *100.0);
+                    int progress = (int) ((double)todo.getCurtime() / ((double)todoListItems.get(index).getTotalsec()) *100.0);
                     tvProgress.setText(progress + " %");
                     progressBar.setProgress(progress);
                     /*if(progress>=100) {
@@ -307,7 +264,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
             }
 
-            if(items.get(index).getIsrunning()) {
+            if(todoListItems.get(index).getIsrunning()) {
                 Log.e(TAG, "onBind: isrunning ?");
                 startTimerTask();
             }
@@ -327,16 +284,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 isRunning = !isRunning;
                 new Thread(() -> {
                     for(int i=0; i<index; i++){
-                        if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                        roomdb.todoDao().update(items.get(i));
+                        if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                        roomdb.todoDao().update(todoListItems.get(i));
                     }
-                    for(int i=(index+1); i <items.size() ; i++){
-                        if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                        roomdb.todoDao().update(items.get(i));
+                    for(int i=(index+1); i <todoListItems.size() ; i++){
+                        if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                        roomdb.todoDao().update(todoListItems.get(i));
                     }
-                    items.get(index).setIsrunning(isRunning);
-                    items.get(index).setCurtime(0);
-                    roomdb.todoDao().update(items.get(index));
+                    todoListItems.get(index).setIsrunning(isRunning);
+                    todoListItems.get(index).setCurtime(0);
+                    roomdb.todoDao().update(todoListItems.get(index));
                 }).start();
             }
             alramset(false);
@@ -353,19 +310,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
             isRunning = !isRunning;
             new Thread(() -> {
-                items.get(index).setIsrunning(isRunning);
-                roomdb.todoDao().update(items.get(index));
+                todoListItems.get(index).setIsrunning(isRunning);
+                roomdb.todoDao().update(todoListItems.get(index));
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("capital", true);
+                firebaseFirestore.collection("cities").document("BJ")
+                        .set(data, SetOptions.merge());
 
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    items.get(i).setIsrunning(!isRunning);
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    todoListItems.get(i).setIsrunning(!isRunning);
                     roomdb.todoDao().update(items.get(i));
                 }
-                for(int i=(index+1); i <items.size() ; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    items.get(i).setIsrunning(!isRunning);
-                    roomdb.todoDao().update(items.get(i));
+                for(int i=(index+1); i <todoListItems.size() ; i++){
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    todoListItems.get(i).setIsrunning(!isRunning);
+                    roomdb.todoDao().update(todoListItems.get(i));
                 }
             }).start();
         }
@@ -387,7 +349,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 int hour_24, minute, secon;
                 //남은 시간
-                long totalsec = items.get(index).getTotalsec() - items.get(index).getCurtime() - timegap;
+                long totalsec = todoListItems.get(index).getTotalsec() - todoListItems.get(index).getCurtime() - timegap;
 
                 //예약 시간
                 if(curampm.equals("오후")) curhour = curhour + 12;
@@ -398,15 +360,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 minute = (int) (lestmin + curmin);
                 int lestsec = (int) (totalsec % 60);
                 secon = (int) (lestsec + cursec);
-
-                Log.e(TAG,
-                        "로그 추적 run: 진행 초"  +  (items.get(index).getCurtime() + timegap)
-                                + "\n남은 설정 전체 초" + items.get(index).getTotalsec()
-                                + "\n남은 totalsec" + totalsec
-                                + "\n남은 시" + lesthour + " 남은 분" + lestmin + " 남은 초" + lestsec
-                                + "\n현재 시" + curhour  + " 현재 분" + curmin  + " 현재 초" + cursec
-                                + "\n예약 시" + hour_24  + " 예약 분" + minute  + " 예약 초" + secon
-                );
 
                 // 현재 지정된 시간으로 알람 시간 설정
                 Calendar calendar = Calendar.getInstance();
@@ -427,9 +380,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 if(totalsec>0)
 //                Toast.makeText(mContext,date_text + "뒤에 알람이 울립니다!", Toast.LENGTH_SHORT).show();
 
-                //  Preference에 설정한 값 저장
-                editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
-                editor.putString("alarmtitle", items.get(index).getTitle());
+                    //  Preference에 설정한 값 저장
+                    editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
+                editor.putString("alarmtitle", todoListItems.get(index).getTitle());
                 editor.apply();
                 diaryNotification(calendar);
 
@@ -484,7 +437,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(timerTask != null)
             {
                 new Thread(() -> {
-                    items.get(index).setCurtime(lastsec);
+                    todoListItems.get(index).setCurtime(lastsec);
                     roomdb.todoDao().update(items.get(index));
                 }).start();
 
@@ -497,16 +450,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             isRunning = !isRunning;
             new Thread(() -> {
-                items.get(index).setIsrunning(isRunning);
-                roomdb.todoDao().update(items.get(index));
+                todoListItems.get(index).setIsrunning(isRunning);
+                roomdb.todoDao().update(todoListItems.get(index));
             }).start();
         }
 
         @SuppressLint("SetTextI18n")
         public void editPlus() {
             timegap = 0;
-            int curcount = items.get(index).getCurcount();
-            if(items.get(index).getCurcount()<items.get(index).getCount()){
+            int curcount = todoListItems.get(index).getCurcount();
+            if(todoListItems.get(index).getCurcount()<todoListItems.get(index).getCount()){
                 curcount = curcount + 1;
             } else {
                 curcount = 0;
@@ -517,16 +470,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(items.get(i));
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    roomdb.todoDao().update(todoListItems.get(i));
                 }
-                for(int i=(index+1); i <items.size() ; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(items.get(i));
+                for(int i=(index+1); i <todoListItems.size() ; i++){
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    roomdb.todoDao().update(todoListItems.get(i));
                 }
 
-                items.get(index).setCurcount(cur);
-                roomdb.todoDao().update(items.get(index));
+                todoListItems.get(index).setCurcount(cur);
+                roomdb.todoDao().update(todoListItems.get(index));
 
             }).start();
         }
@@ -534,27 +487,67 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void editMinus() {
             timegap = 0;
-            int curcount = items.get(index).getCurcount() ;
+            int curcount = todoListItems.get(index).getCurcount() ;
             if(curcount > 0) {
-                curcount = items.get(index).getCurcount() - 1;
+                curcount = todoListItems.get(index).getCurcount() - 1;
             }
             int finalCurcount = curcount;
             new Thread(() -> {
 
                 for(int i=0; i<index; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(items.get(i));
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    roomdb.todoDao().update(todoListItems.get(i));
                 }
-                for(int i=(index+1); i <items.size() ; i++){
-                    if(items.get(i).getIsrunning()) items.get(i).setCurtime(lastsec-1);
-                    roomdb.todoDao().update(items.get(i));
+                for(int i=(index+1); i <todoListItems.size() ; i++){
+                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    roomdb.todoDao().update(todoListItems.get(i));
                 }
 
-                items.get(index).setCurcount(finalCurcount);
-                roomdb.todoDao().update(items.get(index));
+                todoListItems.get(index).setCurcount(finalCurcount);
+                roomdb.todoDao().update(todoListItems.get(index));
             }).start();
         }
     }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @NonNull
+    @Override
+    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.habbits_item_today, viewGroup, false);
+        mContext = viewGroup.getContext();
+        final ViewHolder holder = new ViewHolder(v);
+
+        v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MySoundPlayer.play(MySoundPlayer.CLICK);
+                showPopupCountTime(v, holder.getAdapterPosition());
+            }
+        });
+        v.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MySoundPlayer.play(MySoundPlayer.CLICK);
+                makedialogtitle(v, holder.getAdapterPosition());
+            }
+        });
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerAdapter.ViewHolder viewHolder, int position) {
+        viewHolder.onBind(todoListItems.get(position),position);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        Log.e(TAG, "onDetachedFromRecyclerView: ");
+    }
+
+
 
     @SuppressLint("SetTextI18n")
     private void makedialogtitle(View v, final int position){
@@ -562,7 +555,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         final TextView tvTitle = (TextView) v. findViewById(R.id.tvTitle);
 
         EditText edittext = new EditText(mContext);
-        edittext.setText(items.get(position).getTitle());
+        edittext.setText(todoListItems.get(position).getTitle());
         edittext.setGravity(Gravity.CENTER);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -575,8 +568,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     //제목 입력, DB추가
                     tvTitle.setText(edittext.getText().toString());
                     new Thread(() -> {
-                        items.get(position).setTitle(edittext.getText().toString());
-                        roomdb.todoDao().update(items.get(position));
+                        todoListItems.get(position).setTitle(edittext.getText().toString());
+                        roomdb.todoDao().update(todoListItems.get(position));
                     }).start();
                 });
         builder.setNegativeButton("취소",
@@ -666,12 +659,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     //제목 입력, DB추가
                     textView.setText(result);
                     new Thread(() -> {
-                        items.get(position).setHour(hourPicker.getValue());
-                        items.get(position).setMin(minPicker.getValue());
-                        items.get(position).setSec(secPicker.getValue());
-                        items.get(position).setCount(0);
-                        items.get(position).setTotalsec(totalsec);
-                        roomdb.todoDao().update(items.get(position));
+                        todoListItems.get(position).setHour(hourPicker.getValue());
+                        todoListItems.get(position).setMin(minPicker.getValue());
+                        todoListItems.get(position).setSec(secPicker.getValue());
+                        todoListItems.get(position).setCount(0);
+                        todoListItems.get(position).setTotalsec(totalsec);
+                        roomdb.todoDao().update(todoListItems.get(position));
                     }).start();
                 });
         builder.setNegativeButton("취소",
@@ -709,10 +702,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     //제목 입력, DB추가
                     textView.setText(numberPicker.getValue()+" ");
                         new Thread(() -> {
-                            items.get(position).setHour(0);
-                            items.get(position).setMin(0);
-                            items.get(position).setSec(0);
-                            items.get(position).setCount(numberPicker.getValue());
+                            todoListItems.get(position).setHour(0);
+                            todoListItems.get(position).setMin(0);
+                            todoListItems.get(position).setSec(0);
+                            todoListItems.get(position).setCount(numberPicker.getValue());
                             roomdb.todoDao().update(items.get(position));
                         }).start();
                 });
@@ -722,6 +715,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 });
         builder.show();
     }
+
+    @Override
+    public int getItemCount() {
+        return todoListItems.size();}
+
 
     /*private void showPopupcycle(View v, final int position){
 
