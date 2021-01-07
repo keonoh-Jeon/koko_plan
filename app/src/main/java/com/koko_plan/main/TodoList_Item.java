@@ -6,7 +6,6 @@ public class TodoList_Item
 {
     @PrimaryKey(autoGenerate = true)
     private String id;
-    private String title;
     private String text;
     private String from;
     private String fromid;
@@ -26,9 +25,6 @@ public class TodoList_Item
 
     public String getFrom(){ return from; }
     public void setFrom(String from){ this.from = from;  }
-
-    public String getTitle(){ return title; }
-    public void setTitle(String title){ this.title = title; }
 
     public String getHabbittitle(){ return habbittitle; }
     public void setHabbittitle(String habbittitle){ this.habbittitle = habbittitle; }

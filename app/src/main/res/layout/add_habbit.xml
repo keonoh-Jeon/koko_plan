@@ -74,6 +74,7 @@
                         <RadioButton
                             android:id="@+id/rbtn_radioButton1"
                             android:text="매일"
+                            android:checked="true"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="50sp"

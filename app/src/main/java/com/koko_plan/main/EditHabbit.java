@@ -34,7 +34,7 @@ public class EditHabbit extends AppCompatActivity {
 
     private Map<String, CheckBox> map;
 
-    private String habbitroutine;
+    private String habbitroutine = "매일";
 
     @SuppressLint("FindViewByIdCast")
     @Override
@@ -81,8 +81,6 @@ public class EditHabbit extends AppCompatActivity {
 
     private void SetListener() {
         View.OnClickListener Listener = new View.OnClickListener() {
-
-
 
             @SuppressLint("SetTextI18n")
             @Override

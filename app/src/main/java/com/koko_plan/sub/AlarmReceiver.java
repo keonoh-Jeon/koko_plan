@@ -33,7 +33,6 @@ import static android.content.ContentValues.TAG;
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.pref;
-import static com.koko_plan.main.MainActivity.roomdb;
 import static com.koko_plan.main.MainActivity.todaydate;
 
 public class AlarmReceiver extends BroadcastReceiver {

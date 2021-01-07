@@ -99,6 +99,7 @@ import com.koko_plan.server.habbitlist.HabbitList_Adapter;
 import com.koko_plan.server.habbitlist.HabbitList_Item;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
+import com.koko_plan.server.totalhabbits.TotalHabbitsList_Item;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
 import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.ItemTouchHelperCallback;
@@ -158,10 +159,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String photourl;
     public static Bitmap profile;
 
-    private RecyclerAdapter adapter;
     private RecyclerView recyclerView, recyclerView3;
 
-    public static TodoDatabase roomdb;
     private ScrollView scrollview;
 
     public static SharedPreferences pref;
@@ -196,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int todayitemsize;
 
     public static ArrayList<TodoList_Item> todoListItems = null;
+    private RecyclerAdapter adapter;
     public static ArrayList<GoodText_Item> goodText_items = null;
     private GoodText_Adapter goodText_adapter = null;
 
@@ -249,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 가로 달력 구현
         horizontalCalendarmaker(calendar);
 
-        initSwipe();
         initSwipe2();
 
         // 할일 목록 만들기(리사이클러뷰)
@@ -314,27 +313,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void HabbitTodayListmaker() {
-        /*RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        //데이터베이스 지정
-        roomdb = TodoDatabase.getDatabase(this);
-        adapter = new RecyclerAdapter(roomdb);
-        //리사이클러뷰 옵션 적용용
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);*/
 
         todoListItems = new ArrayList<>();
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
+
+        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
+
         adapter = new RecyclerAdapter(todoListItems, this, this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(goodText_adapter);
+        recyclerView.setAdapter(adapter);
 
-        //ItemTouchHelper 생성
-        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
-        //RecyclerView에 ItemTouchHelper 붙이기
-        helper.attachToRecyclerView(recyclerView);
+        initSwipe();
+
     }
 
     private void HabbitListmaker() {
@@ -355,7 +347,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         layoutManager.setStackFromEnd(true);
 
         goodText_adapter = new GoodText_Adapter(goodText_items, this, this);
-        recyclerView3.setLayoutManager(layoutManager);
         recyclerView3.setLayoutManager(layoutManager);
         recyclerView3.setAdapter(goodText_adapter);
 
@@ -410,8 +401,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 public void run() {
                                                     cur = 0;
                                                     for(int i=0 ; i < todoListItems.size() ; i++) {
-                                                            int curtime = (int) ((double)roomdb.todoDao().search(selecteddata).get(i).getCurtime() / ((double)roomdb.todoDao().search(selecteddata).get(i).getTotalsec()) * 100.0);
-                                                            cur += curtime;
+//                                                            int curtime = (int) ((double)roomdb.todoDao().search(selecteddata).get(i).getCurtime() / ((double)roomdb.todoDao().search(selecteddata).get(i).getTotalsec()) * 100.0);
+
+                                                        DocumentReference docRef = firebaseFirestore.collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle());
+                                                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    DocumentSnapshot document = task.getResult();
+                                                                    if (document.exists()) {
+                                                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                                                        int curtime = Integer.parseInt(String.valueOf(document.getData().get("curtime")));
+                                                                        int totalsec = Integer.parseInt(String.valueOf(document.getData().get("totalsec")));
+                                                                        curtime = curtime / totalsec * 100;
+                                                                        cur += curtime;
+                                                                    } else {
+                                                                        Log.d(TAG, "No such document");
+                                                                    }
+                                                                } else {
+                                                                    Log.d(TAG, "get failed with ", task.getException());
+                                                                }
+                                                            }
+                                                        });
                                                     }
                                                     today_progress = cur/todoListItems.size();
                                                     tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
@@ -585,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         probitmap();
 
         ivTrophy = findViewById(R.id.iv_trophy);
-        recyclerView = (RecyclerView) findViewById(R.id.rv_view);
+
         pieChart = findViewById(R.id.piechart);
 
         btnPlus = findViewById(R.id.btnPlus);
@@ -864,8 +875,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         listenerDoc();
+        listenerhabbitlistDoc();
 
         saveProgressAlarm(this);
+    }
+
+    private void listenerhabbitlistDoc() {
+
+        firebaseFirestore
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                .document(firebaseUser.getUid())
+                .collection("total")
+                .orderBy("num", Query.Direction.ASCENDING)
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("listen:error", e);
+                            return;                        }
+
+                        assert snapshots != null;
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    Log.w("ADDED","TOTALHABBIT Data: " + dc.getDocument().getData());
+                                    todoListItems.add(todoListItems.size(), dc.getDocument().toObject(TodoList_Item.class));
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case MODIFIED:
+                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+//                                    rankingAdapter.notifyDataSetChanged();
+                                    break;
+                                case REMOVED:
+                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                    break;
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private void listenerDoc(){
@@ -944,51 +997,62 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @SuppressLint("DefaultLocale")
                 int totalsec = (hour*60*60+min*60+sec)*count;
 
-                new Thread(() -> {
-                    int size = todoListItems.size()+1;
-                    Todo todo = new Todo(size+1, todaydate, habbittitle, 0,0, count, hour, min, sec, totalsec, isrunning);
-                    roomdb.todoDao().insert(todo);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void run() {
+                                //파이어베이스 저장
+                                //저장 리스트 목록 만들기
+                                Map<String, Object> todayprogresslist = new HashMap<>();
+                                todayprogresslist.put("hour", hour);
+                                todayprogresslist.put("min", min);
+                                todayprogresslist.put("sec", sec);
+                                todayprogresslist.put("start", todaydate);
+                                todayprogresslist.put("totalsec", totalsec);
+                                todayprogresslist.put("count", count);
+                                todayprogresslist.put("habbittitle", habbittitle);
+                                todayprogresslist.put("isrunning", isrunning);
+                                todayprogresslist.put("habbitroutine", habbitroutine);
+                                todayprogresslist.put("curtime", totalsec);
+                                todayprogresslist.put("num", todoListItems.size()+1);
+                                todayprogresslist.put("monday", monday);
+                                todayprogresslist.put("tuesday", tuesday);
+                                todayprogresslist.put("wednesday", wednesday);
+                                todayprogresslist.put("thursday", thursday);
+                                todayprogresslist.put("friday", friday);
+                                todayprogresslist.put("saturday", saturday);
+                                todayprogresslist.put("sunday", sunday);
+
+                                if (firebaseUser != null) {
+                                    assert habbittitle != null;
+                                    firebaseFirestore
+                                            .collection("users")
+                                            .document(firebaseUser.getUid())
+                                            .collection("total")
+                                            .document(habbittitle)
+
+                                            .set(todayprogresslist)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+                                }
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
                 }).start();
 
-                new Thread(() -> {
-
-                    //파이어베이스 저장
-                    //저장 리스트 목록 만들기
-                    Map<String, Object> todayprogresslist = new HashMap<>();
-                    todayprogresslist.put("start", todaydate);
-                    todayprogresslist.put("totalsec", totalsec);
-                    todayprogresslist.put("habbittitle", habbittitle);
-                    todayprogresslist.put("habbitroutine", habbitroutine);
-                    todayprogresslist.put("curtime", totalsec);
-                    todayprogresslist.put("monday", monday);
-                    todayprogresslist.put("tuesday", tuesday);
-                    todayprogresslist.put("wednesday", wednesday);
-                    todayprogresslist.put("thursday", thursday);
-                    todayprogresslist.put("friday", friday);
-                    todayprogresslist.put("saturday", saturday);
-                    todayprogresslist.put("sunday", sunday);
-
-                        if (firebaseUser != null) {
-                            assert habbittitle != null;
-                            firebaseFirestore
-                                    .collection("users")
-                                    .document(firebaseUser.getUid())
-                                    .collection("total")
-                                    .document(habbittitle)
-
-                                    .set(todayprogresslist)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                        }
-                                    });
-                        }
-                }).start();
             }
         }
     }
@@ -1011,9 +1075,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(todoListItems.size() > 0) {
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
-                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    Map<String, Object> data = new HashMap<>();
+                    if(todoListItems.get(i).getIsrunning()) {
+                        todoListItems.get(i).setCurtime(lastsec-1);
+                        data.put("curtime", lastsec-1);
+                    }
                     adapter.getItems().get(i).setNum((i+1));
-//                    roomdb.todoDao().update(adapter.getItems().get(i));
+                    data.put("num", (i+1));
+
+                    firebaseFirestore
+                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                            .set(data, SetOptions.merge());
+
                 }
             }).start();
         }
@@ -1043,7 +1116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //차트 항목 타이틀 지정
             ArrayList title = new ArrayList();
             for (int i = 0; i < adapter.getItemCount(); i++) {
-                title.add(adapter.getItems().get(i).getTitle());
+                title.add(adapter.getItems().get(i).getHabbittitle());
             }
             title.add("하루");
 
@@ -1093,7 +1166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         timegap = 0;
-
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
 //        adapter.setItem(roomdb.todoDao().search(todaydate));
         todayitemsize = todoListItems.size();
@@ -1107,8 +1179,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             for(int i=0 ; i < adapter.getItemCount() ; i++) {
                 if(todoListItems.get(i).getIsrunning()) {
                     todoListItems.get(i).setCurtime(lastsec-1);
-
-//                    roomdb.todoDao().update(adapter.getItems().get(i));
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("isrunning", lastsec-1);
+                    firebaseFirestore
+                            .collection("users")
+                            .document(firebaseUser.getUid())
+                            .collection("total")
+                            .document(todoListItems.get(i).getHabbittitle())
+                            .set(data, SetOptions.merge());
 
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
@@ -1217,7 +1295,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //스와이프 기능 헬퍼 연결
     private void initSwipe() {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT /* | ItemTouchHelper.RIGHT */) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT  | ItemTouchHelper.RIGHT ) {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -1233,8 +1311,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d(TAG, "run: "+ "onSwiped");
-//                            roomdb.todoDao().delete(adapter.getItems().get(position));
+                            runOnUiThread(new Runnable() {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void run() {
+                                    firebaseFirestore
+                                            .collection("users")
+                                            .document(firebaseUser.getUid())
+                                            .collection("total")
+                                            .document(todoListItems.get(position).getHabbittitle())
+                                            .delete()
+
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.e(TAG, "onSuccess: "  + todoListItems.get(position).getHabbittitle());
+                                                    todoListItems.remove(position);
+                                                    adapter.notifyItemRemoved(position);
+                                                }
+                                            })
+
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+                                }
+                            });
                         }
                     }).start();
                 }else {
@@ -1293,8 +1396,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
         };
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        helper.attachToRecyclerView(recyclerView);
     }
 
     //스와이프 기능 헬퍼 연결

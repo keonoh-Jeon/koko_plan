@@ -73,7 +73,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_totalhabbit_list);
 
-
         // 뷰 초기화
         initView();
 
@@ -139,7 +138,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         layoutManager.setStackFromEnd(true);
 
         recyclerView = findViewById(R.id.rv_totlahabbitlist);
-        recyclerView.setLayoutManager(layoutManager);
 
         totalHabbitsList_adapter = new TotalHabbitsList_Adapter(totalhabbitlist_items, this, this);
         recyclerView.setLayoutManager(layoutManager);
@@ -147,9 +145,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
         //리스트 스와이프 기능 초기화
         initSwipe();
-
-
-
     }
 
     @Override
@@ -176,11 +171,9 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                Log.e(TAG, "initSwipe: " + "실행" + position);
 
                 //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
-                    Log.e(TAG, "onSwiped: totalhabbit" + "왼쪽" );
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
