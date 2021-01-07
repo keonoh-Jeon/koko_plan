@@ -882,43 +882,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerhabbitlistDoc() {
 
-        firebaseFirestore
-                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                .document(firebaseUser.getUid())
-                .collection("total")
-                .orderBy("num", Query.Direction.ASCENDING)
+        if(firebaseUser!=null){
 
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .orderBy("num", Query.Direction.ASCENDING)
 
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("listen:error", e);
-                            return;                        }
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-                        assert snapshots != null;
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot snapshots,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("listen:error", e);
+                                return;                        }
 
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    Log.w("ADDED","TOTALHABBIT Data: " + dc.getDocument().getData());
-                                    todoListItems.add(todoListItems.size(), dc.getDocument().toObject(TodoList_Item.class));
+                            assert snapshots != null;
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.w("ADDED","TOTALHABBIT Data: " + dc.getDocument().getData());
+                                        todoListItems.add(todoListItems.size(), dc.getDocument().toObject(TodoList_Item.class));
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case MODIFIED:
-                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+                                        break;
+                                    case MODIFIED:
+                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case REMOVED:
-                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+                                        break;
+                                    case REMOVED:
+                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
 //                                    clubAdapter.notifyDataSetChanged();
-                                    break;
+                                        break;
+                                }
                             }
+                            adapter.notifyDataSetChanged();
                         }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                    });
+        }
+
     }
 
     private void listenerDoc(){
@@ -1016,7 +1020,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 todayprogresslist.put("habbittitle", habbittitle);
                                 todayprogresslist.put("isrunning", isrunning);
                                 todayprogresslist.put("habbitroutine", habbitroutine);
-                                todayprogresslist.put("curtime", totalsec);
+                                todayprogresslist.put("curtime", 0);
                                 todayprogresslist.put("num", todoListItems.size()+1);
                                 todayprogresslist.put("monday", monday);
                                 todayprogresslist.put("tuesday", tuesday);
@@ -1180,7 +1184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(todoListItems.get(i).getIsrunning()) {
                     todoListItems.get(i).setCurtime(lastsec-1);
                     Map<String, Object> data = new HashMap<>();
-                    data.put("isrunning", lastsec-1);
+                    data.put("curtime", lastsec-1);
                     firebaseFirestore
                             .collection("users")
                             .document(firebaseUser.getUid())
@@ -1195,7 +1199,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
             goodText_items.removeAll(goodText_items);
+
         }).start();
+
 
         savehabbitportion();
     }
@@ -1255,6 +1261,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
+
+        todoListItems.removeAll(todoListItems);
+
+
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})

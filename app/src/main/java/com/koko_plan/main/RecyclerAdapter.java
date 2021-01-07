@@ -340,24 +340,30 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
-                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    if(todoListItems.get(i).getIsrunning()) {
+                        todoListItems.get(i).setCurtime(lastsec-1);
+                        data.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data, SetOptions.merge());
+                    }
                         todoListItems.get(i).setIsrunning(!isRunning);
-
-                        Map<String, Object> data2 = new HashMap<>();
-                        data2.put("curtime", lastsec-1);
-                        data2.put("isrunning", !isRunning);
+                        data.put("isrunning", !isRunning);
                         firebaseFirestore
                                 .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
                                 .set(data, SetOptions.merge());
 
                 }
                 for(int i=(index+1); i <todoListItems.size() ; i++){
-                    if(todoListItems.get(i).getIsrunning()) todoListItems.get(i).setCurtime(lastsec-1);
+                    if(todoListItems.get(i).getIsrunning()) {
+                        todoListItems.get(i).setCurtime(lastsec-1);
+                        data.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data, SetOptions.merge());
+                    }
                     todoListItems.get(i).setIsrunning(!isRunning);
-
-                    Map<String, Object> data2 = new HashMap<>();
-                    data2.put("curtime", lastsec-1);
-                    data2.put("isrunning", !isRunning);
+                    data.put("isrunning", !isRunning);
                     firebaseFirestore
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
                             .set(data, SetOptions.merge());
