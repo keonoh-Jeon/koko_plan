@@ -88,6 +88,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
@@ -251,11 +252,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         initSwipe2();
 
-        // 할일 목록 만들기(리사이클러뷰)
-        HabbitTodayListmaker();
-
 //        HabbitTodayListmaker();
 //        HabbitListmaker();
+
+        listenerhabbitlistDoc2();
+
+        // 할일 목록 만들기(리사이클러뷰)
+        HabbitTodayListmaker();
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
@@ -263,6 +266,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         GoodTextListmaker();
 
         RequestReview.show(this);
+    }
+
+    private void listenerhabbitlistDoc2() {
+
+        if(firebaseUser!=null){
+
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .orderBy("num", Query.Direction.ASCENDING)
+
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot snapshots,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("listen:error", e);
+                                return;                        }
+
+                            assert snapshots != null;
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.w("ADDED","Data: " + dc.getDocument().getData());
+//                                        todoListItems.add(0, dc.getDocument().toObject(TodoList_Item.class));
+                                        break;
+                                    case MODIFIED:
+                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+//                                    rankingAdapter.notifyDataSetChanged();
+                                        adapter.notifyDataSetChanged();
+                                        break;
+                                    case REMOVED:
+                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+//                                    clubAdapter.notifyDataSetChanged();
+                                        break;
+                                }
+                            }
+
+                        }
+                    });
+        }
     }
 
     @SuppressLint("Range")
@@ -875,7 +922,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         listenerDoc();
-        listenerhabbitlistDoc();
 
         saveProgressAlarm(this);
     }
@@ -883,42 +929,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void listenerhabbitlistDoc() {
 
         if(firebaseUser!=null){
-
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
                     .collection("total")
                     .orderBy("num", Query.Direction.ASCENDING)
-
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
-                        public void onEvent(@Nullable QuerySnapshot snapshots,
-                                            @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w("listen:error", e);
-                                return;                        }
-
-                            assert snapshots != null;
-                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        Log.w("ADDED","TOTALHABBIT Data: " + dc.getDocument().getData());
-                                        todoListItems.add(todoListItems.size(), dc.getDocument().toObject(TodoList_Item.class));
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case MODIFIED:
-                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case REMOVED:
-                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
-                                        break;
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    todoListItems.add(document.toObject(TodoList_Item.class));
+                                    adapter.notifyDataSetChanged();
                                 }
+                            } else {
+                                Log.d(TAG, "Error getting documents: ", task.getException());
                             }
-                            adapter.notifyDataSetChanged();
                         }
                     });
         }
@@ -1037,11 +1065,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             .document(firebaseUser.getUid())
                                             .collection("total")
                                             .document(habbittitle)
-
                                             .set(todayprogresslist)
+
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
+                                                    adapter.notifyDataSetChanged();
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -1050,13 +1079,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 }
                                             });
                                 }
-                                adapter.notifyDataSetChanged();
+//                                adapter.notifyDataSetChanged();
                             }
                         });
+
                     }
-
                 }).start();
-
             }
         }
     }
@@ -1202,6 +1230,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }).start();
 
+        todoListItems.removeAll(todoListItems);
 
         savehabbitportion();
     }
@@ -1261,17 +1290,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
-
-        todoListItems.removeAll(todoListItems);
-
-
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "lifecycle onResume: 시작=============");
 
         //업데이트 가능 시, 연결해서 업데이트
         appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
@@ -1301,6 +1325,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         timegap = (int)((now-stoptime)/1000);
 
+        listenerhabbitlistDoc();
     }
 
     //스와이프 기능 헬퍼 연결

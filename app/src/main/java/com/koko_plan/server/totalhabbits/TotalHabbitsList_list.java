@@ -301,7 +301,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                             }
                         }
                         totalHabbitsList_adapter.notifyDataSetChanged();
-
                     }
                 });
     }
