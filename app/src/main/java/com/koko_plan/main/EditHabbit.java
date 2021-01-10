@@ -2,6 +2,7 @@ package com.koko_plan.main;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,8 +13,11 @@ import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.koko_plan.R;
 import com.koko_plan.sub.MySoundPlayer;
 
@@ -22,6 +26,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class EditHabbit extends AppCompatActivity {
 
@@ -32,11 +40,22 @@ public class EditHabbit extends AppCompatActivity {
     private RadioButton radioButton1, radioButton2;
     private CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7;
 
-    private Map<String, CheckBox> map;
+    private View vieweveryday;
+
+    public static SharedPreferences pref;
+    public static SharedPreferences.Editor editor;
 
     private String habbitroutine = "매일";
 
-    @SuppressLint("FindViewByIdCast")
+    boolean monday = false;
+    boolean tuesday = false;
+    boolean wednesday = false;
+    boolean thursday = false;
+    boolean friday = false;
+    boolean saturday = false;
+    boolean sunday = false;
+
+    @SuppressLint({"FindViewByIdCast", "CommitPrefEdits"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -49,6 +68,9 @@ public class EditHabbit extends AppCompatActivity {
         this.SetListener();
 
         et_habbittitle = (EditText) findViewById(R.id.et_habbittitle);
+
+        vieweveryday = findViewById(R.id.view_everyday);
+        vieweveryday.setVisibility(View.INVISIBLE);
 
         cb1 = (CheckBox)findViewById(R.id.checkBox1);
         cb2 = (CheckBox)findViewById(R.id.checkBox2);
@@ -77,6 +99,10 @@ public class EditHabbit extends AppCompatActivity {
         secPicker.setMinValue(0);
         secPicker.setMaxValue(60);
         secPicker.setValue(0);
+
+        // 저장 위치 초기화
+        pref = getSharedPreferences("pref", MODE_PRIVATE);
+        editor = pref.edit();
     }
 
     private void SetListener() {
@@ -89,15 +115,16 @@ public class EditHabbit extends AppCompatActivity {
                     case R.id.rbtn_radioButton1:
                         MySoundPlayer.play(MySoundPlayer.CLICK);
                         habbitroutine = "매일";
+                        vieweveryday.setVisibility(View.INVISIBLE);
                         break;
                     case R.id.rbtn_radioButton2:
                         MySoundPlayer.play(MySoundPlayer.CLICK);
                         habbitroutine = "매주";
+                        vieweveryday.setVisibility(View.VISIBLE);
                         break;
                 }
             }
         };
-
         radioButton1.setOnClickListener(Listener);
         radioButton2.setOnClickListener(Listener);
     }
@@ -109,14 +136,6 @@ public class EditHabbit extends AppCompatActivity {
 
     public void mOnConfirm(View v){
 
-        boolean monday = false;
-        boolean tuesday = false;
-        boolean wednesday = false;
-        boolean thursday = false;
-        boolean friday = false;
-        boolean saturday = false;
-        boolean sunday = false;
-
         if(habbitroutine.equals("매일")) {
             monday = tuesday = wednesday = thursday = friday = saturday = sunday = true;
 
@@ -125,9 +144,9 @@ public class EditHabbit extends AppCompatActivity {
             if(cb2.isChecked()) tuesday = true;
             if(cb3.isChecked()) wednesday = true;
             if(cb4.isChecked()) thursday = true;
-            if(cb4.isChecked()) friday = true;
-            if(cb4.isChecked()) saturday = true;
-            if(cb4.isChecked()) sunday = true;
+            if(cb5.isChecked()) friday = true;
+            if(cb6.isChecked()) saturday = true;
+            if(cb7.isChecked()) sunday = true;
         }
 
         String habbittitle = et_habbittitle.getText().toString();
@@ -137,26 +156,49 @@ public class EditHabbit extends AppCompatActivity {
         int sec = secPicker.getValue();
         boolean isrunning = false;
 
-        Intent intent = new Intent();
+        @SuppressLint("DefaultLocale")
+        int totalsec = (hour*60*60+min*60+sec)*count;
 
-        intent.putExtra("habbittitle", habbittitle);
-        intent.putExtra("count", count);
-        intent.putExtra("hour", hour);
-        intent.putExtra("min", min);
-        intent.putExtra("sec", sec);
-        intent.putExtra("habbitroutine", habbitroutine);
-        intent.putExtra("isrunning", isrunning);
-        intent.putExtra("monday", monday);
-        intent.putExtra("tuesday", tuesday);
-        intent.putExtra("wednesday", wednesday);
-        intent.putExtra("thursday", thursday);
-        intent.putExtra("friday", friday);
-        intent.putExtra("saturday", saturday);
-        intent.putExtra("sunday", sunday);
+        Map<String, Object> todayprogresslist = new HashMap<>();
+        todayprogresslist.put("hour", hour);
+        todayprogresslist.put("min", min);
+        todayprogresslist.put("sec", sec);
+        todayprogresslist.put("start", todaydate);
+        todayprogresslist.put("totalsec", totalsec);
+        todayprogresslist.put("count", count);
+        todayprogresslist.put("habbittitle", habbittitle);
+        todayprogresslist.put("isrunning", isrunning);
+        todayprogresslist.put("habbitroutine", habbitroutine);
+        todayprogresslist.put("curtime", 0);
+        todayprogresslist.put("num", pref.getInt("todayitemsize", 0)+1);
+        todayprogresslist.put("monday", monday);
+        todayprogresslist.put("tuesday", tuesday);
+        todayprogresslist.put("wednesday", wednesday);
+        todayprogresslist.put("thursday", thursday);
+        todayprogresslist.put("friday", friday);
+        todayprogresslist.put("saturday", saturday);
+        todayprogresslist.put("sunday", sunday);
 
+        if (firebaseUser != null) {
+            assert habbittitle != null;
+            firebaseFirestore
+                    .collection("users")
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .document(habbittitle)
+                    .set(todayprogresslist)
 
-        setResult(RESULT_OK, intent);
-
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    });
+        }
         finish();
     }
 }

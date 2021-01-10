@@ -6,20 +6,16 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -42,7 +38,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -68,7 +63,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -95,14 +89,9 @@ import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
 import com.koko_plan.server.goodtext.RandomGoodText;
-import com.koko_plan.server.goodtext.SetMsgToUsers;
-import com.koko_plan.server.habbitlist.HabbitList_Adapter;
-import com.koko_plan.server.habbitlist.HabbitList_Item;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
-import com.koko_plan.server.totalhabbits.TotalHabbitsList_Item;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
-import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -114,8 +103,6 @@ import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.Utils;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -123,8 +110,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -133,7 +118,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
@@ -353,10 +337,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         date = new Date();
         calendar = Calendar.getInstance();
         calendar.setTime(date);
+
         //날짜 표시 형식 지정
         dateformat = new SimpleDateFormat("yyyy-MM-dd");
         todaydate = dateformat.format(date);
         selecteddata = todaydate;
+    }
+
+    private String getdayofweek() {
+        int dayNum = calendar.get(Calendar.DAY_OF_WEEK);
+        String day = "";
+
+        switch (dayNum) {
+            case 1:
+                day = "sunday";
+                break;
+            case 2:
+                day = "monday";
+                break;
+            case 3:
+                day = "tuesday";
+                break;
+            case 4:
+                day = "wednesday";
+                break;
+            case 5:
+                day = "thursday";
+                break;
+            case 6:
+                day = "friday";
+                break;
+            case 7:
+                day = "saturday";
+                break;
+        }
+        return day;
+
     }
 
     private void HabbitTodayListmaker() {
@@ -928,11 +944,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerhabbitlistDoc() {
 
+        Log.e(TAG, "listenerhabbitlistDoc: " + getdayofweek());
+
         if(firebaseUser!=null){
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
                     .collection("total")
+                    .whereEqualTo(getdayofweek(), true) // 복합 쿼리 순서 주의! -- 색인에 가서 복합 색인 추가
                     .orderBy("num", Query.Direction.ASCENDING)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -998,7 +1017,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                             goodText_adapter.notifyDataSetChanged();
                             goodtextsize.setText(goodText_items.size() + "개");
-                            Log.e(TAG, "onEvent: " + goodText_items.size());
                         }
                     });
         }
@@ -1070,6 +1088,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
+                                                    Log.e(TAG, "onSuccess: "+ "돌아와서  => " );
                                                     adapter.notifyDataSetChanged();
                                                 }
                                             })
@@ -1208,7 +1227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
-            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+            for(int i=0 ; i < todayitemsize ; i++) {
                 if(todoListItems.get(i).getIsrunning()) {
                     todoListItems.get(i).setCurtime(lastsec-1);
                     Map<String, Object> data = new HashMap<>();
@@ -1223,14 +1242,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
+                    Log.e(TAG, "onPause: stoptime" +  now);
                     editor.apply();
                 }
             }
             goodText_items.removeAll(goodText_items);
+            todoListItems.removeAll(todoListItems);
 
         }).start();
 
-        todoListItems.removeAll(todoListItems);
+
 
         savehabbitportion();
     }

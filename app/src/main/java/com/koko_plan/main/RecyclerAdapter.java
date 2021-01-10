@@ -282,10 +282,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editStop() {
             timegap = 0;
             dailyNotify = false;
-            if(isRunning) {
+            if(isRunning = true) {
                 stopTimerTask();
+                ivPlay.setVisibility(View.VISIBLE);
+                ivPause.setVisibility(View.GONE);
 
                 isRunning = !isRunning;
+
                 new Thread(() -> {
                     for(int i=0; i<index; i++){
                         if(todoListItems.get(i).getIsrunning()) {
