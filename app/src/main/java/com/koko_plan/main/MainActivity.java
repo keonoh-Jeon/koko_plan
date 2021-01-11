@@ -118,6 +118,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
@@ -231,9 +232,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 현재 날짜 구하기
         gettodaydate();
 
-        // 가로 달력 구현
-        horizontalCalendarmaker(calendar);
-
         initSwipe2();
 
 //        HabbitTodayListmaker();
@@ -242,7 +240,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listenerhabbitlistDoc2();
 
         // 할일 목록 만들기(리사이클러뷰)
-        HabbitTodayListmaker();
+        HabbitTodayListInit();
+
+        // 가로 달력 구현
+        horizontalCalendarmaker(calendar);
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
@@ -286,11 +287,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         break;
                                     case REMOVED:
                                         Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
                                         break;
                                 }
                             }
-
                         }
                     });
         }
@@ -375,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void HabbitTodayListmaker() {
+    private void HabbitTodayListInit() {
 
         todoListItems = new ArrayList<>();
 
@@ -453,70 +452,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                 tvTodayProgress.setText("실행한 습관이 없슴");
 
-                                if(todoListItems.size() > 0){
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
-                                            runOnUiThread(new Runnable() {
-                                                @SuppressLint("SetTextI18n")
-                                                @Override
-                                                public void run() {
-                                                    cur = 0;
-                                                    for(int i=0 ; i < todoListItems.size() ; i++) {
-//                                                            int curtime = (int) ((double)roomdb.todoDao().search(selecteddata).get(i).getCurtime() / ((double)roomdb.todoDao().search(selecteddata).get(i).getTotalsec()) * 100.0);
-
-                                                        DocumentReference docRef = firebaseFirestore.collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle());
-                                                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    DocumentSnapshot document = task.getResult();
-                                                                    if (document.exists()) {
-                                                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                                                        int curtime = Integer.parseInt(String.valueOf(document.getData().get("curtime")));
-                                                                        int totalsec = Integer.parseInt(String.valueOf(document.getData().get("totalsec")));
-                                                                        curtime = curtime / totalsec * 100;
-                                                                        cur += curtime;
-                                                                    } else {
-                                                                        Log.d(TAG, "No such document");
-                                                                    }
-                                                                } else {
-                                                                    Log.d(TAG, "get failed with ", task.getException());
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                    today_progress = cur/todoListItems.size();
-                                                    tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
-
-                                                    if(firebaseUser!=null){
-                                                        //파이어베이스 저장
-                                                        new Thread(() -> {
-                                                                Map<String, Object> dairyInfo = new HashMap<>();
-                                                                dairyInfo.put(todaydate, today_progress);
-
-                                                                firebaseFirestore
-                                                                        .collection("users")
-                                                                        .document(firebaseUser.getUid())
-                                                                        .set(dairyInfo, SetOptions.merge())
-                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid) {
-                                                                            }
-                                                                        })
-                                                                        .addOnFailureListener(new OnFailureListener() {
-                                                                            @Override
-                                                                            public void onFailure(@NonNull Exception e) {
-                                                                            }
-                                                                        });
-                                                        }).start();
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }).start();
-                                }
                                 //달력추가
                                 EventCalendarMaker(date);
 
@@ -966,10 +901,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             } else {
                                 Log.d(TAG, "Error getting documents: ", task.getException());
                             }
+                            showdayprogress();
                         }
                     });
         }
+    }
 
+    private void showdayprogress(){
+
+        if(adapter.getItemCount() > 0){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
+                    runOnUiThread(new Runnable() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void run() {
+                            cur = 0;
+                            for(int i=0 ; i < adapter.getItemCount() ; i++) {
+                                DocumentReference docRef = firebaseFirestore
+                                        .collection("users")
+                                        .document(firebaseUser.getUid())
+                                        .collection("total")
+                                        .document(todoListItems.get(i).getHabbittitle());
+
+                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                double curtime = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("curtime")));
+                                                double totalsec = Integer.parseInt(String.valueOf(document.getData().get("totalsec")));
+                                                cur += (int) ((double)curtime / (double)totalsec * 100.0);
+                                            } else {
+                                                Log.d(TAG, "No such document");
+                                            }
+                                            today_progress = cur/adapter.getItemCount();
+                                            tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+
+                                            Map<String, Object> dairyInfo = new HashMap<>();
+                                            dairyInfo.put(todaydate, today_progress);
+
+                                            firebaseFirestore
+                                                    .collection("users")
+                                                    .document(firebaseUser.getUid())
+                                                    .set(dairyInfo, SetOptions.merge())
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                        }
+                                                    });
+
+                                        } else {
+                                            Log.d(TAG, "get failed with ", task.getException());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
     private void listenerDoc(){
@@ -1006,7 +1006,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         break;
                                     case MODIFIED:
                                         Log.w("MODIFIED", "Data: " + dc.getDocument().getData());
-//                                    maketoast("this club is already exist.");
 //                                    rankingAdapter.notifyDataSetChanged();
                                         break;
                                     case REMOVED:
@@ -1251,8 +1250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }).start();
 
-
-
         savehabbitportion();
     }
 
@@ -1303,7 +1300,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "lifecycle onStop: 시작=============");
 
 //플레이 중이면 스레드 중지
         if(timerTask != null)
@@ -1638,7 +1634,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Calendar resetCal = Calendar.getInstance();
         resetCal.setTimeInMillis(System.currentTimeMillis());
         resetCal.set(Calendar.HOUR_OF_DAY, 0);
-        resetCal.set(Calendar.MINUTE, -5);
+        resetCal.set(Calendar.MINUTE, 0);
         resetCal.set(Calendar.SECOND, 0);
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
@@ -1646,6 +1642,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()/*+AlarmManager.INTERVAL_DAY*/));
+        Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }
 }

@@ -165,11 +165,14 @@ public class EditHabbit extends AppCompatActivity {
         todayprogresslist.put("sec", sec);
         todayprogresslist.put("start", todaydate);
         todayprogresslist.put("totalsec", totalsec);
+        todayprogresslist.put("sumtotalsec", 0);
         todayprogresslist.put("count", count);
+        todayprogresslist.put("countsum", 0);
         todayprogresslist.put("habbittitle", habbittitle);
         todayprogresslist.put("isrunning", isrunning);
         todayprogresslist.put("habbitroutine", habbitroutine);
         todayprogresslist.put("curtime", 0);
+        todayprogresslist.put("curtimesum", 0);
         todayprogresslist.put("num", pref.getInt("todayitemsize", 0)+1);
         todayprogresslist.put("monday", monday);
         todayprogresslist.put("tuesday", tuesday);
@@ -180,7 +183,6 @@ public class EditHabbit extends AppCompatActivity {
         todayprogresslist.put("sunday", sunday);
 
         if (firebaseUser != null) {
-            assert habbittitle != null;
             firebaseFirestore
                     .collection("users")
                     .document(firebaseUser.getUid())

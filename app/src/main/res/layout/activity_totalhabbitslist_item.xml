@@ -97,7 +97,7 @@
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
-                    android:id="@+id/tv_totalcount"
+                    android:id="@+id/tv_countsum"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:hint="총 횟수"
@@ -110,7 +110,7 @@
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
-                    android:id="@+id/tv_totalsec"
+                    android:id="@+id/tv_sumtotalsec"
                     android:layout_width="0dp"
                     android:hint="총 시간"
                     android:layout_height="wrap_content"

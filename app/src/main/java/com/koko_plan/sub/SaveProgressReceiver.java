@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.MainActivity;
 
 import java.util.HashMap;
@@ -36,20 +37,21 @@ public class SaveProgressReceiver extends BroadcastReceiver {
     }
 
     private void saveprogresstofirebase() {
-        /*if(todayitemsize > 0){
+        if(todayitemsize > 0){
             new Thread(() -> {
                 for(int i=0; i < todoListItems.size(); i++ ) {
 
-                    String date = todoListItems.get(i).getDay();
                     String habbit = todoListItems.get(i).getHabbittitle();
                     int curtime = todoListItems.get(i).getCurtime();
                     int curcount = todoListItems.get(i).getCount();
                     int totalsec = todoListItems.get(i).getTotalsec();
+                    int sumtotalsec = todoListItems.get(i).getSumtotalsec() + totalsec;
 
                     //파이어베이스 저장
                     //저장 리스트 목록 만들기
                     Map<String, Object> todayprogresslist = new HashMap<>();
-                    todayprogresslist.put("date", date);
+
+                    todayprogresslist.put("date", todaydate);
                     todayprogresslist.put("habbit", habbit);
                     todayprogresslist.put("curtime", curtime);
                     todayprogresslist.put("curcount", curcount);
@@ -59,12 +61,35 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                         firebaseFirestore
                                 .collection("users")
                                 .document(firebaseUser.getUid())
-                                .collection("totalhabbits")
+                                .collection("total")
                                 .document(habbit)
                                 .collection("dates")
                                 .document(todaydate)
 
-                                .set(todayprogresslist)
+                                .set(todayprogresslist, SetOptions.merge())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
+                    }
+
+                    Map<String, Object> sum = new HashMap<>();
+                    sum.put("sumtotalsec", sumtotalsec);
+
+                    if (firebaseUser != null) {
+                        firebaseFirestore
+                                .collection("users")
+                                .document(firebaseUser.getUid())
+                                .collection("total")
+                                .document(habbit)
+
+                                .set(sum, SetOptions.merge())
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -78,6 +103,6 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                     }
                 }
             }).start();
-        }*/
+        }
     }
 }

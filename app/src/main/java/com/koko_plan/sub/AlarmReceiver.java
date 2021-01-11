@@ -55,13 +55,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.e(TAG, "onReceive: " + "알람리시버");
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        //연결되는 액티비티
-        Intent notificationIntent = new Intent(context, RecyclerAdapter.class);
-
+        //연결되는 액티비티(돌아갈 액티비티)
+        Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         //헤더 클릭시 액티비티 이동시 필요
-        PendingIntent pendingI = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        PendingIntent pendingI = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //노티 생성
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default");
@@ -81,7 +80,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             //채널은 초기값 세팅으로 되어 있어 수정을 하고 적용을 시키려면 어플리케이션을 제거하고 다시 설치하여 확인을 해야 한다고 한다.
             NotificationChannel channel = new NotificationChannel("default", channelName, importance);
             channel.setDescription(description);
-            channel.enableVibration(true);// 진동 무음
+            channel.enableVibration(true); // 진동 무음
             channel.enableLights(true);
             channel.setLightColor(Color.BLUE);
             channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
@@ -101,7 +100,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentText("'"+ pref.getString("alarmtitle", null) + "' 의 목표 시간을 달성하였습니다.")
                 .setContentInfo("INFO")
                 .setOngoing(true) // 사용자가 직접 못지우게 계속 실행하기.
-                .setContentIntent(pendingI); //눌렀을때 액티비티 이동
+                .setContentIntent(pendingI) //눌렀을때 액티비티 이동
+                .setAutoCancel(true);
 
         if (notificationManager != null) {
 

@@ -334,6 +334,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
             isRunning = !isRunning;
             new Thread(() -> {
+                if(todoListItems.get(index).getCurtime() == 0) {
+                    todoListItems.get(index).setCountsum(todoListItems.get(index).getCountsum() + 1);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("countsum", todoListItems.get(index).getCountsum());
+                    firebaseFirestore
+                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
+                            .set(data, SetOptions.merge());
+                }
                 todoListItems.get(index).setIsrunning(isRunning);
                 Map<String, Object> data = new HashMap<>();
                 data.put("isrunning", isRunning);
@@ -448,9 +456,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //            dailyNotify = true; // 무조건 알람을 사용
 
             PackageManager pm = mContext.getPackageManager();
+            //부팅 리시버 지정
             ComponentName receiver = new ComponentName(mContext, DeviceBootReceiver.class);
+            //리시버 클래스 지정
             Intent alarmIntent = new Intent(mContext, AlarmReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, alarmIntent, 0);
+            //알람 매니저
             AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
             // 사용자가 매일 알람을 허용했다면
@@ -511,16 +522,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void editPlus() {
             timegap = 0;
+
+            int hour = todoListItems.get(index).getHour();
+            int min = todoListItems.get(index).getMin();
+            int sec = todoListItems.get(index).getSec();
+            int unitsec = hour*60*60+min*60+sec;
+
             int curcount = todoListItems.get(index).getCurcount();
+            int countsum = todoListItems.get(index).getCountsum();
             if(todoListItems.get(index).getCurcount()<todoListItems.get(index).getCount()){
                 curcount = curcount + 1;
+                countsum = countsum + 1;
             } else {
                 curcount = 0;
             }
-            int cur = curcount;
-
+            int finalCountsum = countsum;
+            int finalCurcount = curcount;
             new Thread(() -> {
-
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
                     if(todoListItems.get(i).getIsrunning()) {
@@ -540,9 +558,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
                             .set(data, SetOptions.merge());
                 }
-                todoListItems.get(index).setCurcount(cur);
+
+                todoListItems.get(index).setCurcount(finalCurcount);
+                todoListItems.get(index).setCountsum(finalCountsum);
                 Map<String, Object> data = new HashMap<>();
-                data.put("curcount", cur);
+                data.put("curcount", finalCurcount);
+                data.put("curtime", finalCurcount * unitsec);
+                data.put("countsum", finalCountsum);
 
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
@@ -554,10 +576,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void editMinus() {
             timegap = 0;
+            int hour = todoListItems.get(index).getHour();
+            int min = todoListItems.get(index).getMin();
+            int sec = todoListItems.get(index).getSec();
+            int unitsec = hour*60*60+min*60+sec;
+
             int curcount = todoListItems.get(index).getCurcount() ;
+            int countsum = todoListItems.get(index).getCountsum();
             if(curcount > 0) {
-                curcount = todoListItems.get(index).getCurcount() - 1;
+                curcount = curcount - 1;
+                countsum = countsum - 1;
             }
+
+            int finalCountsum = countsum;
             int finalCurcount = curcount;
             new Thread(() -> {
 
@@ -580,8 +611,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
 
                 todoListItems.get(index).setCurcount(finalCurcount);
+                todoListItems.get(index).setCountsum(finalCountsum);
                 Map<String, Object> data = new HashMap<>();
                 data.put("curcount", finalCurcount);
+                data.put("curtime", finalCurcount * unitsec);
+                data.put("countsum", finalCountsum);
+
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
                         .set(data, SetOptions.merge());
@@ -771,11 +806,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         todoListItems.get(position).setHour(hourPicker.getValue());
                         todoListItems.get(position).setMin(minPicker.getValue());
                         todoListItems.get(position).setSec(secPicker.getValue());
-                        todoListItems.get(position).setCount(0);
+                        todoListItems.get(position).setCount(todoListItems.get(position).getCount());
                         todoListItems.get(position).setTotalsec(totalsec);
 
                         Map<String, Object> data = new HashMap<>();
                         data.put("totalsec", totalsec);
+                        data.put("hour", hourPicker.getValue());
+                        data.put("min", minPicker.getValue());
+                        data.put("sec", secPicker.getValue());
+
                         firebaseFirestore
                                 .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(position).getHabbittitle())
                                 .set(data, SetOptions.merge());
@@ -841,7 +880,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public int getItemCount() {
         return todoListItems.size();}
-
 
     /*private void showPopupcycle(View v, final int position){
 

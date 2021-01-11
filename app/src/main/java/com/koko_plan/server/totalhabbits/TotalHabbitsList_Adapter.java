@@ -72,8 +72,8 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         TextView tvstartdate = null;
         TextView tv1count = null;
         TextView tv1counttime = null;
-        TextView tvtotalcount = null;
-        TextView tvtotalsec = null;
+        TextView tvcountsum = null;
+        TextView tvsumtotalsec = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
@@ -83,8 +83,8 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
             tvstartdate = (TextView)view.findViewById(R.id.tv_startdate);
             tv1count = (TextView)view.findViewById(R.id.tv_1count);
             tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
-            tvtotalcount = (TextView)view.findViewById(R.id.tv_totalcount);
-            tvtotalsec = (TextView)view.findViewById(R.id.tv_totalsec);
+            tvcountsum = (TextView)view.findViewById(R.id.tv_countsum);
+            tvsumtotalsec = (TextView)view.findViewById(R.id.tv_sumtotalsec);
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -188,7 +188,16 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                                 viewHolder.tvroutine.setText(routine);
                             }
 
-                            viewHolder.tvstartdate.setText("시작 일자:" + (String) Objects.requireNonNull(document.getData()).get("start"));
+                            viewHolder.tvstartdate.setText("시작 " + (String) Objects.requireNonNull(document.getData()).get("start"));
+                            viewHolder.tvcountsum.setText("총 "+ document.getData().get("countsum")+"회");
+
+                            long sumtotalsec = (long) document.getData().get("sumtotalsec");
+
+                            long second = sumtotalsec % 60;
+                            long minute = (sumtotalsec / 60) % 60;
+                            long hour = (sumtotalsec / 3600) % 24;
+
+                            viewHolder.tvsumtotalsec.setText(String.format("%02d:%02d:%02d", hour, minute, second));
 
                         } else {
                             Log.d(TAG, "No such document");

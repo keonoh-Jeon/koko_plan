@@ -150,6 +150,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_gravity="bottom"
             android:layout_width="match_parent"

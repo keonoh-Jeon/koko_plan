@@ -14,6 +14,7 @@ public class TodoList_Item
     private String day;
     private int progress;
     private int count;
+    private int countsum;
     private int num;
     private int curcount;
     private int randomnum;
@@ -21,6 +22,7 @@ public class TodoList_Item
     private float average;
     private boolean isrunning;
     private int totalsec;
+    private int sumtotalsec;
     private int hour, min, sec;
 
     public String getFrom(){ return from; }
@@ -35,11 +37,17 @@ public class TodoList_Item
     public int getCount(){ return count; }
     public void setCount(int count){ this.count = count; }
 
+    public int getCountsum(){ return countsum; }
+    public void setCountsum(int countsum){ this.countsum = countsum; }
+
     public int getNum(){ return num; }
     public void setNum(int num){ this.num = num; }
 
     public int getTotalsec(){ return totalsec; }
     public void setTotalsec(int totalsec){ this.totalsec = totalsec; }
+
+    public int getSumtotalsec(){ return sumtotalsec; }
+    public void setSumtotalsec(int sumtotalsec){ this.sumtotalsec = sumtotalsec; }
 
     public String getTime(){ return time; }
     public void setTime(String time){ this.time = time;  }
