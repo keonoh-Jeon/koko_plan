@@ -45,7 +45,7 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                     int curtime = todoListItems.get(i).getCurtime();
                     int curcount = todoListItems.get(i).getCount();
                     int totalsec = todoListItems.get(i).getTotalsec();
-                    int sumtotalsec = todoListItems.get(i).getSumtotalsec() + totalsec;
+                    int curtimesum = todoListItems.get(i).getCurtimesum() + curtime;
 
                     //파이어베이스 저장
                     //저장 리스트 목록 만들기
@@ -80,7 +80,7 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                     }
 
                     Map<String, Object> sum = new HashMap<>();
-                    sum.put("sumtotalsec", sumtotalsec);
+                    sum.put("curtimesum", curtimesum);
 
                     if (firebaseUser != null) {
                         firebaseFirestore

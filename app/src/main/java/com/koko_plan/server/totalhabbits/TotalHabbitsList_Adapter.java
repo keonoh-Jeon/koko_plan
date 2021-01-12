@@ -73,7 +73,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         TextView tv1count = null;
         TextView tv1counttime = null;
         TextView tvcountsum = null;
-        TextView tvsumtotalsec = null;
+        TextView tvcurtimesum = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
@@ -84,7 +84,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
             tv1count = (TextView)view.findViewById(R.id.tv_1count);
             tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
             tvcountsum = (TextView)view.findViewById(R.id.tv_countsum);
-            tvsumtotalsec = (TextView)view.findViewById(R.id.tv_sumtotalsec);
+            tvcurtimesum = (TextView)view.findViewById(R.id.tv_curtimesum);
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -188,16 +188,25 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                                 viewHolder.tvroutine.setText(routine);
                             }
 
-                            viewHolder.tvstartdate.setText("시작 " + (String) Objects.requireNonNull(document.getData()).get("start"));
+                            viewHolder.tvstartdate.setText("since " + (String) Objects.requireNonNull(document.getData()).get("start"));
                             viewHolder.tvcountsum.setText("총 "+ document.getData().get("countsum")+"회");
 
-                            long sumtotalsec = (long) document.getData().get("sumtotalsec");
+                            long curtimesum = (long) document.getData().get("curtimesum");
 
-                            long second = sumtotalsec % 60;
-                            long minute = (sumtotalsec / 60) % 60;
-                            long hour = (sumtotalsec / 3600) % 24;
+                            long second = curtimesum % 60;
+                            long minute = (curtimesum / 60) % 60;
+                            long hour = (curtimesum / 3600) % 24;
 
-                            viewHolder.tvsumtotalsec.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+                            viewHolder.tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+                            long count = (long) document.getData().get("count");
+                            viewHolder.tv1count.setText(Long.toString(count)+"회 씩");
+
+                            long h = (long) document.getData().get("hour");
+                            long m = (long) document.getData().get("min");
+                            long s = (long) document.getData().get("sec");
+                            viewHolder.tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
+
+
 
                         } else {
                             Log.d(TAG, "No such document");

@@ -19,6 +19,7 @@ public class TodoList_Item
     private int curcount;
     private int randomnum;
     private int curtime;
+    private int curtimesum;
     private float average;
     private boolean isrunning;
     private int totalsec;
@@ -75,6 +76,9 @@ public class TodoList_Item
 
     public int getCurtime(){ return curtime; }
     public void setCurtime(int curtime){ this.curtime = curtime; }
+
+    public int getCurtimesum(){ return curtimesum; }
+    public void setCurtimesum(int curtimesum){ this.curtimesum = curtimesum; }
 
     public void setProgress(int progress)
     {

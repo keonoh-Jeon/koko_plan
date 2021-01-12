@@ -1633,16 +1633,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 자정 시간
         Calendar resetCal = Calendar.getInstance();
         resetCal.setTimeInMillis(System.currentTimeMillis());
+
         resetCal.set(Calendar.HOUR_OF_DAY, 0);
         resetCal.set(Calendar.MINUTE, -1);
         resetCal.set(Calendar.SECOND, 0);
 
+        long reserve = resetCal.getTimeInMillis()     + AlarmManager.INTERVAL_DAY    ;
+
+
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, reserve
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+        String setResetTime = format.format(new Date(reserve));
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }
 }

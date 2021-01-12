@@ -33,67 +33,13 @@
                 <TextView
                     android:id="@+id/tv_totalhabbitlistTitle"
                     android:layout_width="0dp"
-                    android:layout_weight="0.5"
+                    android:layout_weight="2"
                     android:layout_height="wrap_content"
                     android:hint="목록"
                     android:singleLine="true"
                     android:textStyle="bold"
                     android:textColor="#2196F3"
                     android:textSize="20sp"
-                    tools:ignore="HardcodedText,NestedWeights" />
-
-                <TextView
-                    android:id="@+id/tv_routine"
-                    android:gravity="center"
-                    android:hint="반복"
-                    android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
-
-                <TextView
-                    android:id="@+id/tv_startdate"
-                    android:gravity="center"
-                    android:hint="시작일"
-                    android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_margin="5dp">
-
-                <TextView
-                    android:id="@+id/tv_1count"
-                    android:layout_width="0dp"
-                    android:hint="시행 횟수"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="#353535"
-                    android:textSize="15sp"
-                    tools:ignore="HardcodedText,NestedWeights" />
-
-                <TextView
-                    android:id="@+id/tv_1counttime"
-                    android:layout_width="0dp"
-                    android:hint="회당 시간"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="#353535"
-                    android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
@@ -110,7 +56,7 @@
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
-                    android:id="@+id/tv_sumtotalsec"
+                    android:id="@+id/tv_curtimesum"
                     android:layout_width="0dp"
                     android:hint="총 시간"
                     android:layout_height="wrap_content"
@@ -118,6 +64,62 @@
                     android:singleLine="true"
                     android:gravity="center"
                     android:textStyle="bold"
+                    android:textColor="#353535"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText,NestedWeights" />
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:id="@+id/tv_startdate"
+                    android:hint="시작일"
+                    android:layout_gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
+
+
+                <TextView
+                    android:id="@+id/tv_routine"
+                    android:gravity="center"
+                    android:hint="반복"
+                    android:layout_gravity="bottom"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
+
+                <TextView
+                    android:id="@+id/tv_1count"
+                    android:layout_width="0dp"
+                    android:hint="시행 횟수"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:textColor="#353535"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText,NestedWeights" />
+
+                <TextView
+                    android:id="@+id/tv_1counttime"
+                    android:layout_width="0dp"
+                    android:hint="회당 시간"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
                     android:textColor="#353535"
                     android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
