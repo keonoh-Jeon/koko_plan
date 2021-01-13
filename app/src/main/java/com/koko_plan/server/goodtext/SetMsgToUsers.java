@@ -39,6 +39,7 @@ public class SetMsgToUsers {
                         .collection("messages")
                         .document(time)
                         .set(GoodTextList)
+
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {

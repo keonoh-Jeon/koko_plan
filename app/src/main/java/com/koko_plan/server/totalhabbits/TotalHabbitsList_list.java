@@ -1,7 +1,6 @@
 package com.koko_plan.server.totalhabbits;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,12 +10,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,35 +23,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.koko_plan.R;
+import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.main.MainActivity;
-import com.koko_plan.server.goodtext.GoodText_ViewListener;
-import com.koko_plan.server.goodtext.RandomGoodText;
-import com.koko_plan.server.ranking.Ranking_Adapter;
-import com.koko_plan.server.ranking.Ranking_Item;
-import com.koko_plan.server.ranking.Ranking_ViewListener;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.sub.MySoundPlayer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
-import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class TotalHabbitsList_list extends AppCompatActivity implements TotalHabbitsList_ViewListener {
 
@@ -103,6 +86,15 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     private void myStartActivity(Class c) {
 
         Intent intent = new Intent(this, c);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
+    private void myStartActivity2(String detailhabbit, Class c) {
+
+        Intent intent = new Intent(this, c);
+        intent.putExtra("detailhabbit", detailhabbit);
         startActivity(intent);
         overridePendingTransition(0, 0);
         finish();
@@ -208,6 +200,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                     }).start();
 
                 } else {
+                    myStartActivity2(totalhabbitlist_items.get(position).getHabbittitle(), DetailHabbit.class);
                                             
                 }
             }
@@ -222,6 +215,25 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                     float width = height / 3;
 
                     if (dX > 0) { //오른쪽으로 밀었을 때
+
+                        Paint p = new Paint();
+                        p.setColor(Color.parseColor("#B1624E"));
+                        RectF background = new RectF((float) itemView.getLeft() + dX, (float) itemView.getTop(), (float) itemView.getLeft(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        //텍스트
+                        Paint p2 = new Paint();
+                        String text = "상세 보기";
+                        p2.setColor(Color.parseColor("#DAA03D"));
+                        p2.setTextSize(30);
+                        p2.setAntiAlias(true);
+                        //텍스트 높이
+                        Rect bounds = new Rect();
+                        p2.getTextBounds(text, 0, text.length(), bounds);
+                        int textheight = bounds.height();
+                        //비트맵
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.historyicon);
+                        c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
+                        c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
                     } else if (dX < 0) {
                         //배경

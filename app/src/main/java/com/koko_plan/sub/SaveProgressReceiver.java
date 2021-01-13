@@ -65,8 +65,10 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                                 .document(habbit)
                                 .collection("dates")
                                 .document(todaydate)
+                                .collection("habbits")
+                                .document(habbit)
 
-                                .set(todayprogresslist, SetOptions.merge())
+                                .set(todayprogresslist)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {

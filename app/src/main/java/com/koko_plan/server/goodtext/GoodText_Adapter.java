@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.Image;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -43,10 +45,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.name;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.ViewHolder> implements Filterable, ItemTouchHelperListener
 {
@@ -145,6 +149,7 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
     }
 
     //뷰 홀더 :리스트에 나타내는 항목의 내용을 세팅
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
@@ -157,6 +162,9 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                 .into(viewHolder.profileview);
 
         viewHolder.timeview.setText(filterList.get(i).getTime());
+        if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
+
+        }
 
         String randomnum = String.valueOf(filterList.get(i).getRandomnum());
         DocumentReference documentReference = firebaseFirestore

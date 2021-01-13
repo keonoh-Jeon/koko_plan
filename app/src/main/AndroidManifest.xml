@@ -80,6 +80,12 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name="com.koko_plan.server.detailhabbit.DetailHabbit"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
 

@@ -45,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.components.Legend;
+import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -85,6 +86,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
 import com.koko_plan.server.goodtext.GoodText_ViewListener;
@@ -194,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private float entries0;
     private FirebaseCrashlytics crashlytics;
+    private int todaysgoodtextsize;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -458,8 +461,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 /*for(int i=0 ; i < selecteditemsize ; i++){
                                     Log.e(TAG, "onDateSelected: " + roomdb.todoDao().search(selecteddata).get(i).getDate());
                                 }*/
-
-                                piechartmaker();
 
                                 LineChartMaker();
 
@@ -879,8 +880,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerhabbitlistDoc() {
 
-        Log.e(TAG, "listenerhabbitlistDoc: " + getdayofweek());
-
         if(firebaseUser!=null){
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
@@ -902,6 +901,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Log.d(TAG, "Error getting documents: ", task.getException());
                             }
                             showdayprogress();
+                            piechartmaker();
                         }
                     });
         }
@@ -978,14 +978,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
-                    .collection("dates")
-                    .document(selecteddata)
                     .collection("messages")
                     .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
-                    .whereEqualTo("day", selecteddata) // 파이어베이스 쿼리 해당 필드 필터
+//                    .whereEqualTo("day", selecteddata) // 파이어베이스 쿼리 해당 필드 필터
 
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -1002,6 +1001,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     case ADDED:
                                         Log.w("ADDED", "Data: " + dc.getDocument().getData());
                                         goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
+                                        goodtextsize.setText(goodText_items.size() + "개");
+                                        if(Objects.equals(dc.getDocument().getData().get("day"), todaydate)) {
+                                            todaysgoodtextsize ++;
+                                            Log.e(TAG, "onEvent: " + "오늘 받은 명언" + todaysgoodtextsize);
+                                        }
 //                                    rankingAdapter.notifyDataSetChanged();
                                         break;
                                     case MODIFIED:
@@ -1011,11 +1015,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     case REMOVED:
                                         Log.w("REMOVED", "Data: " + dc.getDocument().getData());
 //                                    clubAdapter.notifyDataSetChanged();
+                                    goodtextsize.setText(goodText_items.size()-1 + "개");
                                         break;
                                 }
                             }
                             goodText_adapter.notifyDataSetChanged();
-                            goodtextsize.setText(goodText_items.size() + "개");
+
                         }
                     });
         }
@@ -1331,6 +1336,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        todaysgoodtextsize = 0;
+
         //가로 달력 시작시, 선택날짜와 이동
         horizontalCalendar.selectDate(calendar, true);
 
@@ -1394,6 +1401,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).start();
                 }else {
                     //오른쪽으로 밀었을때.
+                    myStartActivity3(todoListItems.get(position).getHabbittitle(), DetailHabbit.class);
                 }
             }
 
@@ -1410,12 +1418,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (dX > 0) {
                         //오른쪽으로 밀었을 때
                         Paint p = new Paint();
-                        p.setColor(Color.parseColor("#317773"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        p.setColor(Color.parseColor("#B1624E"));
+                        RectF background = new RectF((float) itemView.getLeft() + dX, (float) itemView.getTop(), (float) itemView.getLeft(), (float) itemView.getBottom());
                         c.drawRect(background, p);
+                        //텍스트
+                        Paint p2 = new Paint();
+                        String text = "상세 보기";
+                        p2.setColor(Color.parseColor("#DAA03D"));
+                        p2.setTextSize(30);
+                        p2.setAntiAlias(true);
+                        //텍스트 높이
+                        Rect bounds = new Rect();
+                        p2.getTextBounds(text, 0, text.length(), bounds);
+                        int textheight = bounds.height();
+                        //비트맵
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.historyicon);
+                        c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
+                        c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.shareicon);
-                        c.drawBitmap(bmp, background.centerX(), background.centerY() - (float)(bmp.getHeight()/2), null);
 
                     } else if (dX < 0) {
                         //배경
@@ -1458,6 +1478,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         helper.attachToRecyclerView(recyclerView);
     }
 
+    private void myStartActivity3(String detailhabbit, Class c) {
+
+        Intent intent = new Intent(this, c);
+        intent.putExtra("detailhabbit", detailhabbit);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
+        finish();
+    }
+
     //스와이프 기능 헬퍼 연결
     private void initSwipe2() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT  | ItemTouchHelper.RIGHT ) {
@@ -1484,8 +1513,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     firebaseFirestore
                                             .collection("users")
                                             .document(firebaseUser.getUid())
-                                            .collection("dates")
-                                            .document(goodText_items.get(position).getDay())
                                             .collection("messages")
                                             .document(goodText_items.get(position).getTime())
                                             .delete()
@@ -1503,7 +1530,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 public void onFailure(@NonNull Exception e) {
                                                 }
                                             });
-                                    goodtextsize.setText(goodText_items.size()-1 + "개");
                                 }
                             });
                         }
@@ -1647,6 +1673,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setResetTime = format.format(new Date(reserve));
+
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }
 }

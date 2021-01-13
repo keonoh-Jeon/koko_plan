@@ -18,9 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="5dp"
             android:orientation="vertical"
             tools:ignore="DisableBaselineAlignment">
@@ -31,11 +32,10 @@
                 android:layout_weight="1">
 
                 <TextView
-                    android:id="@+id/tv_totalhabbitlistTitle"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
+                    android:id="@+id/tv_habbitdate"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="목록"
+                    android:hint="일자"
                     android:singleLine="true"
                     android:textStyle="bold"
                     android:textColor="#2196F3"
@@ -43,31 +43,14 @@
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
-                    android:id="@+id/tv_countsum"
+                    android:id="@+id/tv_progress"
+                    android:layout_gravity="right"
+                    android:gravity="right"
+                    android:hint="진행율"
                     android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:hint="총 횟수"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="#2196F3"
-                    android:textSize="15sp"
-                    tools:ignore="HardcodedText,NestedWeights" />
-
-                <TextView
-                    android:id="@+id/tv_curtimesum"
-                    android:layout_width="0dp"
-                    android:hint="전체 시간"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="#2196F3"
-                    android:textSize="15sp"
-                    tools:ignore="HardcodedText,NestedWeights" />
-
+                    tools:ignore="HardcodedText,RtlHardcoded" />
 
 
             </LinearLayout>
@@ -75,54 +58,61 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
-
-                <TextView
-                    android:id="@+id/tv_startdate"
-                    android:hint="시작일"
-                    android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
+                android:layout_weight="1.5">
 
 
                 <TextView
-                    android:id="@+id/tv_routine"
-                    android:gravity="center"
-                    android:hint="반복"
-                    android:layout_gravity="bottom"
+                    android:id="@+id/tv_curtime"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="HardcodedText,NestedWeights,RtlHardcoded" />
-
-                <TextView
-                    android:id="@+id/tv_1count"
-                    android:layout_width="0dp"
-                    android:hint="시행 횟수"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:hint="진행"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
                     android:singleLine="true"
-                    android:layout_gravity="bottom"
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:textColor="#353535"
                     android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
-                <TextView
-                    android:id="@+id/tv_1counttime"
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:hint="회당 시간"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2">
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="47dp"
+                    android:layout_weight="2">
+
+
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
                     android:singleLine="true"
-                    android:layout_gravity="bottom"
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:textColor="#353535"
                     android:textSize="15sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="0dp"
+                    android:hint="시간"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:singleLine="true"
+                    android:gravity="center"
                     android:textStyle="bold"
-                    tools:ignore="HardcodedText,NestedWeights"/>
+                    android:textColor="#353535"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText,NestedWeights" />
 
             </LinearLayout>
 
