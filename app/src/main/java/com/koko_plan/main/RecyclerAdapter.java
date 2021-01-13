@@ -551,12 +551,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }
                 }
                 for(int i=(index+1); i <todoListItems.size() ; i++){
-                    todoListItems.get(i).setCurtime(lastsec-1);
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("curtime", lastsec-1);
-                    firebaseFirestore
-                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
-                            .set(data, SetOptions.merge());
+                    if(todoListItems.get(i).getIsrunning()) {
+                        todoListItems.get(i).setCurtime(lastsec-1);
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data, SetOptions.merge());
+                    }
                 }
 
                 todoListItems.get(index).setCurcount(finalCurcount);

@@ -48,7 +48,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     private Context context = null;
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
-    private TextView tvdetailtitle;
+    private TextView tvdetailtitle, tvstartdate , tvcountsum, tvcurtimesum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -96,40 +96,61 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     protected void onStart()
     {
         super.onStart();
-        listenerDoc();
+
+        Intent secondIntent = getIntent();
+        String detail = secondIntent.getStringExtra("detailhabbit");
+
+        listenerDoc(detail);
 
         //파이어베이스 필드 검색
         new Thread(() -> {
             DocumentReference documentReference = firebaseFirestore
-                    .collection("randomsource")
-                    .document("goodtexts");
+                    .collection("users")
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .document(detail);
 
                     documentReference
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        private int i = 0;
+                        @SuppressLint({"SetTextI18n", "DefaultLocale"})
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null) {
+                                    if (document.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
+                                        int ramdomtextsize = document.getData().size();
+                                        tvstartdate.setText("시작 일자: " + document.getData().get("start"));
+                                        tvcountsum.setText("총 " + document.getData().get("countsum") + "회");
 
-                        @SuppressLint("SetTextI18n")
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null) {
-                            if (document.exists()) {
-                                Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
-                                int ramdomtextsize = document.getData().size();
-                                editor.putInt("ramdomtextsize", ramdomtextsize);
-                                editor.apply();
+                                        long curtimesum = (long) document.getData().get("curtimesum");
+                                        long second = curtimesum % 60;
+                                        long minute = (curtimesum / 60) % 60;
+                                        long hour = (curtimesum / 3600) % 24;
+                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+
+                                        /*long count = (long) document.getData().get("count");
+                                        tv1count.setText(Long.toString(count) + "회 씩");
+
+                                        long h = (long) document.getData().get("hour");
+                                        long m = (long) document.getData().get("min");
+                                        long s = (long) document.getData().get("sec");
+                                        tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
+*/
+
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                    }
+                                }
                             } else {
-                                Log.d(TAG, "No such document");
+                                Log.d(TAG, "get failed with ", task.getException());
                             }
                         }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
+                    });
         }).start();
+
     }
 
     @Override
@@ -150,6 +171,9 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     {
 
         tvdetailtitle = findViewById(R.id.tv_detailtitle);
+        tvstartdate = findViewById(R.id.tv_startdate);
+        tvcountsum = findViewById(R.id.tv_countsum);
+        tvcurtimesum = findViewById(R.id.tv_curtimesum);
 
         detailhabbitItems = new ArrayList<>();
 
@@ -177,56 +201,55 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     }
 
     @SuppressLint("SetTextI18n")
-    private void listenerDoc(){
-
-        Intent secondIntent = getIntent();
-        String detail = secondIntent.getStringExtra("detailhabbit");
+    private void listenerDoc(String detail){
 
         tvdetailtitle.setText(detail + " Timeline");
 
-        assert detail != null;
-        firebaseFirestore
-                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                .document(firebaseUser.getUid())
-                .collection("total")
-                .document(detail)
-                .collection("dates")
-                .orderBy("date", Query.Direction.ASCENDING)
+        //파이어베이스 필드 검색
+        new Thread(() -> {
+            assert detail != null;
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .document(detail)
+                    .collection("dates")
+                    .orderBy("date", Query.Direction.ASCENDING)
 
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("listen:error", e);
-                            return;                        }
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot snapshots,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("listen:error", e);
+                                return;                        }
 
-                        assert snapshots != null;
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            assert snapshots != null;
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    Log.w("ADDED","Data: " + dc.getDocument().getData());
-                                    detailhabbitItems.add(detailhabbitItems.size(), dc.getDocument().toObject(Detailhabbit_Item.class));
-                                    Log.e(TAG, "onEvent: " +  dc.getDocument().get(todaydate));
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.w("ADDED","Data: " + dc.getDocument().getData());
+                                        detailhabbitItems.add(detailhabbitItems.size(), dc.getDocument().toObject(Detailhabbit_Item.class));
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case MODIFIED:
-                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+                                        break;
+                                    case MODIFIED:
+                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
 //                                    maketoast("this club is already exist.");
 //                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case REMOVED:
-                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+                                        break;
+                                    case REMOVED:
+                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
 //                                    clubAdapter.notifyDataSetChanged();
-                                    break;
+                                        break;
+                                }
                             }
+                            detailhabbitAdapter.notifyDataSetChanged();
                         }
-                        detailhabbitAdapter.notifyDataSetChanged();
+                    });
+        }).start();
 
-                    }
-                });
     }
 
     @Override

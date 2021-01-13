@@ -112,52 +112,6 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
 
         viewHolder.habbitdate.setText(detailhabbitItems.get(i).getDate());
 
-        DocumentReference documentReference = firebaseFirestore
-                .collection("users")
-                .document(firebaseUser.getUid())
-                .collection("total")
-                .document(detailhabbitItems.get(i).getHabbittitle());
-
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-
-                            viewHolder.tvstartdate.setText("시작 일자: "+ document.getData().get("start"));
-                            viewHolder.tvcountsum.setText("총 "+ document.getData().get("countsum")+"회");
-
-                            long curtimesum = (long) document.getData().get("curtimesum");
-                            long second = curtimesum % 60;
-                            long minute = (curtimesum / 60) % 60;
-                            long hour = (curtimesum / 3600) % 24;
-                            viewHolder.tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
-
-                            long count = (long) document.getData().get("count");
-                            viewHolder.tv1count.setText(Long.toString(count)+"회 씩");
-
-                            long h = (long) document.getData().get("hour");
-                            long m = (long) document.getData().get("min");
-                            long s = (long) document.getData().get("sec");
-                            viewHolder.tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
-
-
-
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-
 
 
         if (pd!= null) pd.dismiss();

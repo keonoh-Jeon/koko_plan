@@ -121,6 +121,7 @@ public class HabbitList_Adapter extends RecyclerView.Adapter<HabbitList_Adapter.
         DocumentReference documentReference = firebaseFirestore
                 .collection("randomsource")
                 .document("goodtexts");
+
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @SuppressLint("SetTextI18n")
             @Override
