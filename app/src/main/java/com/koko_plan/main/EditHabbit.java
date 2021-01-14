@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -115,6 +116,7 @@ public class EditHabbit extends AppCompatActivity {
                     case R.id.rbtn_radioButton1:
                         MySoundPlayer.play(MySoundPlayer.CLICK);
                         habbitroutine = "매일";
+
                         vieweveryday.setVisibility(View.INVISIBLE);
                         break;
                     case R.id.rbtn_radioButton2:
@@ -136,71 +138,81 @@ public class EditHabbit extends AppCompatActivity {
 
     public void mOnConfirm(View v){
 
-        if(habbitroutine.equals("매일")) {
-            monday = tuesday = wednesday = thursday = friday = saturday = sunday = true;
+        if(!et_habbittitle.getText().toString().equals("") && countPicker.getValue()!=0 && hourPicker.getValue()!=0 | minPicker.getValue()!=0 | secPicker.getValue()!=0) {
 
+            if(habbitroutine.equals("매일")) {
+                monday = tuesday = wednesday = thursday = friday = saturday = sunday = true;
+
+            } else {
+                if(cb1.isChecked()) monday = true;
+                if(cb2.isChecked()) tuesday = true;
+                if(cb3.isChecked()) wednesday = true;
+                if(cb4.isChecked()) thursday = true;
+                if(cb5.isChecked()) friday = true;
+                if(cb6.isChecked()) saturday = true;
+                if(cb7.isChecked()) sunday = true;
+            }
+
+            String habbittitle = et_habbittitle.getText().toString();
+            int count = countPicker.getValue();
+            int hour = hourPicker.getValue();
+            int min = minPicker.getValue();
+            int sec = secPicker.getValue();
+            boolean isrunning = false;
+
+            @SuppressLint("DefaultLocale")
+            int totalsec = (hour*60*60+min*60+sec)*count;
+
+            Map<String, Object> todayprogresslist = new HashMap<>();
+            todayprogresslist.put("hour", hour);
+            todayprogresslist.put("min", min);
+            todayprogresslist.put("sec", sec);
+            todayprogresslist.put("start", todaydate);
+            todayprogresslist.put("totalsec", totalsec);
+            todayprogresslist.put("sumtotalsec", 0);
+            todayprogresslist.put("count", count);
+            todayprogresslist.put("countsum", 0);
+            todayprogresslist.put("habbittitle", habbittitle);
+            todayprogresslist.put("isrunning", isrunning);
+            todayprogresslist.put("habbitroutine", habbitroutine);
+            todayprogresslist.put("curtime", 0);
+            todayprogresslist.put("curtimesum", 0);
+            todayprogresslist.put("num", pref.getInt("todayitemsize", 0)+1);
+            todayprogresslist.put("monday", monday);
+            todayprogresslist.put("tuesday", tuesday);
+            todayprogresslist.put("wednesday", wednesday);
+            todayprogresslist.put("thursday", thursday);
+            todayprogresslist.put("friday", friday);
+            todayprogresslist.put("saturday", saturday);
+            todayprogresslist.put("sunday", sunday);
+
+            if (firebaseUser != null) {
+                firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid())
+                        .collection("total")
+                        .document(habbittitle)
+                        .set(todayprogresslist)
+
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                            }
+                        });
+            }
+            finish();
         } else {
-            if(cb1.isChecked()) monday = true;
-            if(cb2.isChecked()) tuesday = true;
-            if(cb3.isChecked()) wednesday = true;
-            if(cb4.isChecked()) thursday = true;
-            if(cb5.isChecked()) friday = true;
-            if(cb6.isChecked()) saturday = true;
-            if(cb7.isChecked()) sunday = true;
+            startToast("습관 명과 시간을 설정해주세요.");
         }
 
-        String habbittitle = et_habbittitle.getText().toString();
-        int count = countPicker.getValue();
-        int hour = hourPicker.getValue();
-        int min = minPicker.getValue();
-        int sec = secPicker.getValue();
-        boolean isrunning = false;
+    }
 
-        @SuppressLint("DefaultLocale")
-        int totalsec = (hour*60*60+min*60+sec)*count;
-
-        Map<String, Object> todayprogresslist = new HashMap<>();
-        todayprogresslist.put("hour", hour);
-        todayprogresslist.put("min", min);
-        todayprogresslist.put("sec", sec);
-        todayprogresslist.put("start", todaydate);
-        todayprogresslist.put("totalsec", totalsec);
-        todayprogresslist.put("sumtotalsec", 0);
-        todayprogresslist.put("count", count);
-        todayprogresslist.put("countsum", 0);
-        todayprogresslist.put("habbittitle", habbittitle);
-        todayprogresslist.put("isrunning", isrunning);
-        todayprogresslist.put("habbitroutine", habbitroutine);
-        todayprogresslist.put("curtime", 0);
-        todayprogresslist.put("curtimesum", 0);
-        todayprogresslist.put("num", pref.getInt("todayitemsize", 0)+1);
-        todayprogresslist.put("monday", monday);
-        todayprogresslist.put("tuesday", tuesday);
-        todayprogresslist.put("wednesday", wednesday);
-        todayprogresslist.put("thursday", thursday);
-        todayprogresslist.put("friday", friday);
-        todayprogresslist.put("saturday", saturday);
-        todayprogresslist.put("sunday", sunday);
-
-        if (firebaseUser != null) {
-            firebaseFirestore
-                    .collection("users")
-                    .document(firebaseUser.getUid())
-                    .collection("total")
-                    .document(habbittitle)
-                    .set(todayprogresslist)
-
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                        }
-                    });
-        }
-        finish();
+    private void startToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

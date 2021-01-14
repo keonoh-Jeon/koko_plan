@@ -63,6 +63,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailhabbit_list);
 
+
         // 뷰 초기화
         initView();
 
@@ -244,7 +245,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                     .collection("total")
                     .document(detail)
                     .collection("dates")
-                    .orderBy("date", Query.Direction.ASCENDING)
+                    .orderBy("date", Query.Direction.DESCENDING)
 
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
 

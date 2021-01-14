@@ -1130,11 +1130,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(todoListItems.size() > 0) {
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
-                    Map<String, Object> data = new HashMap<>();
                     if(todoListItems.get(i).getIsrunning()) {
                         todoListItems.get(i).setCurtime(lastsec-1);
+                        Map<String, Object> data = new HashMap<>();
                         data.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data, SetOptions.merge());
                     }
+                    Map<String, Object> data = new HashMap<>();
                     adapter.getItems().get(i).setNum((i+1));
                     data.put("num", (i+1));
 

@@ -28,12 +28,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_habbittitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textStyle="bold"
                         android:text="습관 이름"
                         tools:ignore="HardcodedText" />
 
@@ -49,12 +51,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_habbitroutine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="#009688"
+                        android:textStyle="bold"
                         android:text="습관 빈도"
                         tools:ignore="HardcodedText" />
 
@@ -63,7 +68,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="50sp"
                         android:orientation="horizontal"
-                        android:background="#DBDBDB"
                         android:layout_margin="5sp">
 
                         <TextView
@@ -77,6 +81,7 @@
                             android:checked="true"
                             android:layout_width="0dp"
                             android:layout_weight="1"
+                            android:textColor="#009688"
                             android:layout_height="50sp"
                             tools:ignore="HardcodedText" />
 
@@ -85,6 +90,7 @@
                             android:text="매주"
                             android:layout_weight="1"
                             android:layout_width="0dp"
+                            android:textColor="#009688"
                             android:layout_height="50sp"
                             tools:ignore="HardcodedText" />
 
@@ -96,20 +102,13 @@
 
                     </RadioGroup>
 
-                    <Spinner
-                        android:id="@+id/spinner_month"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        tools:ignore="InefficientWeight" />
-
-
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/view_everyday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
                     android:layout_gravity="center"
                     android:orientation="vertical">
 
@@ -118,12 +117,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="반복 요일"
+                        android:textStyle="bold"
+                        android:textColor="#FF9800"
                         tools:ignore="HardcodedText" />
 
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="center"
+                        android:layout_margin="10dp"
                         android:gravity="center"
                         android:orientation="horizontal" >
 
@@ -131,6 +133,7 @@
                         android:id="@+id/checkBox1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="#FF9800"
                         android:text="월"
                         tools:ignore="HardcodedText" />
 
@@ -139,6 +142,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="화"
+                        android:textColor="#FF9800"
                         tools:ignore="HardcodedText" />
 
                     <CheckBox
@@ -146,6 +150,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="수"
+                        android:textColor="#FF9800"
                         tools:ignore="HardcodedText" />
 
                     <CheckBox
@@ -153,6 +158,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="목"
+                        android:textColor="#FF9800"
                         tools:ignore="HardcodedText" />
 
                         <CheckBox
@@ -160,6 +166,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="금"
+                            android:textColor="#FF9800"
                             tools:ignore="HardcodedText" />
 
                         <CheckBox
@@ -167,6 +174,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="토"
+                            android:textColor="#FF9800"
                             tools:ignore="HardcodedText" />
 
                         <CheckBox
@@ -174,6 +182,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="일"
+                            android:textColor="#FF9800"
                             tools:ignore="HardcodedText" />
 
 
@@ -183,124 +192,158 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_margin="10dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:id="@+id/view_timeinput"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:orientation="horizontal">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="#03A9F4">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:text="회당 시간"
+                                android:layout_width="0dp"
+                                android:gravity="center"
+                                android:layout_gravity="bottom"
+                                android:textStyle="bold"
+                                android:textColor="#9BE0FF"
+                                android:layout_weight="3"
                                 android:layout_height="wrap_content"
-                                android:background="#FFFFFF"
-                                android:orientation="vertical">
+                                tools:ignore="HardcodedText" />
 
-                                <TextView
-                                    android:layout_gravity="center"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="횟수"
-                                    android:textStyle="bold"
-                                    tools:ignore="HardcodedText" />
+                        </LinearLayout>
 
-                                <NumberPicker
-                                    android:id="@+id/picker_count"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="150dp"
-                                    android:layout_margin="10dp"  >
-                                </NumberPicker>
+                        <LinearLayout
+                            android:id="@+id/view_timeinput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="5dp"
+                            android:orientation="horizontal">
 
-
-
-                            </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                android:background="#9BE0FF">
 
-                                <TextView
-                                    android:layout_gravity="center"
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:text="시"
-                                    android:textStyle="bold"
-                                    tools:ignore="HardcodedText" />
+                                    android:background="#FFFFFF"
+                                    android:orientation="vertical">
 
-                                <NumberPicker
-                                    android:id="@+id/picker_hour"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="150dp"
-                                    android:layout_margin="10dp"  >
-                                </NumberPicker>
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="횟수"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
 
+                                    <NumberPicker
+                                        android:id="@+id/picker_count"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"  >
+                                    </NumberPicker>
+
+
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="시"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_hour"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"  >
+                                    </NumberPicker>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="분"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_min"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"
+                                        >
+                                    </NumberPicker>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="초"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_sec"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"
+                                        >
+                                    </NumberPicker>
+
+                                </LinearLayout>
                             </LinearLayout>
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical">
 
-                                <TextView
-                                    android:layout_gravity="center"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="분"
-                                    android:textStyle="bold"
-                                    tools:ignore="HardcodedText" />
 
-                                <NumberPicker
-                                    android:id="@+id/picker_min"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="150dp"
-                                    android:layout_margin="10dp"
-                                    >
-                                </NumberPicker>
-                            </LinearLayout>
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_gravity="center"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="초"
-                                    android:textStyle="bold"
-                                    tools:ignore="HardcodedText" />
-
-                                <NumberPicker
-                                    android:id="@+id/picker_sec"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="150dp"
-                                    android:layout_margin="10dp"
-                                    >
-                                </NumberPicker>
-
-                            </LinearLayout>
                         </LinearLayout>
 
 
 
 
+
                     </LinearLayout>
+
+
 
                 </FrameLayout>
 
@@ -314,6 +357,7 @@
 
                     <Button
                         android:text="확인"
+                        android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="#ff7a00"
                         android:gravity="center"
