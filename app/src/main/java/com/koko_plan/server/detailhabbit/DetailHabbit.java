@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
@@ -35,7 +37,12 @@ import com.koko_plan.server.ranking.Ranking_ViewListener;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
 import com.koko_plan.sub.MySoundPlayer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -48,7 +55,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     private Context context = null;
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
-    private TextView tvdetailtitle, tvstartdate , tvcountsum, tvcurtimesum;
+    private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -120,10 +127,26 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                 DocumentSnapshot document = task.getResult();
                                 if (document != null) {
                                     if (document.exists()) {
-                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
-                                        int ramdomtextsize = document.getData().size();
-                                        tvstartdate.setText("시작 일자: " + document.getData().get("start"));
-                                        tvcountsum.setText("총 " + document.getData().get("countsum") + "회");
+                                        tvstartdate.setText(""+document.getData().get("start"));
+
+                                        String from = todaydate;
+                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                        try {
+                                            Date todate = transFormat.parse(from);
+                                            Date fromdate = transFormat.parse((String) Objects.requireNonNull(document.getData().get("start")));
+                                            Calendar tocal = Calendar.getInstance();
+                                            assert todate != null;
+                                            tocal.setTime(todate);
+                                            Calendar fromcal = Calendar.getInstance();
+                                            assert fromdate != null;
+                                            fromcal.setTime(fromdate);
+                                            long a = (tocal.getTimeInMillis() - fromcal.getTimeInMillis())/86400000;
+                                            tvduedate.setText("+" + a + "day 습관 형성 중 . . .");
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        tvcountsum.setText("총 " + document.getData().get("countsum") + "회 실시");
 
                                         long curtimesum = (long) document.getData().get("curtimesum");
                                         long second = curtimesum % 60;
@@ -172,6 +195,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
         tvdetailtitle = findViewById(R.id.tv_detailtitle);
         tvstartdate = findViewById(R.id.tv_startdate);
+        tvduedate = findViewById(R.id.tv_duedate);
+
         tvcountsum = findViewById(R.id.tv_countsum);
         tvcurtimesum = findViewById(R.id.tv_curtimesum);
 
@@ -186,6 +211,11 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         detailhabbitAdapter = new Detailhabbit_Adapter(detailhabbitItems, this, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(detailhabbitAdapter);
+
+        //배너 광고 표기
+        AdView adBanner = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adBanner.loadAd(adRequest);
     }
 
     @Override

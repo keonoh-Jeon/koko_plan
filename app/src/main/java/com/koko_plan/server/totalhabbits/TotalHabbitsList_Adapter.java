@@ -160,6 +160,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
                             viewHolder.tvtitle.setText((String) Objects.requireNonNull(document.getData()).get("habbittitle"));
+
                             if(Objects.equals(document.getData().get("habbitroutine"), "매일")) {
                                 viewHolder.tvroutine.setText((String) document.getData().get("habbitroutine"));
                             } else {
@@ -188,25 +189,13 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                                 viewHolder.tvroutine.setText(routine);
                             }
 
-                            viewHolder.tvstartdate.setText("since " + (String) Objects.requireNonNull(document.getData()).get("start"));
-                            viewHolder.tvcountsum.setText("총 "+ document.getData().get("countsum")+"회");
-
-                            long curtimesum = (long) document.getData().get("curtimesum");
-
-                            long second = curtimesum % 60;
-                            long minute = (curtimesum / 60) % 60;
-                            long hour = (curtimesum / 3600) % 24;
-
-                            viewHolder.tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
                             long count = (long) document.getData().get("count");
-                            viewHolder.tv1count.setText(Long.toString(count)+"회 씩");
+                            viewHolder.tv1count.setText(Long.toString(count)+"회");
 
                             long h = (long) document.getData().get("hour");
                             long m = (long) document.getData().get("min");
                             long s = (long) document.getData().get("sec");
-                            viewHolder.tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
-
-
+                            viewHolder.tv1counttime.setText(String.format("목표 " + "%02d:%02d:%02d", h, m, s));
 
                         } else {
                             Log.d(TAG, "No such document");

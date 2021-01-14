@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,8 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
     private Context context ;
     private ArrayList<Detailhabbit_Item> detailhabbitItems;
     private Detailhabbit_ViewListener detailhabbitViewListener;
+
+    ProgressBar progressBar;
 
     private ProgressDialog pd;
 
@@ -79,8 +82,11 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
         // 리스트 목록의 초기화 .... 미연의 충돌 방지
 
         TextView habbitdate = null;
+        TextView tvprogress = null;
+        TextView tvcurtime = null;
+        TextView tvtotalsec = null;
+
         TextView tvcountsum = null;
-        TextView tvcurtimesum = null;
         TextView tvroutine = null;
         TextView tvstartdate = null;
         TextView tv1count = null;
@@ -91,12 +97,17 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
             super(view);
 
             habbitdate = (TextView)view.findViewById(R.id.tv_habbitdate);
+            tvprogress = (TextView)view.findViewById(R.id.tv_progress);
+            tvcurtime = (TextView)view.findViewById(R.id.tv_curtime);
+            tvtotalsec = (TextView)view.findViewById(R.id.tvTime);
+
             tvcountsum = (TextView)view.findViewById(R.id.tv_countsum);
-            tvcurtimesum = (TextView)view.findViewById(R.id.tv_curtimesum);
             tvroutine = (TextView)view.findViewById(R.id.tv_routine);
             tvstartdate = (TextView)view.findViewById(R.id.tv_startdate);
             tv1count = (TextView)view.findViewById(R.id.tv_1count);
             tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
+
+            progressBar = view.findViewById(R.id.dhi_progressBar);
         }
 
         @Override
@@ -112,9 +123,16 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
 
         viewHolder.habbitdate.setText(detailhabbitItems.get(i).getDate());
 
+        sectotime(detailhabbitItems.get(i).getCurtime(), viewHolder.tvcurtime);
+        sectotime(detailhabbitItems.get(i).getTotalsec(), viewHolder.tvtotalsec);
 
+        double progress = (double)detailhabbitItems.get(i).getCurtime() / (double)detailhabbitItems.get(i).getTotalsec() * 100.0;
+        viewHolder.tvprogress.setText(String.format("%.1f", progress) + " %");
+
+        progressBar.setProgress((int) progress);
 
         if (pd!= null) pd.dismiss();
+
     }
 
     @Override
@@ -128,4 +146,11 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
         detailhabbitItems.add(detailhabbitItem);
     }
 
+    @SuppressLint("DefaultLocale")
+    private void sectotime(int curtime, TextView tvcurtime){
+        long second = (long) curtime % 60;
+        long minute = ((long) curtime / 60) % 60;
+        long hour = ((long) curtime / 3600) % 24;
+        tvcurtime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+    }
 }

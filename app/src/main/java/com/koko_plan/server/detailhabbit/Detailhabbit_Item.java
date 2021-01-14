@@ -6,6 +6,8 @@ public class Detailhabbit_Item
     private String habbittitle;
     private String date;
     private int progress;
+    private int curtime;
+    private int totalsec;
     private float average;
 
     public String getId(){ return id; }
@@ -18,6 +20,24 @@ public class Detailhabbit_Item
     public int getProgress()
     {
         return progress;
+    }
+
+    public void setCurtime(int curtime)
+    {
+        this.curtime = curtime;
+    }
+    public int getCurtime()
+    {
+        return curtime;
+    }
+
+    public void setTotalsec(int totalsec)
+    {
+        this.totalsec = totalsec;
+    }
+    public int getTotalsec()
+    {
+        return totalsec;
     }
 
     public String getDate()

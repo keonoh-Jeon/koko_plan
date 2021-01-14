@@ -771,7 +771,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
             assert date != null;
-            map.get("calendar" + i).setTime(date);
+            Objects.requireNonNull(map.get("calendar" + i)).setTime(date);
 
             if (firebaseUser != null) {
 
@@ -1664,15 +1664,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         resetCal.set(Calendar.MINUTE, -1);
         resetCal.set(Calendar.SECOND, 0);
 
-        long reserve = resetCal.getTimeInMillis()     + AlarmManager.INTERVAL_DAY    ;
-
+//        long reserve = resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY ;
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, reserve
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(reserve));
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
 
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }
