@@ -141,18 +141,18 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                             assert fromdate != null;
                                             fromcal.setTime(fromdate);
                                             long a = (tocal.getTimeInMillis() - fromcal.getTimeInMillis())/86400000;
-                                            tvduedate.setText("+" + a + "day 습관 형성 중 . . .");
+                                            tvduedate.setText(" +" + a + "day ");
                                         } catch (ParseException e) {
                                             e.printStackTrace();
                                         }
 
-                                        tvcountsum.setText("총 " + document.getData().get("countsum") + "회 실시");
+                                        tvcountsum.setText(" " + document.getData().get("countsum") + "회 ");
 
                                         long curtimesum = (long) document.getData().get("curtimesum");
                                         long second = curtimesum % 60;
                                         long minute = (curtimesum / 60) % 60;
                                         long hour = (curtimesum / 3600) % 24;
-                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second)+ " ");
 
                                         /*long count = (long) document.getData().get("count");
                                         tv1count.setText(Long.toString(count) + "회 씩");
