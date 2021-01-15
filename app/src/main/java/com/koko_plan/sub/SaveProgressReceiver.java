@@ -37,19 +37,26 @@ public class SaveProgressReceiver extends BroadcastReceiver {
     }
 
     private void saveprogresstofirebase() {
-        if(todayitemsize > 0){
+        Log.e(TAG, "saveProgressAlarm: todayitemsize" + todoListItems.size());
+        if(todoListItems.size() > 0){
+            Log.e(TAG, "saveProgressAlarm: 쓰레드 시작 " + todoListItems.get(0).getHabbittitle());
             new Thread(() -> {
-                for(int i=0; i < todoListItems.size(); i++ ) {
-
+                for(int i=0; i < todayitemsize; i++ ) {
                     String habbit = todoListItems.get(i).getHabbittitle();
+                    Log.e(TAG, "saveProgressAlarm: habbit" + habbit);
                     int curtime = todoListItems.get(i).getCurtime();
                     int curcount = todoListItems.get(i).getCount();
                     int totalsec = todoListItems.get(i).getTotalsec();
                     int curtimesum = todoListItems.get(i).getCurtimesum() + curtime;
 
-                    //파이어베이스 저장
                     //저장 리스트 목록 만들기
                     Map<String, Object> todayprogresslist = new HashMap<>();
+
+                    /*Log.e(TAG, "saveProgressAlarm: date" + todaydate );
+                    Log.e(TAG, "saveProgressAlarm: habbit" + habbit );
+                    Log.e(TAG, "saveProgressAlarm: curtime" + curtime );
+                    Log.e(TAG, "saveProgressAlarm: curcount" + curcount );
+                    Log.e(TAG, "saveProgressAlarm: totalsec" + totalsec );*/
 
                     todayprogresslist.put("date", todaydate);
                     todayprogresslist.put("habbit", habbit);
@@ -61,8 +68,6 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                         firebaseFirestore
                                 .collection("users")
                                 .document(firebaseUser.getUid())
-                                .collection("total")
-                                .document(habbit)
                                 .collection("dates")
                                 .document(todaydate)
                                 .collection("habbits")
