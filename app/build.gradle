@@ -74,14 +74,14 @@ dependencies {
 
 
     //파이어베이스 관련
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-analytics:18.0.1'
     implementation 'com.google.firebase:firebase-messaging:21.0.1'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
     implementation 'com.google.firebase:firebase-firestore:22.0.1'
     implementation 'com.google.firebase:firebase-database:19.6.0'
-    implementation 'com.google.firebase:firebase-core:18.0.0'
-    implementation 'com.google.firebase:firebase-perf:19.0.11'
-    implementation 'com.google.firebase:firebase-auth:20.0.1'
+    implementation 'com.google.firebase:firebase-core:18.0.1'
+    implementation 'com.google.firebase:firebase-perf:19.1.0'
+    implementation 'com.google.firebase:firebase-auth:20.0.2'
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     // Declare the dependencies for the Crashlytics and Analytics libraries
@@ -97,4 +97,7 @@ dependencies {
 
     //로티 애니메이션 처리
     implementation 'com.airbnb.android:lottie:3.4.0'
+
+    //인앱 결제 관련
+    implementation "com.android.billingclient:billing:3.0.2"
 }

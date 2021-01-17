@@ -393,18 +393,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(adapter);
 
         initSwipe();
-
-    }
-
-    private void HabbitListmaker() {
-
-        /*habbitListItems = new ArrayList<>();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-
-        habbitListAdapter = new HabbitList_Adapter(habbitListItems, this, this);
-        recyclerView2.setLayoutManager(layoutManager);
-        recyclerView2.setAdapter(habbitListAdapter);*/
     }
 
     private void GoodTextListmaker() {
@@ -439,38 +427,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .defaultSelectedDate(calendar)
                 .datesNumberOnScreen(7)
                 .build();
-
+//todo
         //가로 달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDateSelected(Calendar date, int position) {
                 selecteddata = dateformat.format(date.getTime());
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable(){
-                            @Override
-                            public void run() {
-                                /*adapter.setItem(roomdb.todoDao().search(selecteddata));
-                                int selecteditemsize = roomdb.todoDao().search(selecteddata).size();*/
 
-                                tvTodayProgress.setText("실행한 습관이 없슴");
+                if(!selecteddata.equals(todaydate)){
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable(){
+                                @Override
+                                public void run() {
 
-                                //달력추가
-                                EventCalendarMaker(date);
+                                    Log.e(TAG, "onDateSelected: "+ todoListItems.size());
+                                    setdidlist();
+                                    tvTodayProgress.setText("실행한 습관이 없슴");
 
-                                /*for(int i=0 ; i < selecteditemsize ; i++){
-                                    Log.e(TAG, "onDateSelected: " + roomdb.todoDao().search(selecteddata).get(i).getDate());
-                                }*/
+                                    //달력추가
+                                    EventCalendarMaker(date);
+                                    LineChartMaker();
+                                }
+                                private void setdidlist() {
+                                    todoListItems.clear();
+                                    if (firebaseUser != null) {
+                                        firebaseFirestore
+                                                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                                                .document(firebaseUser.getUid())
+                                                .collection("dates")
+                                                .document(selecteddata)
+                                                .collection("habbits")
 
-                                LineChartMaker();
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful()) {
+                                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                todoListItems.add(document.toObject(TodoList_Item.class));
+                                                                adapter.notifyDataSetChanged();
+                                                            }
+                                                        } else {
+                                                            Log.d(TAG, "Error getting documents: ", task.getException());
+                                                        }
+                                                        showdayprogress();
+                                                        piechartmaker();
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
 
-                            }
-                        });
-                    }
-                }).start();
-
+                } else {
+                    listenerhabbitlistDoc();
+                }
             }
 
             @Override
@@ -553,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document != null) {
-                                if (document.exists() && document.getData().get("name")!=null) {
+                                if (document.exists() && Objects.requireNonNull(document.getData()).get("name")!=null) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                     Profile_Item profileItem = document.toObject(Profile_Item.class);
                                     assert profileItem != null;
@@ -879,37 +895,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void listenerhabbitlistDoc() {
-
-        if(firebaseUser!=null){
-            firebaseFirestore
-                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                    .document(firebaseUser.getUid())
-                    .collection("total")
-                    .whereEqualTo(getdayofweek(), true) // 복합 쿼리 순서 주의! -- 색인에 가서 복합 색인 추가
-                    .orderBy("num", Query.Direction.ASCENDING)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                    todoListItems.add(document.toObject(TodoList_Item.class));
-                                    adapter.notifyDataSetChanged();
+        new Thread(() -> {
+            todoListItems.clear();
+            if (firebaseUser != null) {
+                firebaseFirestore
+                        .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                        .document(firebaseUser.getUid())
+                        .collection("total")
+                        .whereEqualTo(getdayofweek(), true) // 복합 쿼리 순서 주의! -- 색인에 가서 복합 색인 추가
+                        .orderBy("num", Query.Direction.ASCENDING)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        todoListItems.add(document.toObject(TodoList_Item.class));
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
-                            } else {
-                                Log.d(TAG, "Error getting documents: ", task.getException());
+                                showdayprogress();
+                                piechartmaker();
                             }
-                            showdayprogress();
-                            piechartmaker();
-                        }
-                    });
-        }
+                        });
+            }
+        }).start();
     }
 
     private void showdayprogress(){
 
-        if(adapter.getItemCount() > 0){
+        if(todoListItems.size() > 0){
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -1158,10 +1176,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pieChart.setData(null);
         pieChart.clear();
 
-        if(adapter.getItemCount() > 0) {
+        if(todoListItems.size() > 0) {
             ArrayList NoOfTotalsec = new ArrayList();
             total = 0;
-            for (int i = 0; i < adapter.getItemCount(); i++) {
+            for (int i = 0; i < todoListItems.size(); i++) {
                 NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
                 total += todoListItems.get(i).getTotalsec();
             }
@@ -1225,6 +1243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         timegap = 0;
+
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
 //        adapter.setItem(roomdb.todoDao().search(todaydate));
         todayitemsize = todoListItems.size();
@@ -1352,8 +1371,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         long stoptime = pref.getLong("stoptime", 0);
 
         timegap = (int)((now-stoptime)/1000);
-
-        listenerhabbitlistDoc();
     }
 
     //스와이프 기능 헬퍼 연결
@@ -1664,18 +1681,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Calendar resetCal = Calendar.getInstance();
         resetCal.setTimeInMillis(System.currentTimeMillis());
 
-        resetCal.set(Calendar.HOUR_OF_DAY, 13);
-        resetCal.set(Calendar.MINUTE, 23);
+        resetCal.set(Calendar.HOUR_OF_DAY, 0);
+        resetCal.set(Calendar.MINUTE, -5);
         resetCal.set(Calendar.SECOND, 0);
 
 //        long reserve = resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY ;
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()/*+AlarmManager.INTERVAL_DAY*/
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()/*+AlarmManager.INTERVAL_DAY*/));
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
 
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }

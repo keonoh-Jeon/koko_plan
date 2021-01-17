@@ -53,7 +53,9 @@ import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.lastsec;
+import static com.koko_plan.main.MainActivity.selecteddata;
 import static com.koko_plan.main.MainActivity.timegap;
+import static com.koko_plan.main.MainActivity.todaydate;
 import static com.koko_plan.main.MainActivity.totalprogress;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
@@ -198,29 +200,40 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             index = position;
             tvTitle.setText(todoListItems.getHabbittitle());
 
-            if(todoListItems.getCount() < 2){
-                tvTime.setText(String.format("%02d:%02d:%02d", todoListItems.getHour(), todoListItems.getMin(), todoListItems.getSec()));
-                if(!todoListItems.getIsrunning()){
-                    Log.e(TAG, "onBind: " +  todoListItems.getCount());
-                    ivPlay.setVisibility(View.VISIBLE);
-                    ivPause.setVisibility(View.GONE);
+            if(todoListItems.getCount() < 2 ){
+                int h = todoListItems.getTotalsec() / 60 / 60;
+                int m = todoListItems.getTotalsec() / 60 % 60;
+                int s = todoListItems.getTotalsec() % 60;
+                tvTime.setText(String.format("%02d:%02d:%02d", h, m, s));
+
+                if(selecteddata.equals(todaydate)){
+                    if(!todoListItems.getIsrunning()){
+                        ivPlay.setVisibility(View.VISIBLE);
+                        ivPause.setVisibility(View.GONE);
+                    } else {
+                        ivPause.setVisibility(View.VISIBLE);
+                        ivPlay.setVisibility(View.GONE);
+                    }
+                    ivStop.setVisibility(View.VISIBLE);
+                    ivPlus.setVisibility(View.GONE);
+                    ivMinus.setVisibility(View.GONE);
+
+                    todaysetbtnclickable();
                 } else {
-                    Log.e(TAG, "onBind: " +  todoListItems.getCount());
-                    ivPause.setVisibility(View.VISIBLE);
-                    ivPlay.setVisibility(View.GONE);
+                    isnottodaysetbtnvisibility();
                 }
-                ivStop.setVisibility(View.VISIBLE);
-                ivPlus.setVisibility(View.GONE);
-                ivMinus.setVisibility(View.GONE);
-
             } else {
+                if(selecteddata.equals(todaydate)){
+                    ivPlus.setVisibility(View.VISIBLE);
+                    ivMinus.setVisibility(View.VISIBLE);
+                    ivStop.setVisibility(View.GONE);
+                    ivPause.setVisibility(View.GONE);
+                    ivPlay.setVisibility(View.GONE);
+                    todaysetbtnclickable();
 
-                ivPlus.setVisibility(View.VISIBLE);
-                ivMinus.setVisibility(View.VISIBLE);
-                ivStop.setVisibility(View.GONE);
-                ivPause.setVisibility(View.GONE);
-                ivPlay.setVisibility(View.GONE);
-
+                } else {
+                    isnottodaysetbtnvisibility();
+                }
                 tvTime.setText(String.format("%d", todoListItems.getCount()));
             }
 
@@ -273,6 +286,28 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 startTimerTask();
             }
 
+        }
+
+        private void todaysetbtnclickable() {
+            ivPlay.setClickable(true);
+            ivPause.setClickable(true);
+            ivStop.setClickable(true);
+            ivPlus.setClickable(true);
+            ivMinus.setClickable(true);
+        }
+
+        private void isnottodaysetbtnvisibility() {
+            ivPlay.setVisibility(View.INVISIBLE);
+            ivPause.setVisibility(View.INVISIBLE);
+            ivStop.setVisibility(View.INVISIBLE);
+            ivPlus.setVisibility(View.INVISIBLE);
+            ivMinus.setVisibility(View.INVISIBLE);
+
+            ivPlay.setClickable(false);
+            ivPause.setClickable(false);
+            ivStop.setClickable(false);
+            ivPlus.setClickable(false);
+            ivMinus.setClickable(false);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)

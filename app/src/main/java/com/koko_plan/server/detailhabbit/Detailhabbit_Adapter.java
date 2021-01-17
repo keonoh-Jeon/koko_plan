@@ -46,17 +46,11 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
 
     ProgressBar progressBar;
 
-    private ProgressDialog pd;
-
     public Detailhabbit_Adapter(ArrayList<Detailhabbit_Item> detailhabbitItems, Context context, DetailHabbit listener)
     {
         this.detailhabbitItems  = detailhabbitItems;
         this.context = context;
         this.detailhabbitViewListener = listener;
-
-        //로딩 화면 만들기
-        pd = null;
-        pd = ProgressDialog.show(context, "타임라인 불러 오는 중......", "잠시만 기다려 주세요.");
     }
 
     @NonNull
@@ -130,8 +124,6 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
         viewHolder.tvprogress.setText(String.format("%.1f", progress) + " %");
 
         progressBar.setProgress((int) progress);
-
-        if (pd!= null) pd.dismiss();
 
     }
 

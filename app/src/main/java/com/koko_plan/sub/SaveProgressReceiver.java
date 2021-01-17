@@ -14,11 +14,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.MainActivity;
+import com.koko_plan.main.TodoList_Item;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -30,86 +36,115 @@ import static com.koko_plan.main.MainActivity.todoListItems;
 
 public class SaveProgressReceiver extends BroadcastReceiver {
 
+    private Calendar calendar = Calendar.getInstance();
+
     @SuppressLint("SimpleDateFormat")
     @Override
     public void onReceive(Context context, Intent intent) {
-        saveprogresstofirebase();
+        if(firebaseUser != null){
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .whereEqualTo(getdayofweek(), true)
+
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    String habbit = (String) document.getData().get("habbittitle");
+                                    int curtime = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("curtime")));
+                                    int curcount = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("count")));
+                                    int totalsec = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("totalsec")));
+                                    int curtimesum = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("curtimesum"))) + curtime;
+
+                                    //저장 리스트 목록 만들기
+                                    Map<String, Object> todayprogresslist = new HashMap<>();
+                                    todayprogresslist.put("date", todaydate);
+                                    todayprogresslist.put("habbittitle", habbit);
+                                    todayprogresslist.put("curtime", curtime);
+                                    todayprogresslist.put("curcount", curcount);
+                                    todayprogresslist.put("totalsec", totalsec);
+
+                                    assert habbit != null;
+                                    firebaseFirestore
+                                            .collection("users")
+                                            .document(firebaseUser.getUid())
+                                            .collection("dates")
+                                            .document(todaydate)
+                                            .collection("habbits")
+                                            .document(habbit)
+
+                                            .set(todayprogresslist)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+
+                                    Map<String, Object> sum = new HashMap<>();
+                                    sum.put("curtimesum", curtimesum);
+
+                                    firebaseFirestore
+                                            .collection("users")
+                                            .document(firebaseUser.getUid())
+                                            .collection("total")
+                                            .document(habbit)
+
+                                            .set(sum, SetOptions.merge())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+                                }
+                            } else {
+                                Log.d(TAG, "Error getting documents: ", task.getException());
+                            }
+                        }
+                    });
+        }
     }
 
-    private void saveprogresstofirebase() {
-        Log.e(TAG, "saveProgressAlarm: todayitemsize" + todoListItems.size());
-        if(todoListItems.size() > 0){
-            Log.e(TAG, "saveProgressAlarm: 쓰레드 시작 " + todoListItems.get(0).getHabbittitle());
-            new Thread(() -> {
-                for(int i=0; i < todayitemsize; i++ ) {
-                    String habbit = todoListItems.get(i).getHabbittitle();
-                    Log.e(TAG, "saveProgressAlarm: habbit" + habbit);
-                    int curtime = todoListItems.get(i).getCurtime();
-                    int curcount = todoListItems.get(i).getCount();
-                    int totalsec = todoListItems.get(i).getTotalsec();
-                    int curtimesum = todoListItems.get(i).getCurtimesum() + curtime;
+    private String getdayofweek() {
+        int dayNum = calendar.get(Calendar.DAY_OF_WEEK);
+        String day = "";
 
-                    //저장 리스트 목록 만들기
-                    Map<String, Object> todayprogresslist = new HashMap<>();
-
-                    /*Log.e(TAG, "saveProgressAlarm: date" + todaydate );
-                    Log.e(TAG, "saveProgressAlarm: habbit" + habbit );
-                    Log.e(TAG, "saveProgressAlarm: curtime" + curtime );
-                    Log.e(TAG, "saveProgressAlarm: curcount" + curcount );
-                    Log.e(TAG, "saveProgressAlarm: totalsec" + totalsec );*/
-
-                    todayprogresslist.put("date", todaydate);
-                    todayprogresslist.put("habbit", habbit);
-                    todayprogresslist.put("curtime", curtime);
-                    todayprogresslist.put("curcount", curcount);
-                    todayprogresslist.put("totalsec", totalsec);
-
-                    if (firebaseUser != null) {
-                        firebaseFirestore
-                                .collection("users")
-                                .document(firebaseUser.getUid())
-                                .collection("dates")
-                                .document(todaydate)
-                                .collection("habbits")
-                                .document(habbit)
-
-                                .set(todayprogresslist)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    }
-                                });
-                    }
-
-                    Map<String, Object> sum = new HashMap<>();
-                    sum.put("curtimesum", curtimesum);
-
-                    if (firebaseUser != null) {
-                        firebaseFirestore
-                                .collection("users")
-                                .document(firebaseUser.getUid())
-                                .collection("total")
-                                .document(habbit)
-
-                                .set(sum, SetOptions.merge())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    }
-                                });
-                    }
-                }
-            }).start();
+        switch (dayNum) {
+            case 1:
+                day = "sunday";
+                break;
+            case 2:
+                day = "monday";
+                break;
+            case 3:
+                day = "tuesday";
+                break;
+            case 4:
+                day = "wednesday";
+                break;
+            case 5:
+                day = "thursday";
+                break;
+            case 6:
+                day = "friday";
+                break;
+            case 7:
+                day = "saturday";
+                break;
         }
+        return day;
     }
 }

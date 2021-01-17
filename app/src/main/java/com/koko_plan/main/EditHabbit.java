@@ -164,9 +164,6 @@ public class EditHabbit extends AppCompatActivity {
             int totalsec = (hour*60*60+min*60+sec)*count;
 
             Map<String, Object> todayprogresslist = new HashMap<>();
-            todayprogresslist.put("hour", hour);
-            todayprogresslist.put("min", min);
-            todayprogresslist.put("sec", sec);
             todayprogresslist.put("start", todaydate);
             todayprogresslist.put("totalsec", totalsec);
             todayprogresslist.put("sumtotalsec", 0);

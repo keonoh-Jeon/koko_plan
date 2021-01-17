@@ -192,9 +192,9 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                             long count = (long) document.getData().get("count");
                             viewHolder.tv1count.setText(Long.toString(count)+"회");
 
-                            long h = (long) document.getData().get("hour");
-                            long m = (long) document.getData().get("min");
-                            long s = (long) document.getData().get("sec");
+                            long h = (long) document.getData().get("totalsec") / 60 / 60;
+                            long m = (long) document.getData().get("totalsec") / 60 % 60;
+                            long s = (long) document.getData().get("totalsec") % 60;
                             viewHolder.tv1counttime.setText(String.format("목표 " + "%02d:%02d:%02d", h, m, s));
 
                         } else {
