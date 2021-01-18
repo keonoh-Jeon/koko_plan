@@ -357,32 +357,35 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 for(int i=0; i<index; i++){
                     if(todoListItems.get(i).getIsrunning()) {
                         todoListItems.get(i).setCurtime(lastsec-1);
-                        data.put("curtime", lastsec-1);
+                        Map<String, Object> data2 = new HashMap<>();
+                        data2.put("curtime", lastsec-1);
                         firebaseFirestore
                                 .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
-                                .set(data, SetOptions.merge());
-                    }
-                        todoListItems.get(i).setIsrunning(!isRunning);
-                        data.put("isrunning", !isRunning);
-                        firebaseFirestore
-                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
-                                .set(data, SetOptions.merge());
-
-                }
-                for(int i=(index+1); i <todoListItems.size() ; i++){
-                    if(todoListItems.get(i).getIsrunning()) {
-                        todoListItems.get(i).setCurtime(lastsec-1);
-                        data.put("curtime", lastsec-1);
-                        firebaseFirestore
-                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
-                                .set(data, SetOptions.merge());
+                                .set(data2, SetOptions.merge());
                     }
                     todoListItems.get(i).setIsrunning(!isRunning);
-                    data.put("isrunning", !isRunning);
+                    Map<String, Object> data3 = new HashMap<>();
+                    data3.put("isrunning", !isRunning);
                     firebaseFirestore
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
-                            .set(data, SetOptions.merge());
+                            .set(data3, SetOptions.merge());
+                }
 
+                for(int i=(index+1); i < todoListItems.size() ; i++){
+                    if(todoListItems.get(i).getIsrunning()) {
+                        Map<String, Object> data4 = new HashMap<>();
+                        todoListItems.get(i).setCurtime(lastsec-1);
+                        data4.put("curtime", lastsec-1);
+                        firebaseFirestore
+                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                                .set(data4, SetOptions.merge());
+                    }
+                    todoListItems.get(i).setIsrunning(!isRunning);
+                    Map<String, Object> data5 = new HashMap<>();
+                    data5.put("isrunning", !isRunning);
+                    firebaseFirestore
+                            .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
+                            .set(data5, SetOptions.merge());
                 }
             }).start();
         }

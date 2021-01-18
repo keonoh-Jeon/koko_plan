@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         } else {
                                                             Log.d(TAG, "Error getting documents: ", task.getException());
                                                         }
-                                                        today_progress = (int) (cur/todoListItems.size());
+                                                        if(todoListItems.size()>0) today_progress = (int) (cur/todoListItems.size());
                                                         tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
 
                                                         piechartmaker();
