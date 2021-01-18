@@ -65,7 +65,7 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                                     todayprogresslist.put("date", todaydate);
                                     todayprogresslist.put("habbittitle", habbit);
                                     todayprogresslist.put("curtime", curtime);
-                                    todayprogresslist.put("curcount", curcount);
+                                    todayprogresslist.put("count", curcount);
                                     todayprogresslist.put("totalsec", totalsec);
 
                                     assert habbit != null;

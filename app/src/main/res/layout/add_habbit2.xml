@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:id="@+id/scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_habbittitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:text="습관 이름"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/et_habbittitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:fontFamily="sans-serif" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_habbitroutine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#009688"
+                        android:textStyle="bold"
+                        android:text="습관 빈도"
+                        tools:ignore="HardcodedText" />
+
+                    <RadioGroup
+                        android:id="@+id/parrg"
+                        android:layout_width="match_parent"
+                        android:layout_height="50sp"
+                        android:orientation="horizontal"
+                        android:layout_margin="5sp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="0.5"
+                            android:layout_height="wrap_content"/>
+
+                        <RadioButton
+                            android:id="@+id/rbtn_radioButton1"
+                            android:text="매일"
+                            android:checked="true"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:textColor="#009688"
+                            android:layout_height="50sp"
+                            tools:ignore="HardcodedText" />
+
+                        <RadioButton
+                            android:id="@+id/rbtn_radioButton2"
+                            android:text="매주"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:textColor="#009688"
+                            android:layout_height="50sp"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="0.5"
+                            android:layout_height="wrap_content"/>
+
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/view_everyday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_routinedate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="반복 요일"
+                        android:textStyle="bold"
+                        android:textColor="#FF9800"
+                        tools:ignore="HardcodedText" />
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                    <CheckBox
+                        android:id="@+id/checkBox1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FF9800"
+                        android:text="월"
+                        tools:ignore="HardcodedText" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="화"
+                        android:textColor="#FF9800"
+                        tools:ignore="HardcodedText" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="수"
+                        android:textColor="#FF9800"
+                        tools:ignore="HardcodedText" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="목"
+                        android:textColor="#FF9800"
+                        tools:ignore="HardcodedText" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="금"
+                            android:textColor="#FF9800"
+                            tools:ignore="HardcodedText" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="토"
+                            android:textColor="#FF9800"
+                            tools:ignore="HardcodedText" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="일"
+                            android:textColor="#FF9800"
+                            tools:ignore="HardcodedText" />
+
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:text="회당 시간"
+                                android:layout_width="0dp"
+                                android:gravity="center"
+                                android:layout_gravity="bottom"
+                                android:textStyle="bold"
+                                android:textColor="#9BE0FF"
+                                android:layout_weight="3"
+                                android:layout_height="wrap_content"
+                                tools:ignore="HardcodedText" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/view_timeinput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="5dp"
+                            android:orientation="horizontal">
+
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="#9BE0FF">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:background="#FFFFFF"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="횟수"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_count"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"  >
+                                    </NumberPicker>
+
+
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="시"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_hour"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"  >
+                                    </NumberPicker>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="분"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_min"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"
+                                        >
+                                    </NumberPicker>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_gravity="center"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="초"
+                                        android:textStyle="bold"
+                                        tools:ignore="HardcodedText" />
+
+                                    <NumberPicker
+                                        android:id="@+id/picker_sec"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="150dp"
+                                        android:layout_margin="10dp"
+                                        >
+                                    </NumberPicker>
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+
+
+
+                        </LinearLayout>
+
+
+
+
+
+                    </LinearLayout>
+
+
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <Button
+                        android:text="확인"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="#ff7a00"
+                        android:gravity="center"
+                        android:background="#00000000"
+                        android:layout_width="match_parent"
+                        android:layout_height="53dp"
+                        android:onClick="mOnConfirm"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</FrameLayout>
+

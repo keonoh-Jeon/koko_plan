@@ -45,7 +45,7 @@
                     tools:ignore="ScrollViewSize" />
 
                 <TextView
-                    android:text="습관 하루 비중 추이"
+                    android:text="하루 중, 습관 비중 추이"
                     android:textSize="20sp"
                     android:fontFamily="@font/elandchoice"
                     android:textColor="#FF9800"

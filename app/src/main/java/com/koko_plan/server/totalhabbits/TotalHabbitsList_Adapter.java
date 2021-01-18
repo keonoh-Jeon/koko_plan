@@ -2,6 +2,7 @@ package com.koko_plan.server.totalhabbits;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,6 +19,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -29,6 +31,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.koko_plan.R;
+import com.koko_plan.main.EditHabbit;
+import com.koko_plan.main.EditHabbit2;
 import com.koko_plan.sub.ItemTouchHelperListener;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +41,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 
@@ -92,17 +97,9 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                 public void onClick(View v) {
 
                     int pos = getAdapterPosition();
-                    if (pos != RecyclerView.NO_POSITION)
-                    {
-                        if(totalHabbitsList_viewListener != null) {
-                            totalHabbitsList_viewListener.onItemClick(v, pos);
-                        }
-
-                        /*itemclub = rankingItems.get(pos).getClub();
-                        itemloft = rankingItems.get(pos).getLoft();
-                        itemdist = rankingItems.get(pos).getSet();*/
-
-                    }
+                    Toast.makeText(context, totalHabbitsList_items.get(pos).getHabbittitle(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, EditHabbit2.class);
+                    context.startActivity(intent);
                 }
             });
 
@@ -120,12 +117,14 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         }
     }
 
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_totalhabbitslist_item, viewGroup, false);
         final ViewHolder holder = new ViewHolder(v);
+
         /*v.findViewById(R.id.ci_menu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -5,6 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="#F6D6D6"
+    android:layout_marginTop="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
     tools:ignore="MissingDefaultResource">
     
     <FrameLayout

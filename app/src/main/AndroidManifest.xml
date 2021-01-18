@@ -47,6 +47,12 @@
         </receiver>
 
         <activity
+            android:name="com.koko_plan.main.EditHabbit2"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
             android:name="com.koko_plan.main.EditHabbit"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
@@ -95,6 +101,9 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name="com.koko_plan.sub.subscribe"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
     </application>
 
 </manifest>

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:text="Ball store"
+            android:text="프리미엄 서비스"
             android:padding="10dp"
             android:textSize="30sp"
             android:textColor="#797979"
@@ -35,24 +35,20 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             tools:ignore="DisableBaselineAlignment">
 
             <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:ignore="NestedWeights">
 
                 <ImageView
                     android:id="@+id/iv_basket300"
                     android:layout_margin="10dp"
-                    android:background="@drawable/button_notibar3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/bascket300"
                     tools:ignore="ContentDescription" />
 
                 <TextView
@@ -62,24 +58,21 @@
                     android:textStyle="bold"
                     android:textSize="30sp"
                     android:layout_margin="20dp"
-                    android:text="x300"
+                    android:text="한달 서비스"
                     tools:ignore="HardcodedText" />
 
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:ignore="NestedWeights">
 
             <ImageView
                 android:id="@+id/iv_basket500"
-                android:background="@drawable/button_notibar3"
                 android:layout_margin="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/bascket500"
                 tools:ignore="ContentDescription" />
 
                 <TextView
@@ -89,150 +82,14 @@
                     android:textStyle="bold"
                     android:textSize="30sp"
                     android:layout_margin="20dp"
-                    android:text="x500"
+                    android:text="평생"
                     tools:ignore="HardcodedText" />
 
             </FrameLayout>
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            tools:ignore="DisableBaselineAlignment">
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-            <ImageView
-                android:id="@+id/iv_basket1000"
-                android:background="@drawable/button_notibar3"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bascket1000"
-                tools:ignore="ContentDescription" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
-                android:textStyle="bold"
-                android:textSize="30sp"
-                android:layout_margin="20dp"
-                android:text="x1000"
-                tools:ignore="HardcodedText" />
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-            <ImageView
-                android:id="@+id/iv_basket2500"
-                android:background="@drawable/button_notibar3"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bascket2500"
-                tools:ignore="ContentDescription" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    android:layout_margin="20dp"
-                    android:text="x2500"
-                    tools:ignore="HardcodedText" />
-
-            </FrameLayout>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            tools:ignore="DisableBaselineAlignment">
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-            <ImageView
-                android:id="@+id/iv_basket5000"
-                android:background="@drawable/button_notibar3"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bascket5000"
-                tools:ignore="ContentDescription" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    android:layout_margin="20dp"
-                    android:text="x5000"
-                    tools:ignore="HardcodedText" />
-
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-            <ImageView
-                android:id="@+id/iv_basket10000"
-                android:background="@drawable/button_notibar3"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bascket10000"
-                tools:ignore="ContentDescription" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    android:layout_margin="20dp"
-                    android:text="x10000"
-                    tools:ignore="HardcodedText" />
-
-            </FrameLayout>
-
-        </LinearLayout>
-
-
-
 
     </LinearLayout>
-
-
-
-
-
 
 </LinearLayout>
 

@@ -72,8 +72,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         this.mContext = context;
         this.todoListViewListener = listener;
     }
-
-
 //todo
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -222,6 +220,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 } else {
                     isnottodaysetbtnvisibility();
                 }
+
+                if (todoListItems.getCurtime() > 0) {
+                    int curtime = todoListItems.getCurtime();
+                    int hour = curtime / 60 / 60;
+                    int min = curtime / 60 % 60;
+                    int sec = curtime % 60;
+                    tvCurTime.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+                } else {
+                    tvCurTime.setText("00:00:00");
+                }
             } else {
                 if(selecteddata.equals(todaydate)){
                     ivPlus.setVisibility(View.VISIBLE);
@@ -235,57 +243,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     isnottodaysetbtnvisibility();
                 }
                 tvTime.setText(String.format("%d", todoListItems.getCount()));
+
+                int count = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec() / (double)todoListItems.getCount()));
+                tvCurTime.setText(""+ count);
+                Log.e(TAG, "onBind: 버튼 변화" +  count );
             }
 
-            if(todoListItems.getCount() > 1) {
-                int progress = (int) ((double)todoListItems.getCurcount() / ((double)todoListItems.getCount()) *100.0);
-                tvCurTime.setText(""+todoListItems.getCurcount());
-                tvProgress.setText(progress + " %");
-                progressBar.setProgress(progress);
-                /*if(progress>=100) {
-                    new Thread(() -> {
-                        items.get(index).setNum(getItemCount());
-                        db.todoDao().update(items.get(index));
-                    }).start();
-                }*/
-                totalprogress += progress;
-
-            } else {
-                if (todoListItems.getCurtime() > 0) {
-                    int curtime = todoListItems.getCurtime();
-                    int hour = curtime / 60 / 60;
-                    int min = curtime / 60 % 60;
-                    int sec = curtime % 60;
-                    tvCurTime.setText(String.format("%02d:%02d:%02d", hour, min, sec));
-
-                    int progress = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec()) *100.0);
-                    tvProgress.setText(progress + " %");
-                    progressBar.setProgress(progress);
-                    /*if(progress>=100) {
-                        new Thread(() -> {
-                            items.get(index).setNum(getItemCount());
-                            db.todoDao().update(items.get(index));
-                        }).start();
-                    }*/
-
-                } else {
-                    tvCurTime.setText("00:00:00");
-                    int progress = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec()) *100.0);
-                    tvProgress.setText(progress + " %");
-                    progressBar.setProgress(progress);
-                    /*if(progress>=100) {
-                        new Thread(() -> {
-                            items.get(index).setNum(getItemCount());
-                            db.todoDao().update(items.get(index));
-                        }).start();
-                    }*/
-                }
-            }
+            int progress = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec()) *100.0);
+            tvProgress.setText(progress + " %");
+            progressBar.setProgress(progress);
+            totalprogress += progress;
 
             if(todoListItems.getIsrunning()) {
                 startTimerTask();
             }
-
         }
 
         private void todaysetbtnclickable() {
@@ -596,6 +567,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 todoListItems.get(index).setCurcount(finalCurcount);
                 todoListItems.get(index).setCountsum(finalCountsum);
+                todoListItems.get(index).setCurtime(finalCurcount * unitsec);
+
                 Map<String, Object> data = new HashMap<>();
                 data.put("curcount", finalCurcount);
                 data.put("curtime", finalCurcount * unitsec);
@@ -651,6 +624,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 todoListItems.get(index).setCurcount(finalCurcount);
                 todoListItems.get(index).setCountsum(finalCountsum);
+                todoListItems.get(index).setCurtime(finalCurcount * unitsec);
+
                 Map<String, Object> data = new HashMap<>();
                 data.put("curcount", finalCurcount);
                 data.put("curtime", finalCurcount * unitsec);
@@ -661,7 +636,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         .set(data, SetOptions.merge());
 
                 datasettofirebase("curcount", finalCurcount, index ,"total");
-
 
             }).start();
         }
@@ -675,8 +649,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 .collection("users").document(firebaseUser.getUid()).collection(path).document(todoListItems.get(index).getHabbittitle())
                 .set(data, SetOptions.merge());
     }
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
@@ -702,8 +674,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
         return holder;
     }
-
-
 
     @Override
     public void onBindViewHolder(RecyclerAdapter.ViewHolder viewHolder, int position) {
@@ -738,8 +708,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         edittext.setGravity(Gravity.CENTER);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("일정 수정");
-        builder.setMessage("수정할 일정을 기입해주세요.");
+        builder.setTitle("습관명 수정");
+        builder.setMessage("수정할 습관명을 기입해주세요.");
         builder.setView(edittext);
 
         builder.setPositiveButton("입력",
@@ -747,12 +717,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     //제목 입력, DB추가
                     tvTitle.setText(edittext.getText().toString());
                     new Thread(() -> {
-                        todoListItems.get(position).setHabbittitle(edittext.getText().toString());
                         Map<String, Object> data = new HashMap<>();
                         data.put("habbittitle", edittext.getText().toString());
                         firebaseFirestore
-                                .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(position).getHabbittitle())
-                                .set(data, SetOptions.merge());
+                                .collection("users")
+                                .document(firebaseUser.getUid())
+                                .collection("total")
+                                .document(todoListItems.get(position).getHabbittitle())
+                                .set(data);
                     }).start();
                 });
         builder.setNegativeButton("취소",

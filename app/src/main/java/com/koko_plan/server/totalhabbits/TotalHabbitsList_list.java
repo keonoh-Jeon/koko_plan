@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,19 +24,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
+import com.koko_plan.main.EditHabbit;
+import com.koko_plan.main.TodoList_Item;
 import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
@@ -49,6 +58,8 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     private ItemTouchHelper helper;
     private RecyclerView recyclerView;
 
+    ImageView mcplushabbit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,7 +71,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         initView();
 
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
-        findViewById(R.id.mc_menu).setOnClickListener(OnClickListener);
 
         AdView adBanner = findViewById(R.id.adView_totalhabbit);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -74,10 +84,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                 case R.id.iv_back:
                     MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(MainActivity.class);
-                    break;
-
-                case R.id.mc_menu:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     break;
             }
         }
@@ -104,8 +110,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     protected void onStart()
     {
         super.onStart();
-
-        listenerDoc();
     }
 
     @Override
@@ -147,7 +151,10 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     }
     @Override
     protected void onResume() {
+
         super.onResume();
+
+        listenerDoc();
     }
 
     //스와이프 기능 헬퍼 연결
@@ -284,35 +291,21 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                 .collection("total")
 //                .orderBy("doing", Query.Direction.DESCENDING)
 
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("listen:error", e);
-                            return;                        }
-
-                        assert snapshots != null;
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    Log.w("ADDED","TOTALHABBIT Data: " + dc.getDocument().getData());
-                                    totalhabbitlist_items.add(totalhabbitlist_items.size(), dc.getDocument().toObject(TotalHabbitsList_Item.class));
-//                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case MODIFIED:
-                                    Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    rankingAdapter.notifyDataSetChanged();
-                                    break;
-                                case REMOVED:
-                                    Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
-                                    break;
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        long cur = 0;
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                totalhabbitlist_items.add(document.toObject(TotalHabbitsList_Item.class));
+                                totalHabbitsList_adapter.notifyDataSetChanged();
                             }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
                         }
-                        totalHabbitsList_adapter.notifyDataSetChanged();
                     }
                 });
     }

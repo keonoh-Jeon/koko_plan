@@ -104,6 +104,7 @@ import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.Utils;
+import com.koko_plan.sub.subscribe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -165,14 +166,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String time, day;
 
-    private int cur, total;
+    private int total;
 
     public static String todaydate;
     private SimpleDateFormat dateformat;
 
     ItemTouchHelper helper, helper2;
     public static String selecteddata;
-    private Date date;
+    private Date date, today, selected;
     private AppUpdateManager appUpdateManager;
     private ImageView nav_header_photo_image, ivTrophy;
     private Calendar calendar;
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private float entries0;
     private FirebaseCrashlytics crashlytics;
     private int todaysgoodtextsize;
+    private int showcount = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -253,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         GoodTextListmaker();
 
-        RequestReview.show(this);
+        if(showcount >= 10) RequestReview.show(this);
 
         saveProgressAlarm(this);
     }
@@ -434,16 +436,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDateSelected(Calendar date, int position) {
                 selecteddata = dateformat.format(date.getTime());
+                try {
+                    today = dateformat.parse(todaydate);
+                    selected= dateformat.parse(selecteddata);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int compare = today.compareTo(selected);
 
-                if(!selecteddata.equals(todaydate)){
+                if(!selecteddata.equals(todaydate) && compare > 0){
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             runOnUiThread(new Runnable(){
                                 @Override
                                 public void run() {
-
-                                    Log.e(TAG, "onDateSelected: "+ todoListItems.size());
                                     setdidlist();
                                     tvTodayProgress.setText("실행한 습관이 없슴");
 
@@ -463,18 +470,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                                 .get()
                                                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @SuppressLint("SetTextI18n")
                                                     @Override
                                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        long cur = 0;
                                                         if (task.isSuccessful()) {
                                                             for (QueryDocumentSnapshot document : task.getResult()) {
                                                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                                                 todoListItems.add(document.toObject(TodoList_Item.class));
+                                                                long total = (long) document.getData().get("totalsec");
+                                                                cur += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
                                                                 adapter.notifyDataSetChanged();
                                                             }
                                                         } else {
                                                             Log.d(TAG, "Error getting documents: ", task.getException());
                                                         }
-                                                        showdayprogress();
+                                                        today_progress = (int) (cur/todoListItems.size());
+                                                        tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+
                                                         piechartmaker();
                                                     }
                                                 });
@@ -485,7 +498,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).start();
 
                 } else {
-                    listenerhabbitlistDoc();
+                    if(selecteddata.equals(todaydate)) {
+                        listenerhabbitlistDoc();
+                    }
+                    if(compare < 0)startToast("해당일에는 실행한 습관이 없습니다.");
                 }
             }
 
@@ -535,8 +551,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(TotalHabbitsList_list.class);
 
-            // Handle the camera action
-        } /*else if (id == R.id.nav_history) {
+        } else if (id == R.id.primium) {
+            MySoundPlayer.play(MySoundPlayer.CLICK);
+            myStartActivity(subscribe.class);
+
+        }/*else if (id == R.id.nav_history) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(History_list.class);
 
@@ -906,88 +925,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .orderBy("num", Query.Direction.ASCENDING)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @SuppressLint("SetTextI18n")
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                long cur = 0;
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
                                         todoListItems.add(document.toObject(TodoList_Item.class));
+                                        long total = (long) document.getData().get("totalsec");
+                                        cur += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
                                         adapter.notifyDataSetChanged();
                                     }
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
-                                showdayprogress();
+
+                                today_progress = (int) (cur/todoListItems.size());
+                                tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+
+                                Map<String, Object> dairyInfo = new HashMap<>();
+                                dairyInfo.put(todaydate, today_progress);
+
+                                firebaseFirestore
+                                        .collection("users")
+                                        .document(firebaseUser.getUid())
+
+                                        .set(dairyInfo, SetOptions.merge())
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                            }
+                                        });
                                 piechartmaker();
                             }
                         });
             }
         }).start();
-    }
 
-    private void showdayprogress(){
-
-        if(todoListItems.size() > 0){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // runOnUiThread를 추가하고 그 안에 UI작업을 한다.
-                    runOnUiThread(new Runnable() {
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void run() {
-                            cur = 0;
-                            for(int i=0 ; i < adapter.getItemCount() ; i++) {
-                                DocumentReference docRef = firebaseFirestore
-                                        .collection("users")
-                                        .document(firebaseUser.getUid())
-                                        .collection("total")
-                                        .document(todoListItems.get(i).getHabbittitle());
-
-                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()) {
-                                                double curtime = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("curtime")));
-                                                double totalsec = Integer.parseInt(String.valueOf(document.getData().get("totalsec")));
-                                                cur += (int) ((double)curtime / (double)totalsec * 100.0);
-                                            } else {
-                                                Log.d(TAG, "No such document");
-                                            }
-                                            today_progress = cur/adapter.getItemCount();
-                                            tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
-
-                                            Map<String, Object> dairyInfo = new HashMap<>();
-                                            dairyInfo.put(todaydate, today_progress);
-
-                                            firebaseFirestore
-                                                    .collection("users")
-                                                    .document(firebaseUser.getUid())
-                                                    .set(dairyInfo, SetOptions.merge())
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                        }
-                                                    });
-
-                                        } else {
-                                            Log.d(TAG, "get failed with ", task.getException());
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            }).start();
-        }
+        LineChartMaker();
     }
 
     private void listenerDoc(){
@@ -1051,81 +1032,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                String habbittitle = data.getStringExtra("habbittitle");
-                int count = data.getIntExtra("count", 0);
-                int hour = data.getIntExtra("hour", 0);
-                int min = data.getIntExtra("min", 0);
-                int sec = data.getIntExtra("sec", 0);
-                boolean isrunning = data.getBooleanExtra("isrunning", false);
-                String habbitroutine = data.getStringExtra("habbitroutine");
-                boolean monday = data.getBooleanExtra("monday", false);
-                boolean tuesday = data.getBooleanExtra("tuesday", false);
-                boolean wednesday = data.getBooleanExtra("wednesday", false);
-                boolean thursday = data.getBooleanExtra("thursday", false);
-                boolean friday = data.getBooleanExtra("friday", false);
-                boolean saturday = data.getBooleanExtra("saturday", false);
-                boolean sunday = data.getBooleanExtra("sunday", false);
-
-                @SuppressLint("DefaultLocale")
-                int totalsec = (hour*60*60+min*60+sec)*count;
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void run() {
-                                //파이어베이스 저장
-                                //저장 리스트 목록 만들기
-                                Map<String, Object> todayprogresslist = new HashMap<>();
-                                todayprogresslist.put("hour", hour);
-                                todayprogresslist.put("min", min);
-                                todayprogresslist.put("sec", sec);
-                                todayprogresslist.put("start", todaydate);
-                                todayprogresslist.put("totalsec", totalsec);
-                                todayprogresslist.put("count", count);
-                                todayprogresslist.put("habbittitle", habbittitle);
-                                todayprogresslist.put("isrunning", isrunning);
-                                todayprogresslist.put("habbitroutine", habbitroutine);
-                                todayprogresslist.put("curtime", 0);
-                                todayprogresslist.put("num", todoListItems.size()+1);
-                                todayprogresslist.put("monday", monday);
-                                todayprogresslist.put("tuesday", tuesday);
-                                todayprogresslist.put("wednesday", wednesday);
-                                todayprogresslist.put("thursday", thursday);
-                                todayprogresslist.put("friday", friday);
-                                todayprogresslist.put("saturday", saturday);
-                                todayprogresslist.put("sunday", sunday);
-
-                                if (firebaseUser != null) {
-                                    assert habbittitle != null;
-                                    firebaseFirestore
-                                            .collection("users")
-                                            .document(firebaseUser.getUid())
-                                            .collection("total")
-                                            .document(habbittitle)
-                                            .set(todayprogresslist)
-
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.e(TAG, "onSuccess: "+ "돌아와서  => " );
-                                                    adapter.notifyDataSetChanged();
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                }
-                                            });
-                                }
-//                                adapter.notifyDataSetChanged();
-                            }
-                        });
-
-                    }
-                }).start();
+                startToast("새 습관이 추가되었습니다.");
             }
         }
     }
@@ -1243,11 +1150,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         timegap = 0;
+        showcount++;
 
         //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
 //        adapter.setItem(roomdb.todoDao().search(todaydate));
         todayitemsize = todoListItems.size();
 
+        editor.putInt("showcount", showcount);
         editor.putLong("stoptime", 0);
         editor.putInt("todayitemsize", todayitemsize);
         editor.apply();
@@ -1369,6 +1278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         todayitemsize = pref.getInt("todayitemsize", 0);
         long stoptime = pref.getLong("stoptime", 0);
+        showcount = pref.getInt("showcount", 0);
 
         timegap = (int)((now-stoptime)/1000);
     }

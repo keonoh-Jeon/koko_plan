@@ -45,7 +45,7 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
     private BillingClient billingClient;
 
     SkuDetails skuDetails300, skuDetails500, skuDetails1000, skuDetails2500, skuDetails5000, skuDetails10000;
-    String skuID300 = "ballbasket_300", skuID500 = "ballbasket_500", skuID1000 = "ballbasket_1000", skuID2500 = "ballbasket_2500", skuID5000 = "ballbasket_5000", skuID10000 = "ballbasket_10000";
+    String skuID300, skuID500, skuID1000, skuID2500, skuID5000, skuID10000;
 
 
     @SuppressLint("CommitPrefEdits")
@@ -58,12 +58,15 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
 
+        skuID300 = "ballbasket_300";
+        skuID500 = "ballbasket_500";
+        skuID1000 = "ballbasket_1000";
+        skuID2500 = "ballbasket_2500";
+        skuID5000 = "ballbasket_5000";
+        skuID10000 = "ballbasket_10000";
+
         findViewById(R.id.iv_basket300).setOnClickListener(OnClickListener);
         findViewById(R.id.iv_basket500).setOnClickListener(OnClickListener);
-        findViewById(R.id.iv_basket1000).setOnClickListener(OnClickListener);
-        findViewById(R.id.iv_basket2500).setOnClickListener(OnClickListener);
-        findViewById(R.id.iv_basket5000).setOnClickListener(OnClickListener);
-        findViewById(R.id.iv_basket10000).setOnClickListener(OnClickListener);
 
         MySoundPlayer.initSounds(getApplicationContext());
 
@@ -202,22 +205,6 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                 case R.id.iv_basket500:
                     doBillingFlow(skuDetails500);
                     additionball = 500;
-                    break;
-                case R.id.iv_basket1000:
-                    doBillingFlow(skuDetails1000);
-                    additionball = 1000;
-                    break;
-                case R.id.iv_basket2500:
-                    doBillingFlow(skuDetails2500);
-                    additionball = 2500;
-                    break;
-                case R.id.iv_basket5000:
-                    doBillingFlow(skuDetails5000);
-                    additionball = 5000;
-                    break;
-                case R.id.iv_basket10000:
-                    doBillingFlow(skuDetails10000);
-                    additionball = 10000;
                     break;
             }
         }

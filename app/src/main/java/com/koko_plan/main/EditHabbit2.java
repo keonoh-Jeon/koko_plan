@@ -1,17 +1,14 @@
 package com.koko_plan.main;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,19 +19,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.koko_plan.R;
 import com.koko_plan.sub.MySoundPlayer;
 
-import java.text.ParseException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class EditHabbit extends AppCompatActivity {
+public class EditHabbit2 extends AppCompatActivity {
 
-    private static final String TAG = "EditHabbit";
+    private static final String TAG = "EditHabbit2";
     EditText et_habbittitle;
     NumberPicker countPicker, hourPicker, minPicker, secPicker;
 
@@ -61,7 +55,7 @@ public class EditHabbit extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_habbit);
+        setContentView(R.layout.add_habbit2);
 
         radioButton1 = findViewById(R.id.rbtn_radioButton1);
         radioButton2 = findViewById(R.id.rbtn_radioButton2);
