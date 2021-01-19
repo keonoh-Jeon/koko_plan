@@ -153,7 +153,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     protected void onResume() {
 
         super.onResume();
-
         listenerDoc();
     }
 

@@ -43,10 +43,10 @@ public class EditHabbit extends AppCompatActivity {
 
     private View vieweveryday;
 
+    private String habbitroutine = "매일";
+
     public static SharedPreferences pref;
     public static SharedPreferences.Editor editor;
-
-    private String habbitroutine = "매일";
 
     boolean monday = false;
     boolean tuesday = false;
@@ -139,10 +139,12 @@ public class EditHabbit extends AppCompatActivity {
 
         if(!et_habbittitle.getText().toString().equals("") && countPicker.getValue()!=0 && hourPicker.getValue()!=0 | minPicker.getValue()!=0 | secPicker.getValue()!=0) {
 
-            if(habbitroutine.equals("매일")) {
+            if(radioButton1.isChecked()) {
+                habbitroutine = "매일";
                 monday = tuesday = wednesday = thursday = friday = saturday = sunday = true;
 
             } else {
+                habbitroutine = "매주";
                 if(cb1.isChecked()) monday = true;
                 if(cb2.isChecked()) tuesday = true;
                 if(cb3.isChecked()) wednesday = true;
@@ -170,8 +172,8 @@ public class EditHabbit extends AppCompatActivity {
             todayprogresslist.put("countsum", 0);
             todayprogresslist.put("habbittitle", habbittitle);
             todayprogresslist.put("isrunning", isrunning);
-            todayprogresslist.put("habbitroutine", habbitroutine);
             todayprogresslist.put("curtime", 0);
+            todayprogresslist.put("habbitroutine", habbitroutine);
             todayprogresslist.put("curtimesum", 0);
             todayprogresslist.put("num", pref.getInt("todayitemsize", 0)+1);
             todayprogresslist.put("monday", monday);

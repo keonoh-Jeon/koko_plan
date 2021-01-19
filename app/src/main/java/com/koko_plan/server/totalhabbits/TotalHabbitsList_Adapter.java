@@ -95,10 +95,32 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
 
                 @Override
                 public void onClick(View v) {
-
                     int pos = getAdapterPosition();
-                    Toast.makeText(context, totalHabbitsList_items.get(pos).getHabbittitle(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(context, EditHabbit2.class);
+                    intent.putExtra("habbittitle", totalHabbitsList_items.get(pos).getHabbittitle());
+
+                    intent.putExtra("totalsec", totalHabbitsList_items.get(pos).getTotalsec());
+
+
+                    if(totalHabbitsList_items.get(pos).getMonday()
+                            && totalHabbitsList_items.get(pos).getTuesday()
+                            && totalHabbitsList_items.get(pos).getWednesday()
+                            && totalHabbitsList_items.get(pos).getThursday()
+                            && totalHabbitsList_items.get(pos).getFriday()
+                            && totalHabbitsList_items.get(pos).getSaturday()
+                            && totalHabbitsList_items.get(pos).getSunday()
+                    ) {
+                        intent.putExtra("everyday", true);
+                    } else {
+                        intent.putExtra("everyday", false);
+                        intent.putExtra("Monday", totalHabbitsList_items.get(pos).getMonday());
+                        intent.putExtra("Tuesday", totalHabbitsList_items.get(pos).getTuesday());
+                        intent.putExtra("Wednesday", totalHabbitsList_items.get(pos).getWednesday());
+                        intent.putExtra("Thursday", totalHabbitsList_items.get(pos).getThursday());
+                        intent.putExtra("Friday", totalHabbitsList_items.get(pos).getFriday());
+                        intent.putExtra("Saturday", totalHabbitsList_items.get(pos).getSaturday());
+                        intent.putExtra("Sunday", totalHabbitsList_items.get(pos).getSunday());
+                    }
                     context.startActivity(intent);
                 }
             });

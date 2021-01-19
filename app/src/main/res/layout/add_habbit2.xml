@@ -32,6 +32,17 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:layout_margin="10dp"
+                        android:textSize="20sp"
+                        android:text="습관 수정"
+                        android:textColor="#3F51B5"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
                         android:id="@+id/tv_habbittitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

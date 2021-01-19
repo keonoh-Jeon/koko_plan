@@ -1,8 +1,10 @@
 package com.koko_plan.main;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.CheckBox;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
 import com.koko_plan.sub.MySoundPlayer;
 
@@ -24,6 +27,7 @@ import java.util.Map;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.lastsec;
 import static com.koko_plan.main.MainActivity.todaydate;
 
 public class EditHabbit2 extends AppCompatActivity {
@@ -40,8 +44,6 @@ public class EditHabbit2 extends AppCompatActivity {
     public static SharedPreferences pref;
     public static SharedPreferences.Editor editor;
 
-    private String habbitroutine = "매일";
-
     boolean monday = false;
     boolean tuesday = false;
     boolean wednesday = false;
@@ -49,6 +51,7 @@ public class EditHabbit2 extends AppCompatActivity {
     boolean friday = false;
     boolean saturday = false;
     boolean sunday = false;
+    private String habbitroutine = "매일";
 
     @SuppressLint({"FindViewByIdCast", "CommitPrefEdits"})
     @Override
@@ -62,7 +65,10 @@ public class EditHabbit2 extends AppCompatActivity {
 
         this.SetListener();
 
+        Intent secondIntent = getIntent();
         et_habbittitle = (EditText) findViewById(R.id.et_habbittitle);
+        et_habbittitle.setText(secondIntent.getStringExtra("habbittitle"));
+        et_habbittitle.setEnabled(false);
 
         vieweveryday = findViewById(R.id.view_everyday);
         vieweveryday.setVisibility(View.INVISIBLE);
@@ -75,25 +81,43 @@ public class EditHabbit2 extends AppCompatActivity {
         cb6 = (CheckBox)findViewById(R.id.checkBox6);
         cb7 = (CheckBox)findViewById(R.id.checkBox7);
 
+        if(!secondIntent.getBooleanExtra("everyday", true)) {
+            radioButton2.setChecked(true);
+            vieweveryday.setVisibility(View.VISIBLE);
+            if(secondIntent.getBooleanExtra("Monday", true)) cb1.setChecked(true);
+            if(secondIntent.getBooleanExtra("Tuesday", true)) cb2.setChecked(true);
+            if(secondIntent.getBooleanExtra("Wednesday", true)) cb3.setChecked(true);
+            if(secondIntent.getBooleanExtra("Thursday", true)) cb4.setChecked(true);
+            if(secondIntent.getBooleanExtra("Friday", true)) cb5.setChecked(true);
+            if(secondIntent.getBooleanExtra("Saturday", true)) cb6.setChecked(true);
+            if(secondIntent.getBooleanExtra("Sunday", true)) cb7.setChecked(true);
+        }
+
         countPicker  = (NumberPicker) findViewById(R.id.picker_count);
         countPicker.setMinValue(0);
         countPicker.setMaxValue(100);
         countPicker.setValue(1);
 
+        long totalsec = secondIntent.getIntExtra("totalsec", 0);
+        Log.e(TAG, "onCreate: everyday" + totalsec);
+        long second = totalsec % 60;
+        long minute = (totalsec / 60) % 60;
+        long hour = (totalsec / 3600) % 24;
+
         hourPicker = (NumberPicker) findViewById(R.id.picker_hour);
         hourPicker.setMinValue(0);
         hourPicker.setMaxValue(24);
-        hourPicker.setValue(0);
+        hourPicker.setValue((int) hour);
 
         minPicker = (NumberPicker) findViewById(R.id.picker_min);
         minPicker.setMinValue(0);
         minPicker.setMaxValue(60);
-        minPicker.setValue(0);
+        minPicker.setValue((int) minute);
 
         secPicker = (NumberPicker) findViewById(R.id.picker_sec);
         secPicker.setMinValue(0);
         secPicker.setMaxValue(60);
-        secPicker.setValue(0);
+        secPicker.setValue((int) second);
 
         // 저장 위치 초기화
         pref = getSharedPreferences("pref", MODE_PRIVATE);
@@ -133,10 +157,12 @@ public class EditHabbit2 extends AppCompatActivity {
 
         if(!et_habbittitle.getText().toString().equals("") && countPicker.getValue()!=0 && hourPicker.getValue()!=0 | minPicker.getValue()!=0 | secPicker.getValue()!=0) {
 
-            if(habbitroutine.equals("매일")) {
+            if(radioButton1.isChecked()) {
+                habbitroutine = "매일";
                 monday = tuesday = wednesday = thursday = friday = saturday = sunday = true;
 
             } else {
+                habbitroutine = "매주";
                 if(cb1.isChecked()) monday = true;
                 if(cb2.isChecked()) tuesday = true;
                 if(cb3.isChecked()) wednesday = true;
@@ -182,7 +208,7 @@ public class EditHabbit2 extends AppCompatActivity {
                         .document(firebaseUser.getUid())
                         .collection("total")
                         .document(habbittitle)
-                        .set(todayprogresslist)
+                        .set(todayprogresslist, SetOptions.merge())
 
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
