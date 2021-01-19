@@ -1592,7 +1592,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         resetCal.setTimeInMillis(System.currentTimeMillis());
 
         resetCal.set(Calendar.HOUR_OF_DAY, 0);
-        resetCal.set(Calendar.MINUTE, -5);
+        resetCal.set(Calendar.MINUTE, -1);
         resetCal.set(Calendar.SECOND, 0);
 
 //        long reserve = resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY ;
