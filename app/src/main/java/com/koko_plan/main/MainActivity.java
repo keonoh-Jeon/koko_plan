@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         lineChart.setData(data);
         lineChart.setDescription("");
-        lineChart.animateY(3000);
+//        lineChart.animateY(3000);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -1083,14 +1083,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pieChart.setData(null);
         pieChart.clear();
 
-        if(todoListItems.size() > 0) {
+        if(adapter.getItemCount() > 0) {
+
             ArrayList NoOfTotalsec = new ArrayList();
             total = 0;
             for (int i = 0; i < todoListItems.size(); i++) {
                 NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
                 total += todoListItems.get(i).getTotalsec();
             }
-
             double percentage = total/(24*3600.0)*100;
 
             //하루 24 남은 시간
@@ -1104,13 +1104,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             title.add("하루");
 
+            Log.e(TAG, "piechartmaker: "+ title +  dataSet);
             PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
             pieChart.setData(data);
             dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
-            pieChart.animateXY(2000, 2000);
+//            pieChart.animateXY(2000, 2000);
             pieChart.setDescription("");
             pieChart.setAlpha(0.8f);
             pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
+
+
+
 
             savefieldtofirebase(percentage);
         }

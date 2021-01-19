@@ -530,12 +530,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editPlus() {
             timegap = 0;
 
-            int hour = todoListItems.get(index).getHour();
-            int min = todoListItems.get(index).getMin();
-            int sec = todoListItems.get(index).getSec();
-            int unitsec = hour*60*60+min*60+sec;
-
+            int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
             int curcount = todoListItems.get(index).getCurcount();
+
             int countsum = todoListItems.get(index).getCountsum();
             if(todoListItems.get(index).getCurcount()<todoListItems.get(index).getCount()){
                 curcount = curcount + 1;
@@ -587,12 +584,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void editMinus() {
             timegap = 0;
-            int hour = todoListItems.get(index).getHour();
-            int min = todoListItems.get(index).getMin();
-            int sec = todoListItems.get(index).getSec();
-            int unitsec = hour*60*60+min*60+sec;
+            int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
 
-            int curcount = todoListItems.get(index).getCurcount() ;
+            int curcount = todoListItems.get(index).getCurcount();
             int countsum = todoListItems.get(index).getCountsum();
             if(curcount > 0) {
                 curcount = curcount - 1;
