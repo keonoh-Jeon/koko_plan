@@ -50,6 +50,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
     private Ranking_ViewListener rankingViewListener;
 
     private ProgressDialog pd;
+    private int myrank;
 
     public Ranking_Adapter(ArrayList<Ranking_Item> unfilterList, Context context, Ranking_ViewListener listener)
     {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,6 +43,7 @@ import com.koko_plan.sub.MySoundPlayer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -52,9 +55,11 @@ import static com.koko_plan.main.MainActivity.todaydate;
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener, TextWatcher
 {
     private static final String TAG = "TotalHabbitList";
+    TextView tvtotalranker, tvmyrank;
     private Context context = null;
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -102,6 +107,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     protected void onStart()
     {
         super.onStart();
+
         listenerDoc();
 
         //파이어베이스 필드 검색
@@ -168,6 +174,11 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         rankingAdapter = new Ranking_Adapter(ranking_items, this, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(rankingAdapter);
+
+
+        tvmyrank = findViewById(R.id.tv_myrank);
+        tvtotalranker = findViewById(R.id.tv_totalranker);
+
     }
 
     @Override
@@ -189,13 +200,16 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
+                    private int myrank;
+
+                    @SuppressLint("SetTextI18n")
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
                                         @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w("listen:error", e);
                             return;                        }
-                        int position = 1;
                         assert snapshots != null;
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             switch (dc.getType()) {
@@ -203,6 +217,12 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     Log.w("ADDED","Data: " + dc.getDocument().getData());
                                     ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
 //                                    rankingAdapter.notifyDataSetChanged();
+                                    if(Objects.equals(dc.getDocument().getData().get("name"), name)){
+                                        tvmyrank.setText("오늘의 나의 순위는 "+ ranking_items.size()+"위 입니다.");
+                                        myrank = ranking_items.size();
+                                    }
+                                        
+                                    
                                     break;
                                 case MODIFIED:
                                     Log.w("MODIFIED","Data: " + dc.getDocument().getData());
@@ -216,6 +236,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
                         }
                         rankingAdapter.notifyDataSetChanged();
+                        tvtotalranker.setText("전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다.");
                     }
                 });
     }
