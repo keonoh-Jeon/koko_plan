@@ -10,13 +10,11 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/rk_number"
             android:layout_weight="1"
-            android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="순위"
@@ -26,13 +24,25 @@
 
         <TextView
             android:id="@+id/rk_name"
-            android:layout_weight="2.5"
+            android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="닉네임"
             android:textColor="#000000"
             android:textSize="20sp"
             tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/rk_totalsec"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="right"
+            android:layout_marginRight="10dp"
+            android:hint="시간"
+            android:textColor="#888A8A"
+            android:textSize="20sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
 
         <TextView
             android:id="@+id/rk_progress"
@@ -45,6 +55,12 @@
             android:textColor="#888A8A"
             android:textSize="20sp"
             tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/like_heart"/>
 
     </LinearLayout>
 

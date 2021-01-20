@@ -29,6 +29,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.member.MemberActivity;
@@ -38,10 +39,14 @@ import com.koko_plan.server.goodtext.GoodText_ViewListener;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
+import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
+import static com.koko_plan.main.MainActivity.photourl;
 import static com.koko_plan.main.MainActivity.todaydate;
 
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener, TextWatcher
@@ -170,7 +175,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         super.onPause();
 
         ranking_items.removeAll(ranking_items);
-//        ranking_items = new ArrayList<>();
     }
     @Override
     protected void onResume() {
@@ -191,15 +195,13 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                         if (e != null) {
                             Log.w("listen:error", e);
                             return;                        }
-
+                        int position = 1;
                         assert snapshots != null;
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
                             switch (dc.getType()) {
                                 case ADDED:
                                     Log.w("ADDED","Data: " + dc.getDocument().getData());
                                     ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
-                                    Log.e(TAG, "onEvent: " +  dc.getDocument().get(todaydate));
 //                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case MODIFIED:
@@ -214,7 +216,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
                         }
                         rankingAdapter.notifyDataSetChanged();
-
                     }
                 });
     }

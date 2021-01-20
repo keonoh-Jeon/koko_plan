@@ -46,7 +46,7 @@
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    android:text="Ranking"
+                    android:text="오늘의 습관왕"
                     android:textColor="#B9B8B8"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -71,6 +71,16 @@
 
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#50586C"
+            android:layout_margin="10dp"
+            android:text="선물하기 버튼으로 서로를 응원하세요.
+                            \n'달성율 > 목표시간 > 받은 명언 수'로 순위가 정해집니다.
+                            \n상위 순위권자는 어플의 모든 기능을 사용할수 있습니다."
+            tools:ignore="HardcodedText" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,6 +114,10 @@
                     tools:ignore="ContentDescription" />
 
         </LinearLayout>
+
+
+
+
 
         <LinearLayout
             android:layout_width="match_parent"

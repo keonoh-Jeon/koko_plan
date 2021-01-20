@@ -210,6 +210,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Utils.setStatusBarColor(this, Utils.StatusBarColorType.GREEN_STATUS_BAR);
 
+        // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동
+        initprofile();
+
         //어플 업데이트 매니저
         Appupdatemanager();
 
@@ -224,9 +227,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         crashlytics.log("my message");
         crashlytics.log("E/TAG: my message");
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-
-        // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동
-        initprofile();
 
         // 파이어베이스 회원 정보 모으기
         getprofile();
@@ -467,6 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 .collection("dates")
                                                 .document(selecteddata)
                                                 .collection("habbits")
+                                                .orderBy("curtime", Query.Direction.DESCENDING)
 
                                                 .get()
                                                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -929,6 +930,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 long cur = 0;
+                                long today = 0;
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
@@ -936,16 +938,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         long total = (long) document.getData().get("totalsec");
                                         cur += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
                                         adapter.notifyDataSetChanged();
+                                        today += total;
                                     }
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
 
-                                today_progress = (int) (cur/todoListItems.size());
+                                if(todoListItems.size()>0) today_progress = (int) (cur/todoListItems.size());
                                 tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
 
                                 Map<String, Object> dairyInfo = new HashMap<>();
                                 dairyInfo.put(todaydate, today_progress);
+                                dairyInfo.put("todaytarget", today);
 
                                 firebaseFirestore
                                         .collection("users")
@@ -1088,7 +1092,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ArrayList NoOfTotalsec = new ArrayList();
             total = 0;
             for (int i = 0; i < todoListItems.size(); i++) {
-                NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
+                if(adapter.getItems().get(i).getTotalsec()!=0){
+                    NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
+                }
                 total += todoListItems.get(i).getTotalsec();
             }
             double percentage = total/(24*3600.0)*100;
@@ -1100,21 +1106,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //차트 항목 타이틀 지정
             ArrayList title = new ArrayList();
             for (int i = 0; i < adapter.getItemCount(); i++) {
-                title.add(adapter.getItems().get(i).getHabbittitle());
+                if(adapter.getItems().get(i).getHabbittitle()!=null) {
+                    title.add(adapter.getItems().get(i).getHabbittitle());
+                } else {
+                    startToast("해당일에는 실행한 습관이 없습니다.");
+                }
             }
             title.add("하루");
 
             Log.e(TAG, "piechartmaker: "+ title +  dataSet);
-            PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
-            pieChart.setData(data);
-            dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+
+            if(NoOfTotalsec.size() == title.size()) {
+                PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
+                pieChart.setData(data);
+                dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
 //            pieChart.animateXY(2000, 2000);
-            pieChart.setDescription("");
-            pieChart.setAlpha(0.8f);
-            pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
-
-
-
+                pieChart.setDescription("");
+                pieChart.setAlpha(0.8f);
+                pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
+            }
 
             savefieldtofirebase(percentage);
         }
@@ -1182,7 +1192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
-                    Log.e(TAG, "onPause: stoptime" +  now);
                     editor.apply();
                 }
             }
@@ -1242,6 +1251,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStop() {
         super.onStop();
 
+        //현재의 밀리세컨 구함
+        long now = System.currentTimeMillis();
+        editor.putLong("stoptime", now);
+        editor.apply();
+
 //플레이 중이면 스레드 중지
         if(timerTask != null)
         {
@@ -1285,6 +1299,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         showcount = pref.getInt("showcount", 0);
 
         timegap = (int)((now-stoptime)/1000);
+        Log.e(TAG, "onResume: timegap "  + timegap );
     }
 
     //스와이프 기능 헬퍼 연결

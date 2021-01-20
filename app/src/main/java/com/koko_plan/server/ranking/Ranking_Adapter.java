@@ -16,16 +16,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
+import com.koko_plan.main.TodoList_Item;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.server.goodtext.RandomGoodText;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -113,11 +122,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         viewHolder.numberview.setText((i+1)+".");
         viewHolder.nameview.setText(filterList.get(i).getName());
 
-//        viewHolder.nameview.setText(filteredList.get(i).getName()+"");
         DocumentReference documentReference = firebaseFirestore
                 .collection("users")
                 .document(filterList.get(i).getId());
-        Log.e(TAG, "onBindViewHolder: "  + firebaseUser.getUid() );
 
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -155,6 +162,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         // 리스트 목록의 초기화 .... 미연의 충돌 방지
         TextView numberview = null;
         TextView nameview = null;
+        TextView totalsecview = null;
         TextView progressview = null;
         TextView clubaver = null;
         TextView clubdist = null;
@@ -165,6 +173,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
             numberview = (TextView)view.findViewById(R.id.rk_number);
             nameview = (TextView)view.findViewById(R.id.rk_name);
+            totalsecview = (TextView)view.findViewById(R.id.rk_totalsec);
             progressview = (TextView)view.findViewById(R.id.rk_progress);
 
             view.setOnClickListener(new View.OnClickListener() {
