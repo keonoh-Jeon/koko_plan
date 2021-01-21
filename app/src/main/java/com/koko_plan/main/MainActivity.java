@@ -250,9 +250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 가로 달력 구현
         horizontalCalendarmaker(calendar);
 
-        //하단 프로세스 달력추가
-        EventCalendarMaker(calendar);
-
         GoodTextListmaker();
 
         if(showcount >= 10) RequestReview.show(this);
@@ -716,8 +713,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         System.gc();
+        super.onDestroy();
     }
 
     //어플 업데이트 관리
@@ -1201,6 +1198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }).start();
 
         savehabbitportion();
+        System.gc();
     }
 
     private void savehabbitportion() {
@@ -1264,6 +1262,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onResume() {
@@ -1299,7 +1298,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         showcount = pref.getInt("showcount", 0);
 
         timegap = (int)((now-stoptime)/1000);
-        Log.e(TAG, "onResume: timegap "  + timegap );
+
+        //하단 프로세스 달력추가
+        EventCalendarMaker(calendar);
     }
 
     //스와이프 기능 헬퍼 연결

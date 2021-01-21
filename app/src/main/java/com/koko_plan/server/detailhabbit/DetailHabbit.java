@@ -63,7 +63,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailhabbit_list);
 
-
         // 뷰 초기화
         initView();
 

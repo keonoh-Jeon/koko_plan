@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:ignore="MissingConstraints,UselessParent"
-            android:background="#737372"
+            android:background="#C7D3D4"
             android:layout_marginBottom="5dp"
             android:gravity="center">
 
@@ -46,8 +46,8 @@
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    android:text="오늘의 습관왕"
-                    android:textColor="#B9B8B8"
+                    android:text="습관 달성 순위"
+                    android:textColor="#603F83"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:ignore="HardcodedText" />
@@ -72,78 +72,150 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_totalranker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-
-        <TextView
-            android:id="@+id/tv_myrank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="나의 랭킹"/>
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#50586C"
-            android:layout_margin="10dp"
-            android:text="좋아요 버튼을 눌러 응원(명언선물)을 해주세요.선물하기 버튼으로 서로를 응원하세요.
-                            \n'달성율 > 목표시간 > 받은 명언 수'로 순위가 정해집니다.
-                            \n상위 순위권자는 어플의 모든 기능을 사용할 수 있는 혜택이 주어집니다."
-            tools:ignore="HardcodedText" />
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="오늘의 나의 순위는 "
+                        android:layout_margin="10dp"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/tv_myrank"
+                        android:layout_margin="10dp"
+                        android:textSize="20sp"
+                        android:textColor="#673AB7"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="랭킹"
+                        tools:ignore="HardcodedText" />
+
+
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_totalranker"
+                    android:layout_margin="10dp"
+                    android:text="전체에서"
+                    android:textSize="10sp"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:ignore="HardcodedText,SmallSp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_rank"
+                    android:src="@drawable/rank_trophy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp">
+            android:layout_marginTop="10sp"
+            android:background="#DAC2AE"
+            android:gravity="center">
 
-                <TextView
-                    android:text="닉네임 검색"
-                    android:layout_weight="3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#000000"
-                    android:textSize="20sp"
-                    tools:ignore="HardcodedText" />
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="순위"
+                android:layout_marginLeft="10dp"
+                android:textColor="#D4B996"
+                tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <EditText
-                    android:id="@+id/et_searchnickname"
-                    android:layout_weight="6"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#78A543"
-                    android:textSize="20sp"
-                    tools:ignore="HardcodedText,SmallSp" />
+            <TextView
+                android:layout_weight="4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint=" 닉네임"
+                android:textColor="#D4B996"
+                tools:ignore="HardcodedText" />
 
-                <ImageView
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:src="@drawable/magnifier"
-                    tools:ignore="ContentDescription" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:hint="시간"
+                android:textColor="#D4B996"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:hint="성취율"
+                android:textColor="#D4B996"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_marginRight="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="3dp"/>
 
         </LinearLayout>
-
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="9">
+            android:layout_weight="8">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_rankinglist"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:nestedScrollingEnabled="false">
+                android:nestedScrollingEnabled="false"
+                tools:ignore="UnusedAttribute">
             </androidx.recyclerview.widget.RecyclerView>
 
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textColor="#50586C"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:textSize="10sp"
+            android:text="'좋아요' 버튼을 눌러 서로 습관을 응원(명언선물)을 해주세요.
+                            \n
+                            \n'달성율 > 목표시간 > 받은 명언 수'로 순위가 정해집니다.
+                            \n상위 순위권자는, 어플의 모든 기능을 사용할 수 있는 혜택(광고제거)이 주어집니다."
+            tools:ignore="HardcodedText,SmallSp" />
 
         <LinearLayout
             android:layout_width="match_parent"

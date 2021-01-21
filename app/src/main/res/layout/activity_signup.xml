@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#E3ECF2"
     android:layout_gravity="center_vertical"
     tools:context=".member.Singup">
 
@@ -17,70 +18,73 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         tools:ignore="UselessParent">
-
-        <TextView
-            android:layout_gravity="center_horizontal"
-            android:textSize="50sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="환영합니다"
-            android:textColor="#FEBD5F"
-            android:textStyle="bold"
-            android:layout_marginTop="100dp"
-            android:layout_marginBottom="10dp"
-            tools:ignore="HardcodedText" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="50dp"
-            android:text="KOKO HABBIT"
-            android:textStyle="bold"
-            android:textColor="#FFC107"
-            android:textSize="35sp"
-            tools:ignore="HardcodedText" />
-
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
-            android:layout_marginTop="30dp"
+        
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:text="구글로 로그인"
-            tools:ignore="HardcodedText"/>
+            android:gravity="center"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/emailsignup"
-            android:layout_marginTop="5dp"
+            <TextView
+                android:textSize="50sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="KOBBIT"
+                android:textColor="#07553B"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="5dp"
-            android:background="#FFFF00"
-            android:text="이메일로 가입"
-            tools:ignore="HardcodedText" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/gotoLogin"
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="구글로 로그인"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/emailsignup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="5dp"
+                android:layout_marginTop="5dp"
+                android:textColor="#0A174E"
+                android:background="#F5D042"
+                android:text="이메일로 가입"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:layout_marginTop="70dp"
-            android:background="#B2FF59"
-            android:text="로그인"
-            tools:ignore="HardcodedText" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
+            <Button
+                android:id="@+id/gotoLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:layout_marginTop="70dp"
+                android:background="#CED46A"
+                android:text="로그인"
+                android:textColor="#07553B"
+                tools:ignore="HardcodedText" />
 
-
-
-
-
+        </LinearLayout>
 
     </LinearLayout>
-
-
 
 </RelativeLayout>

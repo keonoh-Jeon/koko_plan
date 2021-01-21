@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,7 +54,7 @@ import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.photourl;
 import static com.koko_plan.main.MainActivity.todaydate;
 
-public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener, TextWatcher
+public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener
 {
     private static final String TAG = "TotalHabbitList";
     TextView tvtotalranker, tvmyrank;
@@ -73,9 +75,9 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
         findViewById(R.id.mc_menu).setOnClickListener(OnClickListener);
 
-        /*AdView adBanner = findViewById(R.id.adView);
+        AdView adBanner = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);*/
+        adBanner.loadAd(adRequest);
 
     }
 
@@ -160,9 +162,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @SuppressLint("SetTextI18n")
     private void initView()
     {
-        EditText searchnickname = findViewById(R.id.et_searchnickname);
-        searchnickname.addTextChangedListener(this);
-
         ranking_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -184,7 +183,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @Override
     protected void onPause() {
         super.onPause();
-
         ranking_items.removeAll(ranking_items);
     }
     @Override
@@ -218,7 +216,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
 //                                    rankingAdapter.notifyDataSetChanged();
                                     if(Objects.equals(dc.getDocument().getData().get("name"), name)){
-                                        tvmyrank.setText("오늘의 나의 순위는 "+ ranking_items.size()+"위 입니다.");
+                                        tvmyrank.setText(ranking_items.size()+"위");
                                         myrank = ranking_items.size();
                                     }
                                         
@@ -236,7 +234,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
                         }
                         rankingAdapter.notifyDataSetChanged();
-                        tvtotalranker.setText("전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다.");
+                        tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
                     }
                 });
     }
@@ -247,20 +245,5 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        rankingAdapter.getFilter().filter(charSequence.toString());
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-
     }
 }

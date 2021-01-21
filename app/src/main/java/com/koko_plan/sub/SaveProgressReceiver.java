@@ -121,6 +121,33 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                                                     public void onFailure(@NonNull Exception e) {
                                                     }
                                                 });
+
+                                        Map<String, Object> daybyday = new HashMap<>();
+                                        daybyday.put("totalsec", totalsec);
+                                        daybyday.put("curcount", curcount);
+                                        daybyday.put("curtime", curtime);
+                                        daybyday.put("habbittitle", habbit);
+                                        daybyday.put("date", todaydate);
+
+                                        firebaseFirestore
+                                                .collection("users")
+                                                .document(firebaseUser.getUid())
+                                                .collection("total")
+                                                .document(habbit)
+                                                .collection("dates")
+                                                .document(todaydate)
+
+                                                .set(daybyday, SetOptions.merge())
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                    }
+                                                });
                                     }
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());

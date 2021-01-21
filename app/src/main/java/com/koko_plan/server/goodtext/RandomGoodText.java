@@ -43,6 +43,7 @@ public class RandomGoodText {
                             text = (String) document.get(randomnum);
                             CustomToastMaker.show(context, text);
                             SetMsgToUsers.send(day, time, text, userid);
+                            SetMsgToUsers2.send(userid);
                         } else {
                             Log.d(TAG, "No such document");
                         }

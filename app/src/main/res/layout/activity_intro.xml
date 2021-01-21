@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#E5EBE6">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -23,36 +24,42 @@
             android:gravity="center">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textSize="10sp"/>
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="KOKO \nHABBIT"
+                android:gravity="center"
+                android:textColor="#38DAA4"
+                android:textSize="40sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="KOKO \nHABBIT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="50sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="KOBBIT"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:textColor="#07553B"
                 android:textSize="60sp"
                 tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textSize="30sp"/>
-
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
-            android:textColor="#FFFFFF"
+            android:textColor="#6C6565"
             android:text="design by kokofun"
-            android:layout_marginBottom="30dp"/>
+            android:layout_margin="30dp"
+            tools:ignore="HardcodedText" />
 
 
     </FrameLayout>

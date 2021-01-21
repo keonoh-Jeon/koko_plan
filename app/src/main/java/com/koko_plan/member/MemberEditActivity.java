@@ -282,7 +282,8 @@ public class MemberEditActivity extends AppCompatActivity {
         if (name.length() > 0 && birthday.length() > 0) {
 
             if(firebaseUser != null) {
-                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid());
+                int getcount = 0;
+                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount);
                 firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid())

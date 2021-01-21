@@ -269,7 +269,8 @@ public class MemberActivity extends AppCompatActivity {
 
         if (!name.equals("name")  && !birthday.equals("birthday")) {
             if(firebaseUser != null) {
-                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid());
+                int getcount = 0;
+                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount);
                 firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid())

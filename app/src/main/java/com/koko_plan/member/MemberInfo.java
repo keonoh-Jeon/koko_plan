@@ -6,8 +6,10 @@ public class MemberInfo {
     private String birthday;
     private String gender;
     private String id;
+    private int getcount;
 
-    public MemberInfo(String name, String birthday, String gender, String id){
+
+    public MemberInfo(String name, String birthday, String gender, String id, int getcount){
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
@@ -39,6 +41,13 @@ public class MemberInfo {
     }
     public void setGender(String gender){
         this.gender = gender;
+    }
+
+    public int getGetcount(){
+        return this.getcount;
+    }
+    public void setGetcount(int getcount){
+        this.getcount = getcount;
     }
 
 }
