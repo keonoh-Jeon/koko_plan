@@ -32,10 +32,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
+import com.koko_plan.main.TodoList_Item;
 import com.koko_plan.member.MemberActivity;
 import com.koko_plan.member.Profile_Item;
 import com.koko_plan.member.Singup;
@@ -78,6 +80,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         AdView adBanner = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         adBanner.loadAd(adRequest);
+
+        realtimelistenerDoc();
 
     }
 
@@ -196,9 +200,42 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                 .orderBy(todaydate, Query.Direction.DESCENDING)
 
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
                     private int myrank;
+
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                ranking_items.add(document.toObject(Ranking_Item.class));
+
+                                if(document.getData().get("name") == name) {
+                                    tvmyrank.setText(ranking_items.size()+"위");
+                                    myrank = ranking_items.size();
+                                }
+                                rankingAdapter.notifyDataSetChanged();
+                            }
+
+                            tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void realtimelistenerDoc() {
+        firebaseFirestore
+                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+//                .orderBy(todaydate, Query.Direction.DESCENDING)
+
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
                     @SuppressLint("SetTextI18n")
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -213,19 +250,11 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             switch (dc.getType()) {
                                 case ADDED:
                                     Log.w("ADDED","Data: " + dc.getDocument().getData());
-                                    ranking_items.add(ranking_items.size(), dc.getDocument().toObject(Ranking_Item.class));
-//                                    rankingAdapter.notifyDataSetChanged();
-                                    if(Objects.equals(dc.getDocument().getData().get("name"), name)){
-                                        tvmyrank.setText(ranking_items.size()+"위");
-                                        myrank = ranking_items.size();
-                                    }
-                                        
-                                    
                                     break;
                                 case MODIFIED:
                                     Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    maketoast("this club is already exist.");
-//                                    rankingAdapter.notifyDataSetChanged();
+
+                                    rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case REMOVED:
                                     Log.w("REMOVED", "Data: " + dc.getDocument().getData());
@@ -233,10 +262,10 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     break;
                             }
                         }
-                        rankingAdapter.notifyDataSetChanged();
-                        tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
+
                     }
                 });
+
     }
 
     @Override

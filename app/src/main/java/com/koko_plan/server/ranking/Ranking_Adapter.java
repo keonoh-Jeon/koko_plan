@@ -124,6 +124,14 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
         viewHolder.numberview.setText((i+1)+"");
         viewHolder.nameview.setText(filterList.get(i).getName());
+        long target = (long) filterList.get(i).getTodaytarget();
+        long second = (long) target % 60;
+        long minute = ((long) target / 60) % 60;
+        long hour = ((long) target / 3600) % 24;
+        viewHolder.totalsecview.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+        viewHolder.tvgetcountview.setText(filterList.get(i).getGetcount()+"");
+        Log.e(TAG, "onBindViewHolder: "+ filterList.get(i).getGetcount());
+
 
         DocumentReference documentReference = firebaseFirestore
                 .collection("users")
@@ -138,16 +146,13 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                         if (document.exists()) {
                             Log.e(TAG, "onComplete: "+ document.get(todaydate));
 
-                            long target = (long) document.get("todaytarget");
-
+                            /*long target = (long) document.get("todaytarget");
 
                             long second = (long) target % 60;
                             long minute = ((long) target / 60) % 60;
                             long hour = ((long) target / 3600) % 24;
-                            viewHolder.totalsecview.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+                            viewHolder.totalsecview.setText(String.format("%02d:%02d:%02d", hour, minute, second));*/
 
-                            viewHolder.progressview.setText(document.get(todaydate)+"%");
-                            viewHolder.tvgetcountview.setText(document.get("getcount")+"");
                         }
                     }
                 } else {
@@ -155,8 +160,6 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                 }
             }
         });
-
-
 
         if (pd!= null) pd.dismiss();
     }

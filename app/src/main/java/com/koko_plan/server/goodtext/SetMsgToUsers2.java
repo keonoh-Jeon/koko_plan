@@ -23,7 +23,7 @@ import static com.koko_plan.main.MainActivity.photourl;
 
 public class SetMsgToUsers2 {
 
-    private static int getcount;
+    private static long getcount;
 
     public static void send(String touser) {
         new Thread(() -> {
@@ -42,7 +42,7 @@ public class SetMsgToUsers2 {
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
-                                getcount = (int) document.get("getcount");
+                                getcount = (long) document.get("getcount");
                                 getcount ++;
                             } else {
 
