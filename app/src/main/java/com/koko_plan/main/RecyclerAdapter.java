@@ -53,10 +53,12 @@ import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.lastsec;
+import static com.koko_plan.main.MainActivity.like;
 import static com.koko_plan.main.MainActivity.selecteddata;
 import static com.koko_plan.main.MainActivity.timegap;
 import static com.koko_plan.main.MainActivity.todaydate;
 import static com.koko_plan.main.MainActivity.totalprogress;
+import static com.koko_plan.main.MainActivity.trophy;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -76,7 +78,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
 
-
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(todoListItems, i, i + 1);
@@ -88,6 +89,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
         notifyItemMoved(fromPosition, toPosition);
         btnsavelist.setVisibility(View.VISIBLE);
+        //TODO
+        like.setVisibility(View.GONE);
+        trophy.setVisibility(View.GONE);
+
+
         return true;
     }
 

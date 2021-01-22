@@ -16,7 +16,7 @@ public class CustomToastMaker {
     {
         View view = View.inflate(context, R.layout.toast_layout, null);
         TextView tvtoastmsg = view.findViewById(R.id.tv_toastmsg);
-        tvtoastmsg.setText("[ 명언을 선물합니다 ]" + "\n" +"\n" +string);
+        tvtoastmsg.setText("[ 명언의 응원 ]" + "\n" +"\n" +string);
         Toast toast = new Toast(context);
         toast.setView(view);
         toast.setGravity(Gravity.CENTER, 0, 0);

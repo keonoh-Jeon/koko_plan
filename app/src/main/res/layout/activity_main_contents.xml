@@ -44,6 +44,10 @@
                     android:layout_width="match_parent"
                     tools:ignore="ScrollViewSize" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30sp"/>
+
                 <TextView
                     android:text="하루 중, 습관 비중 추이"
                     android:textSize="20sp"
@@ -66,7 +70,6 @@
 
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
-                            android:padding="50dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
@@ -95,6 +98,11 @@
                     ads:adSize="BANNER"
                     ads:adUnitId="@string/google_ads_banner_api_key">
                 </com.google.android.gms.ads.AdView>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30sp"/>
 
                 <TextView
                     android:text="월간 성취율"
@@ -126,6 +134,9 @@
                     ads:adUnitId="@string/google_ads_banner_api_key">
                 </com.google.android.gms.ads.AdView>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"

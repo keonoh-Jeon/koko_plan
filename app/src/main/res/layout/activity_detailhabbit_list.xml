@@ -182,6 +182,7 @@
                     tools:ignore="HardcodedText" />
 
                 <TextView
+                    android:id="@+id/tv_average"
                     android:text="0시간 0분 0초"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -193,7 +194,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="/day   ,"
+                    android:text="/ day   ,"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -208,7 +209,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="/day"
+                    android:text="/ day"
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>

@@ -110,14 +110,12 @@
                 </LinearLayout>
                 <TextView
                     android:id="@+id/tv_totalranker"
-                    android:layout_margin="10dp"
                     android:text="전체에서"
                     android:textSize="10sp"
-                    android:layout_gravity="center"
+                    android:layout_marginLeft="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:ignore="HardcodedText,SmallSp" />
-
+                    tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
             </LinearLayout>
 
@@ -125,6 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_gravity="center"
+                android:layout_margin="5dp"
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -165,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="center"
-                android:hint="시간"
+                android:hint="할당시간"
                 android:textColor="#D4B996"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
@@ -209,11 +208,11 @@
             android:layout_weight="1"
             android:textColor="#50586C"
             android:layout_margin="10dp"
-            android:layout_gravity="center"
+            android:gravity="bottom"
             android:textSize="10sp"
-            android:text="'좋아요' 버튼을 눌러 서로 습관을 응원(명언선물)을 해주세요.
+            android:text="'좋아요' 버튼을 눌러 서로의 습관 실천을 응원(명언선물)하세요.
                             \n
-                            \n'달성율 > 목표시간 > 받은 명언 수'로 순위가 정해집니다.
+                            \n'달성율 > 할당시간 > 받은 명언'로 순위가 정해집니다.
                             \n상위 순위권자는, 어플의 모든 기능을 사용할 수 있는 혜택(광고제거)이 주어집니다."
             tools:ignore="HardcodedText,SmallSp" />
 

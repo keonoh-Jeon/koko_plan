@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("StaticFieldLeak")
     public static Button btnsavelist;
+    public static View like, trophy;
 
     public static String name, email;
     private String inputname;
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
+    private TextView tvgetcount;
 
     private SimpleDateFormat timeformat, dayformat;
 
@@ -180,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private HorizontalCalendar horizontalCalendar;
     private PieChart pieChart;
 
-    private int today_progress;
+    private long today_progress;
     public static int todayitemsize;
 
     public static ArrayList<TodoList_Item> todoListItems = null;
@@ -199,6 +201,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseCrashlytics crashlytics;
     private int todaysgoodtextsize;
     private int showcount = 0;
+    private long myranking;
+    private TextView tvmyrankscore;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -483,8 +487,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         } else {
                                                             Log.d(TAG, "Error getting documents: ", task.getException());
                                                         }
-                                                        if(todoListItems.size()>0) today_progress = (int) (cur/todoListItems.size());
-                                                        tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+                                                        if(todoListItems.size()>0) today_progress = (long) (cur/todoListItems.size());
+                                                        tvTodayProgress.setText("오늘의 실천 : " + today_progress+ "%" );
 
                                                         piechartmaker();
                                                     }
@@ -552,6 +556,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.primium) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(subscribe.class);
+
+        } else if (id == R.id.ranker) {
+        MySoundPlayer.play(MySoundPlayer.CLICK);
+        myStartActivity(Ranking_list.class);
 
         }/*else if (id == R.id.nav_history) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
@@ -630,11 +638,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         probitmap();
 
         ivTrophy = findViewById(R.id.iv_trophy);
+        tvmyrankscore = findViewById(R.id.tv_myrankscore);
+
+        tvgetcount= findViewById(R.id.tv_getcount);
 
         pieChart = findViewById(R.id.piechart);
 
         btnPlus = findViewById(R.id.btnPlus);
         btnsavelist = findViewById(R.id.btn_savelist);
+        like = findViewById(R.id.view_like);
+        trophy = findViewById(R.id.view_trophy);
+
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
         //배너 광고 표기
@@ -901,11 +915,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
 
-        btnsavelist.setVisibility(View.INVISIBLE);
+        btnsavelist.setVisibility(View.GONE);
         btnsavelist.setOnClickListener(v -> {
             timegap =0;
             resetId();
-            btnsavelist.setVisibility(View.INVISIBLE);
+            btnsavelist.setVisibility(View.GONE);
+            like.setVisibility(View.VISIBLE);
+            trophy.setVisibility(View.VISIBLE);
         });
 
         listenerDoc();
@@ -941,11 +957,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
 
-                                if(todoListItems.size()>0) today_progress = (int) (cur/todoListItems.size());
-                                tvTodayProgress.setText("오늘의 실행율 : " + today_progress+ "%" );
+                                if(todoListItems.size()>0) today_progress = (long) (cur/todoListItems.size());
+                                tvTodayProgress.setText("오늘의 실천 : " + today_progress+ "%" );
 
                                 Map<String, Object> dairyInfo = new HashMap<>();
                                 dairyInfo.put(todaydate, today_progress);
+                                dairyInfo.put("progress", today_progress);
                                 dairyInfo.put("todaytarget", today);
 
                                 firebaseFirestore
@@ -1285,6 +1302,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        getdocforgetlike();
+
         todaysgoodtextsize = 0;
 
         //가로 달력 시작시, 선택날짜와 이동
@@ -1295,12 +1314,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         todayitemsize = pref.getInt("todayitemsize", 0);
         long stoptime = pref.getLong("stoptime", 0);
+        myranking = pref.getLong("myranking", 0);
+        tvmyrankscore.setText(myranking+"");
         showcount = pref.getInt("showcount", 0);
 
         timegap = (int)((now-stoptime)/1000);
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
+    }
+
+    private void getdocforgetlike() {
+        if (firebaseUser != null) {
+            DocumentReference documentReference = firebaseFirestore
+                    .collection("users")
+                    .document(firebaseUser.getUid());
+
+            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null) {
+                            tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+        }
     }
 
     //스와이프 기능 헬퍼 연결

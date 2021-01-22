@@ -311,8 +311,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
     @Override
     public void onBackPressed() {
-
-        Intent intent = new Intent(this, TotalHabbitsList_list.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }

@@ -130,36 +130,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         long hour = ((long) target / 3600) % 24;
         viewHolder.totalsecview.setText(String.format("%02d:%02d:%02d", hour, minute, second));
         viewHolder.tvgetcountview.setText(filterList.get(i).getGetcount()+"");
-        Log.e(TAG, "onBindViewHolder: "+ filterList.get(i).getGetcount());
-
-
-        DocumentReference documentReference = firebaseFirestore
-                .collection("users")
-                .document(filterList.get(i).getId());
-
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            Log.e(TAG, "onComplete: "+ document.get(todaydate));
-
-                            /*long target = (long) document.get("todaytarget");
-
-                            long second = (long) target % 60;
-                            long minute = ((long) target / 60) % 60;
-                            long hour = ((long) target / 3600) % 24;
-                            viewHolder.totalsecview.setText(String.format("%02d:%02d:%02d", hour, minute, second));*/
-
-                        }
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
+        viewHolder.progressview.setText(filterList.get(i).getProgress()+"%");
 
         if (pd!= null) pd.dismiss();
     }
@@ -226,7 +197,13 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             day = dayformat.format(date);
 
                             RandomGoodText.make(context, filterList.get(pos).getId(), day, time);
-//                        Log.e(TAG, "onClick: make"+ text + "to " + filterList.get(pos).getId());
+                            filterList.get(pos).setGetcount(filterList.get(pos).getGetcount()+1);
+
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("getcount", filterList.get(pos).getGetcount()+1);
+                            firebaseFirestore
+                                    .collection("users").document(firebaseUser.getUid())
+                                    .set(data, SetOptions.merge());
 
                             getItemId();
                         } else {

@@ -205,6 +205,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
                     private int myrank;
 
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -215,7 +216,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 ranking_items.add(document.toObject(Ranking_Item.class));
 
-                                if(document.getData().get("name") == name) {
+                                if(Objects.equals(document.getData().get("name"), name)) {
                                     tvmyrank.setText(ranking_items.size()+"위");
                                     myrank = ranking_items.size();
                                 }
@@ -223,6 +224,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
 
                             tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
+                            editor.putLong("myranking", (long) (myrank/(double)ranking_items.size()*100.0));
+                            editor.apply();
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }

@@ -55,7 +55,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     private Context context = null;
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
-    private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum;
+    private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum, tvaverage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -131,6 +131,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
                                         String from = todaydate;
                                         @SuppressLint("SimpleDateFormat") SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                        long daygap = 0;
                                         try {
                                             Date todate = transFormat.parse(from);
                                             Date fromdate = transFormat.parse((String) Objects.requireNonNull(document.getData().get("start")));
@@ -140,8 +141,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                             Calendar fromcal = Calendar.getInstance();
                                             assert fromdate != null;
                                             fromcal.setTime(fromdate);
-                                            long a = (tocal.getTimeInMillis() - fromcal.getTimeInMillis())/86400000;
-                                            tvduedate.setText(" +" + a + "day ");
+                                            daygap = (tocal.getTimeInMillis() - fromcal.getTimeInMillis())/86400000;
+                                            tvduedate.setText(" +" + daygap + "day ");
                                         } catch (ParseException e) {
                                             e.printStackTrace();
                                         }
@@ -152,7 +153,13 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                         long second = curtimesum % 60;
                                         long minute = (curtimesum / 60) % 60;
                                         long hour = (curtimesum / 3600) % 24;
-                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second)+ " ");
+                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second)+ "동안 ");
+
+                                        long average = curtimesum / daygap;
+                                        long s = average % 60;
+                                        long m = (average / 60) % 60;
+                                        long h = (average / 3600) % 24;
+                                        tvaverage.setText(h+"시간 "+ m+"분 " +s+"초");
 
                                         /*long count = (long) document.getData().get("count");
                                         tv1count.setText(Long.toString(count) + "회 씩");
@@ -199,6 +206,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
         tvcountsum = findViewById(R.id.tv_countsum);
         tvcurtimesum = findViewById(R.id.tv_curtimesum);
+        tvaverage = findViewById(R.id.tv_average);
 
         detailhabbitItems = new ArrayList<>();
 

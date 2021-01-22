@@ -20,6 +20,11 @@
             tools:ignore="HardcodedText"
             android:title="전체 습관 보기" />
         <item
+            android:id="@+id/ranker"
+            android:icon="@drawable/showranker"
+            tools:ignore="HardcodedText"
+            android:title="습관 달성 순위" />
+        <item
             android:id="@+id/primium"
             android:icon="@drawable/medal"
             tools:ignore="HardcodedText"
