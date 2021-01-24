@@ -59,7 +59,7 @@ import static com.koko_plan.main.MainActivity.todaydate;
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener
 {
     private static final String TAG = "TotalHabbitList";
-    TextView tvtotalranker, tvmyrank;
+    TextView tvtotalranker, tvmyrank, tvranking;
     private Context context = null;
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
@@ -180,6 +180,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
 
         tvmyrank = findViewById(R.id.tv_myrank);
+        tvranking = findViewById(R.id.tv_ranking);
         tvtotalranker = findViewById(R.id.tv_totalranker);
 
     }
@@ -224,11 +225,125 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             }
 
                             tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
+                            putrankimage(myrank/(double)ranking_items.size()*100.0);
                             editor.putLong("myranking", (long) (myrank/(double)ranking_items.size()*100.0));
                             editor.apply();
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
+                    }
+
+                    @SuppressLint("SetTextI18n")
+                    private void putrankimage(double v) {
+                        new Thread(() -> {
+                            tvranking.setText("Iron 4");
+                            editor.putString("rank", "Iron 4");
+                            if(v<=99.94) {
+                                tvranking.setText("Iron 3");
+                                editor.putString("rank", "Iron 3");
+                                if (v <= 99.64) {
+                                    tvranking.setText("Iron 2");
+                                    editor.putString("rank", "Iron 2");
+                                    if (v <= 98.94) {
+                                        tvranking.setText("Iron 1");
+                                        editor.putString("rank", "Iron 1");
+                                        if (v <= 97.93) {
+                                            tvranking.setText("Bronze 4");
+                                            editor.putString("rank", "Bronze 4");
+                                            if (v <= 95.53) {
+                                                tvranking.setText("Bronze 3");
+                                                editor.putString("rank", "Bronze 3");
+                                                if (v <= 92.78) {
+                                                    tvranking.setText("Bronze 2");
+                                                    editor.putString("rank", "Bronze 2");
+                                                    if (v <= 88.73) {
+                                                        tvranking.setText("Bronze 1");
+                                                        editor.putString("rank", "Bronze 1");
+                                                        if (v <= 82.76) {
+                                                            tvranking.setText("Silver 4");
+                                                            editor.putString("rank", "Silver 4");
+                                                            if (v <= 73.61) {
+                                                                tvranking.setText("Silver 3");
+                                                                editor.putString("rank", "Silver 3");
+                                                                if (v <= 66.31) {
+                                                                    tvranking.setText("Silver 2");
+                                                                    editor.putString("rank", "Silver 2");
+                                                                    if (v <= 57.53) {
+                                                                        tvranking.setText("Silver 1");
+                                                                        editor.putString("rank", "Silver 1");
+                                                                        if (v <= 50.21) {
+                                                                            tvranking.setText("Gold 4");
+                                                                            editor.putString("rank", "Gold 4");
+                                                                            if (v <= 36.76) {
+                                                                                tvranking.setText("Gold 3");
+                                                                                editor.putString("rank", "Gold 3");
+                                                                                if (v <= 29.14) {
+                                                                                    tvranking.setText("Gold 2");
+                                                                                    editor.putString("rank", "Gold 2");
+                                                                                    if (v <= 22.53) {
+                                                                                        tvranking.setText("Gold 1");
+                                                                                        editor.putString("rank", "Gold 1");
+                                                                                        if (v <= 18.36) {
+                                                                                            tvranking.setText("Platinum 4");
+                                                                                            editor.putString("rank", "Platinum 4");
+                                                                                            if (v <= 10.58) {
+                                                                                                tvranking.setText("Platinum 3");
+                                                                                                editor.putString("rank", "Platinum 3");
+                                                                                                if (v <= 7.58) {
+                                                                                                    tvranking.setText("Platinum 2");
+                                                                                                    editor.putString("rank", "Platinum 2");
+                                                                                                    if (v <= 5.59) {
+                                                                                                        tvranking.setText("Platinum 1");
+                                                                                                        editor.putString("rank", "Platinum 1");
+                                                                                                        if (v <= 3.67) {
+                                                                                                            tvranking.setText("Diamond 4");
+                                                                                                            editor.putString("rank", "Diamond 4");
+                                                                                                            if (v <= 1.45) {
+                                                                                                                tvranking.setText("Diamond 3");
+                                                                                                                editor.putString("rank", "Diamond 3");
+                                                                                                                if (v <= 0.68) {
+                                                                                                                    tvranking.setText("Diamond 2");
+                                                                                                                    editor.putString("rank", "Diamond 2");
+                                                                                                                    if (v <= 0.31) {
+                                                                                                                        tvranking.setText("Diamond 1");
+                                                                                                                        editor.putString("rank", "Diamond 1");
+                                                                                                                        if (v <= 0.11) {
+                                                                                                                            tvranking.setText("Master");
+                                                                                                                            editor.putString("rank", "Master");
+                                                                                                                            if (v <= 0.06) {
+                                                                                                                                tvranking.setText("G_Master");
+                                                                                                                                editor.putString("rank", "G_Master");
+                                                                                                                                if (v <= 0.02) {
+                                                                                                                                    tvranking.setText("Challenger");
+                                                                                                                                    editor.putString("rank", "Challenger");
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            editor.apply();
+                        }).start();
                     }
                 });
     }
@@ -256,7 +371,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     break;
                                 case MODIFIED:
                                     Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-
                                     rankingAdapter.notifyDataSetChanged();
                                     break;
                                 case REMOVED:

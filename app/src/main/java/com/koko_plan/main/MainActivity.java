@@ -201,8 +201,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseCrashlytics crashlytics;
     private int todaysgoodtextsize;
     private int showcount = 0;
-    private long myranking;
     private TextView tvmyrankscore;
+    private String rank;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -1138,6 +1138,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 pieChart.setDescription("");
                 pieChart.setAlpha(0.8f);
                 pieChart.setCenterText("습관\n비중\n" + String.format("%.2f", percentage) + "%");
+                pieChart.setCenterTextSize(20);
+                pieChart.setCenterTextColor(Color.parseColor("#A4193D"));
             }
 
             savefieldtofirebase(percentage);
@@ -1314,8 +1316,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         todayitemsize = pref.getInt("todayitemsize", 0);
         long stoptime = pref.getLong("stoptime", 0);
-        myranking = pref.getLong("myranking", 0);
-        tvmyrankscore.setText(myranking+"");
+        rank = pref.getString("rank", null);
+        tvmyrankscore.setText(rank+"");
         showcount = pref.getInt("showcount", 0);
 
         timegap = (int)((now-stoptime)/1000);
@@ -1662,11 +1664,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        long reserve = resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY ;
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY
+        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY ));
 
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
     }

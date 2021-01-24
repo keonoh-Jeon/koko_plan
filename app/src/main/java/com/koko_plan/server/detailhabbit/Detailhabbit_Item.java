@@ -7,6 +7,7 @@ public class Detailhabbit_Item
     private String date;
     private int progress;
     private int curtime;
+    private int curcount;
     private int totalsec;
     private float average;
 
@@ -20,6 +21,15 @@ public class Detailhabbit_Item
     public int getProgress()
     {
         return progress;
+    }
+
+    public void setCurcount(int curcount)
+    {
+        this.curcount = curcount;
+    }
+    public int getCurcount()
+    {
+        return curcount;
     }
 
     public void setCurtime(int curtime)

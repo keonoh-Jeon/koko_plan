@@ -142,6 +142,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                             assert fromdate != null;
                                             fromcal.setTime(fromdate);
                                             daygap = (tocal.getTimeInMillis() - fromcal.getTimeInMillis())/86400000;
+                                            if(daygap==0) daygap = 1;
                                             tvduedate.setText(" +" + daygap + "day ");
                                         } catch (ParseException e) {
                                             e.printStackTrace();

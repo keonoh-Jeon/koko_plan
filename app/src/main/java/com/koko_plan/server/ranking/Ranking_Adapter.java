@@ -194,6 +194,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             dayformat = new SimpleDateFormat("yyyy-MM-dd");
                             time = timeformat.format(date);
+                            Log.e(TAG, "onClick: "+ time);
                             day = dayformat.format(date);
 
                             RandomGoodText.make(context, filterList.get(pos).getId(), day, time);

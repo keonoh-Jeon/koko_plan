@@ -71,14 +71,15 @@
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_height="match_parent">
 
-                        <com.github.mikephil.charting.charts.PieChart
-                            android:id="@+id/piechart"
-                            android:layout_marginTop="20dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            tools:ignore="ScrollViewSize" />
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/piechart"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="20dp"
+                                tools:ignore="ScrollViewSize" />
+                        </com.github.mikephil.charting.charts.LineChart>
 
                         <!--<com.github.mmin18.widget.RealtimeBlurView
                             android:layout_width="match_parent"
@@ -174,6 +175,7 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_msg"
                             android:layout_margin="10dp"

@@ -68,28 +68,121 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/colorPrimaryDark"/>
 
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="9">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_totlahabbitlist"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:nestedScrollingEnabled="false">
-            </androidx.recyclerview.widget.RecyclerView>
-
-
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:orientation="horizontal"
+                tools:ignore="RtlHardcoded">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="하루의 "
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_percentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" %"
+                    android:textStyle="bold"
+                    android:textColor="#3F51B5"
+                    android:textSize="25sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 에 해당하는,"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                tools:ignore="RtlHardcoded">
+
+                <TextView
+                    android:id="@+id/tv_todaytarget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="목표 시간"
+                    android:textSize="25sp"
+                    android:textColor="#00BCD4"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 동안 습관 형성에 할당 중"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6.7">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="5dp"
+                tools:ignore="ObsoleteLayoutParam">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_totlahabbitlist"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:nestedScrollingEnabled="false"
+                    tools:ignore="UnusedAttribute">
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20sp"
+                    android:text="대기 중 습관"
+                    android:textStyle="italic"
+                    android:textColor="#7C7C7C"
+                    tools:ignore="HardcodedText,RtlHardcoded" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_totlahabbitlistforready"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:nestedScrollingEnabled="false"
+                    tools:ignore="UnusedAttribute">
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
             android:gravity="bottom">
 
             <com.google.android.gms.ads.AdView

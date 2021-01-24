@@ -117,14 +117,13 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
 
         viewHolder.habbitdate.setText(detailhabbitItems.get(i).getDate());
 
-        sectotime(detailhabbitItems.get(i).getCurtime(), viewHolder.tvcurtime);
-        sectotime(detailhabbitItems.get(i).getTotalsec(), viewHolder.tvtotalsec);
+        sectotime(detailhabbitItems.get(i).getCurcount(), detailhabbitItems.get(i).getCurtime(), detailhabbitItems.get(i).getTotalsec(), viewHolder.tvcurtime);
+        sectotime(detailhabbitItems.get(i).getCurcount(), detailhabbitItems.get(i).getTotalsec(), detailhabbitItems.get(i).getTotalsec(), viewHolder.tvtotalsec);
 
         double progress = (double)detailhabbitItems.get(i).getCurtime() / (double)detailhabbitItems.get(i).getTotalsec() * 100.0;
         viewHolder.tvprogress.setText(String.format("%.1f", progress) + " %");
 
         progressBar.setProgress((int) progress);
-
     }
 
     @Override
@@ -138,11 +137,15 @@ public class Detailhabbit_Adapter extends RecyclerView.Adapter<Detailhabbit_Adap
         detailhabbitItems.add(detailhabbitItem);
     }
 
-    @SuppressLint("DefaultLocale")
-    private void sectotime(int curtime, TextView tvcurtime){
-        long second = (long) curtime % 60;
-        long minute = ((long) curtime / 60) % 60;
-        long hour = ((long) curtime / 3600) % 24;
-        tvcurtime.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void sectotime(int curcount, int curtime, int totalsec, TextView view){
+        if(curcount > 1) {
+            view.setText((String.format("%.0f",curtime/(totalsec/(double)curcount)) + "회"));
+        } else {
+            long second = (long) curtime % 60;
+            long minute = ((long) curtime / 60) % 60;
+            long hour = ((long) curtime / 3600) % 24;
+            view.setText(String.format("%02d:%02d:%02d", hour, minute, second));
+        }
     }
 }
