@@ -253,7 +253,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         Paint p2 = new Paint();
                         String text = "상세 보기";
                         p2.setColor(Color.parseColor("#DAA03D"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -274,7 +274,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         Paint p2 = new Paint();
                         String text = "삭제";
                         p2.setColor(Color.parseColor("#295F2E"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -378,7 +378,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         Paint p2 = new Paint();
                         String text = "상세 보기";
                         p2.setColor(Color.parseColor("#DAA03D"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -399,7 +399,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         Paint p2 = new Paint();
                         String text = "삭제";
                         p2.setColor(Color.parseColor("#295F2E"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();

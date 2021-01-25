@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String selecteddata;
     private Date date, today, selected;
     private AppUpdateManager appUpdateManager;
-    private ImageView nav_header_photo_image, ivTrophy;
+    private ImageView nav_header_photo_image, ivTrophy, ivgetcount;
     private Calendar calendar;
     private HorizontalCalendar horizontalCalendar;
     private PieChart pieChart;
@@ -634,7 +634,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_header_mail_text.setText(email + " ");
         probitmap();
 
+        ivgetcount = findViewById(R.id.iv_getcount);
         ivTrophy = findViewById(R.id.iv_trophy);
+
         tvmyrankscore = findViewById(R.id.tv_myrankscore);
 
         tvgetcount= findViewById(R.id.tv_getcount);
@@ -911,6 +913,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
+        ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, 3300));
 
         btnsavelist.setVisibility(View.GONE);
         btnsavelist.setOnClickListener(v -> {
@@ -988,56 +991,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void listenerDoc(){
 
-        if(firebaseUser != null) {
-            firebaseFirestore
-                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                    .document(firebaseUser.getUid())
-                    .collection("messages")
-                    .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
-//                    .whereEqualTo("day", selecteddata) // 파이어베이스 쿼리 해당 필드 필터
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
 
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+                        if (firebaseUser != null) {
+                            firebaseFirestore
+                                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                                    .document(firebaseUser.getUid())
+                                    .collection("messages")
+                                    .orderBy("time", Query.Direction.DESCENDING) // 파이어베이스 쿼리 정렬
 
-                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot snapshots,
-                                            @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w("listen:error", e);
-                                return;
-                            }
-
-                            assert snapshots != null;
-                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        Log.w("ADDED", "Data: " + dc.getDocument().getData());
-                                        goodText_items.add(goodText_items.size(), dc.getDocument().toObject(GoodText_Item.class));
-                                        goodtextsize.setText(goodText_items.size() + "개");
-                                        if(Objects.equals(dc.getDocument().getData().get("day"), todaydate)) {
-                                            todaysgoodtextsize ++;
-                                            Log.e(TAG, "onEvent: " + "오늘 받은 명언" + todaysgoodtextsize);
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                        @SuppressLint("SetTextI18n")
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                                    goodText_items.add(document.toObject(GoodText_Item.class));
+                                                    goodtextsize.setText(goodText_items.size() + "개");
+                                                    if(Objects.equals(document.getData().get("day"), todaydate)) {
+                                                        todaysgoodtextsize ++;
+                                                    }
+                                                }
+                                            } else {
+                                                Log.d(TAG, "Error getting documents: ", task.getException());
+                                            }
+                                            goodText_adapter.notifyDataSetChanged();
                                         }
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case MODIFIED:
-                                        Log.w("MODIFIED", "Data: " + dc.getDocument().getData());
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case REMOVED:
-                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
-                                    goodtextsize.setText(goodText_items.size()-1 + "개");
-                                        break;
-                                }
-                            }
-                            goodText_adapter.notifyDataSetChanged();
-
+                                    });
                         }
-                    });
-        }
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
@@ -1617,6 +1610,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     goodText_items.remove(position);
+                                                    goodtextsize.setText(goodText_items.size()+ "개");
                                                     goodText_adapter.notifyItemRemoved(position);
                                                 }
                                             })
@@ -1641,7 +1635,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
                                     @Override
                                     public void run() {
-
                                         // 현재 날짜 구하기
                                         date = new Date();
                                         //날짜 표시 형식 지정
@@ -1651,7 +1644,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         day = dayformat.format(date);
 
                                         RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time);
-                                        goodText_adapter.notifyDataSetChanged();
+                                        goodText_adapter.notifyItemChanged(position);
                                     }
                                 });
                             }

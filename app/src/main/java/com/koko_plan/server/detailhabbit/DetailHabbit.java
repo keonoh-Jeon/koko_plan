@@ -147,7 +147,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                         } catch (ParseException e) {
                                             e.printStackTrace();
                                         }
-
                                         tvcountsum.setText(" " + document.getData().get("countsum") + "회 ");
 
                                         long curtimesum = (long) document.getData().get("curtimesum");
@@ -161,16 +160,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                         long m = (average / 60) % 60;
                                         long h = (average / 3600) % 24;
                                         tvaverage.setText(h+"시간 "+ m+"분 " +s+"초");
-
-                                        /*long count = (long) document.getData().get("count");
-                                        tv1count.setText(Long.toString(count) + "회 씩");
-
-                                        long h = (long) document.getData().get("hour");
-                                        long m = (long) document.getData().get("min");
-                                        long s = (long) document.getData().get("sec");
-                                        tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
-*/
-
                                     } else {
                                         Log.d(TAG, "No such document");
                                     }
@@ -181,7 +170,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                         }
                     });
         }).start();
-
     }
 
     @Override

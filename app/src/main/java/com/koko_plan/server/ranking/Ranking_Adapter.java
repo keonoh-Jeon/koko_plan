@@ -154,6 +154,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
         TextView totalsecview = null;
         TextView progressview = null;
         TextView tvgetcountview = null;
+        ImageView ivlikeitview = null;
 
         TextView clubaver = null;
         TextView clubdist = null;
@@ -167,8 +168,9 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
             totalsecview = (TextView)view.findViewById(R.id.rk_totalsec);
             progressview = (TextView)view.findViewById(R.id.rk_progress);
             tvgetcountview = (TextView)view.findViewById(R.id.tv_getcount);
+            ivlikeitview = (ImageView) view.findViewById(R.id.iv_cheerup);
 
-            view.setOnClickListener(new View.OnClickListener() {
+            ivlikeitview.setOnClickListener(new View.OnClickListener() {
 
                 private Date date;
                 private String time, day;

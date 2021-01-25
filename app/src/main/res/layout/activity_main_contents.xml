@@ -34,7 +34,6 @@
                         android:layout_height="wrap_content"
                         app:textColorNormal="#FFFFFF"
                         android:background="#23DDCB"/>
-
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -149,6 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
@@ -156,6 +156,7 @@
                             android:textSize="15sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+
                             tools:ignore="HardcodedText" />
 
                         <TextView
@@ -165,6 +166,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:ignore="HardcodedText" />
+
+                        <ImageView
+                            android:layout_marginLeft="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/like_heart2"/>
 
                     </LinearLayout>
 
