@@ -31,7 +31,10 @@ public class RandomGoodText {
         DocumentReference documentReference = firebaseFirestore
                 .collection("randomsource")
                 .document("goodtexts");
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+        documentReference
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -43,7 +46,6 @@ public class RandomGoodText {
                             text = (String) document.get(randomnum);
                             CustomToastMaker.show(context, text);
                             SetMsgToUsers.send(day, time, text, userid);
-                            SetMsgToUsers2.send(userid);
                         } else {
                             Log.d(TAG, "No such document");
                         }

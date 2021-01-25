@@ -154,7 +154,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                         long second = curtimesum % 60;
                                         long minute = (curtimesum / 60) % 60;
                                         long hour = (curtimesum / 3600) % 24;
-                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second)+ "동안 ");
+                                        tvcurtimesum.setText(String.format("%02d:%02d:%02d", hour, minute, second));
 
                                         long average = curtimesum / daygap;
                                         long s = average % 60;

@@ -194,16 +194,16 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             dayformat = new SimpleDateFormat("yyyy-MM-dd");
                             time = timeformat.format(date);
-                            Log.e(TAG, "onClick: "+ time);
                             day = dayformat.format(date);
 
                             RandomGoodText.make(context, filterList.get(pos).getId(), day, time);
                             filterList.get(pos).setGetcount(filterList.get(pos).getGetcount()+1);
 
                             Map<String, Object> data = new HashMap<>();
-                            data.put("getcount", filterList.get(pos).getGetcount()+1);
+                            data.put("getcount", filterList.get(pos).getGetcount());
                             firebaseFirestore
-                                    .collection("users").document(firebaseUser.getUid())
+                                    .collection("users")
+                                    .document(filterList.get(pos).getId())
                                     .set(data, SetOptions.merge());
 
                             getItemId();

@@ -238,9 +238,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //객체 초기화
         InitializeView();
 
-        // 현재 날짜 구하기
-        gettodaydate();
-
         initSwipe2();
 
 //        HabbitTodayListmaker();
@@ -856,8 +853,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     Paint pnt2 = new Paint();
                                                     pnt2.setAntiAlias(true);
                                                     pnt2.setColor(Color.RED);
-                                                    pnt2.setTextSize(30);
-                                                    canvas.drawText(st, 0, canvas.getHeight() - 10, pnt2);
+                                                    pnt2.setTextSize(20);
+                                                    canvas.drawText(st, canvas.getWidth()*1/4, canvas.getHeight() - 10, pnt2);
                                                 }
 
                                                 @Override
@@ -1304,6 +1301,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        // 현재 날짜 구하기
+        gettodaydate();
+
         getdocforgetlike();
 
         todaysgoodtextsize = 0;
@@ -1316,14 +1316,113 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         todayitemsize = pref.getInt("todayitemsize", 0);
         long stoptime = pref.getLong("stoptime", 0);
-        rank = pref.getString("rank", null);
+        rank = pref.getString("rank", "");
+        float rankscore = pref.getFloat("rankscore", 100);
         tvmyrankscore.setText(rank+"");
+        settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
-
         timegap = (int)((now-stoptime)/1000);
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
+    }
+
+    private void settrophyimage(float rankscore) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    private Drawable drawable;
+
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+                        drawable = getResources().getDrawable(R.drawable.iron);
+                        if(rankscore<=99.94) {
+                            drawable = getResources().getDrawable(R.drawable.iron);
+                            if (rankscore <= 99.64) {
+                                drawable = getResources().getDrawable(R.drawable.iron);
+                                if (rankscore <= 98.94) {
+                                    drawable = getResources().getDrawable(R.drawable.iron);
+                                    if (rankscore <= 97.93) {
+                                        drawable = getResources().getDrawable(R.drawable.bronze);
+                                        if (rankscore <= 95.53) {
+                                            drawable = getResources().getDrawable(R.drawable.bronze);
+                                            if (rankscore <= 92.78) {
+                                                drawable = getResources().getDrawable(R.drawable.bronze);
+                                                if (rankscore <= 88.73) {
+                                                    drawable = getResources().getDrawable(R.drawable.bronze);
+                                                    if (rankscore <= 82.76) {
+                                                        drawable = getResources().getDrawable(R.drawable.silver);
+                                                        if (rankscore <= 73.61) {
+                                                            drawable = getResources().getDrawable(R.drawable.silver);
+                                                            if (rankscore <= 66.31) {
+                                                                drawable = getResources().getDrawable(R.drawable.silver);
+                                                                if (rankscore <= 57.53) {
+                                                                    drawable = getResources().getDrawable(R.drawable.silver);
+                                                                    if (rankscore <= 50.21) {
+                                                                        drawable = getResources().getDrawable(R.drawable.gold);
+                                                                        if (rankscore <= 36.76) {
+                                                                            drawable = getResources().getDrawable(R.drawable.gold);
+                                                                            if (rankscore <= 29.14) {
+                                                                                drawable = getResources().getDrawable(R.drawable.gold);
+                                                                                if (rankscore <= 22.53) {
+                                                                                    drawable = getResources().getDrawable(R.drawable.gold);
+                                                                                    if (rankscore <= 18.36) {
+                                                                                        drawable = getResources().getDrawable(R.drawable.platinum);
+                                                                                        if (rankscore <= 10.58) {
+                                                                                            drawable = getResources().getDrawable(R.drawable.platinum);
+                                                                                            if (rankscore <= 7.58) {
+                                                                                                drawable = getResources().getDrawable(R.drawable.platinum);
+                                                                                                if (rankscore <= 5.59) {
+                                                                                                    drawable = getResources().getDrawable(R.drawable.platinum);
+                                                                                                    if (rankscore <= 3.67) {
+                                                                                                        drawable = getResources().getDrawable(R.drawable.diamond);
+                                                                                                        if (rankscore <= 1.45) {
+                                                                                                            drawable = getResources().getDrawable(R.drawable.diamond);
+                                                                                                            if (rankscore <= 0.68) {
+                                                                                                                drawable = getResources().getDrawable(R.drawable.diamond);
+                                                                                                                if (rankscore <= 0.31) {
+                                                                                                                    drawable = getResources().getDrawable(R.drawable.diamond);
+                                                                                                                    if (rankscore <= 0.11) {
+                                                                                                                        drawable = getResources().getDrawable(R.drawable.master);
+                                                                                                                        if (rankscore <= 0.06) {
+                                                                                                                            drawable = getResources().getDrawable(R.drawable.g_master);
+                                                                                                                            if (rankscore <= 0.02) {
+                                                                                                                                drawable = getResources().getDrawable(R.drawable.challenger);
+
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        ivTrophy.setImageDrawable(drawable);
+                    }
+                });
+            }
+        }).start();
     }
 
     private void getdocforgetlike() {
@@ -1422,7 +1521,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Paint p2 = new Paint();
                         String text = "상세 보기";
                         p2.setColor(Color.parseColor("#DAA03D"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -1444,7 +1543,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Paint p2 = new Paint();
                         String text = "삭제";
                         p2.setColor(Color.parseColor("#295F2E"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -1583,7 +1682,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Paint p2 = new Paint();
                         String text = "명언 답장";
                         p2.setColor(Color.parseColor("#5CC8D7"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();
@@ -1604,7 +1703,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Paint p2 = new Paint();
                         String text = "삭제";
                         p2.setColor(Color.parseColor("#295F2E"));
-                        p2.setTextSize(30);
+                        p2.setTextSize(20);
                         p2.setAntiAlias(true);
                         //텍스트 높이
                         Rect bounds = new Rect();

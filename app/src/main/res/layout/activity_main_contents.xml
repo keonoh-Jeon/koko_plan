@@ -50,9 +50,10 @@
 
                 <TextView
                     android:text="하루 중, 습관 비중 추이"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:fontFamily="@font/elandchoice"
                     android:textColor="#FF9800"
+                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -76,8 +77,8 @@
                             <com.github.mikephil.charting.charts.PieChart
                                 android:id="@+id/piechart"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_marginTop="20dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="10dp"
                                 tools:ignore="ScrollViewSize" />
                         </com.github.mikephil.charting.charts.LineChart>
 
@@ -107,9 +108,10 @@
 
                 <TextView
                     android:text="월간 성취율"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:fontFamily="@font/elandchoice"
                     android:textColor="#3162C7"
+                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"

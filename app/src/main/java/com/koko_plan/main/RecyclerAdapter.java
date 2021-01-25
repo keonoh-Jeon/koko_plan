@@ -538,16 +538,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
             int curcount = todoListItems.get(index).getCurcount();
-
             int countsum = todoListItems.get(index).getCountsum();
+            int curtimesum = todoListItems.get(index).getCurtimesum();
             if(todoListItems.get(index).getCurcount()<todoListItems.get(index).getCount()){
                 curcount = curcount + 1;
                 countsum = countsum + 1;
+                curtimesum = curtimesum + unitsec;
             } else {
                 curcount = 0;
             }
             int finalCountsum = countsum;
             int finalCurcount = curcount;
+            int finalUnitsec = unitsec;
+            int finalCurtimesum = curtimesum;
             new Thread(() -> {
                 //나머지 항목 전부 일시 정지
                 for(int i=0; i<index; i++){
@@ -573,12 +576,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 todoListItems.get(index).setCurcount(finalCurcount);
                 todoListItems.get(index).setCountsum(finalCountsum);
-                todoListItems.get(index).setCurtime(finalCurcount * unitsec);
+                todoListItems.get(index).setCurtime(finalCurcount * finalUnitsec);
+                todoListItems.get(index).setCurtimesum(finalCurtimesum);
 
                 Map<String, Object> data = new HashMap<>();
                 data.put("curcount", finalCurcount);
-                data.put("curtime", finalCurcount * unitsec);
+                data.put("curtime", finalCurcount * finalUnitsec);
                 data.put("countsum", finalCountsum);
+                data.put("curtimesum", finalCurtimesum);
 
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
@@ -591,16 +596,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editMinus() {
             timegap = 0;
             int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
-
             int curcount = todoListItems.get(index).getCurcount();
             int countsum = todoListItems.get(index).getCountsum();
+            int curtimesum = todoListItems.get(index).getCurtimesum();
             if(curcount > 0) {
                 curcount = curcount - 1;
                 countsum = countsum - 1;
+                curtimesum = curtimesum - unitsec;
             }
 
             int finalCountsum = countsum;
             int finalCurcount = curcount;
+            int finalCurtimesum = curtimesum;
             new Thread(() -> {
 
                 for(int i=0; i<index; i++){
@@ -628,11 +635,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 todoListItems.get(index).setCurcount(finalCurcount);
                 todoListItems.get(index).setCountsum(finalCountsum);
                 todoListItems.get(index).setCurtime(finalCurcount * unitsec);
+                todoListItems.get(index).setCurtimesum(finalCurtimesum);
 
                 Map<String, Object> data = new HashMap<>();
                 data.put("curcount", finalCurcount);
                 data.put("curtime", finalCurcount * unitsec);
                 data.put("countsum", finalCountsum);
+                data.put("curtimesum", finalCurtimesum);
 
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())

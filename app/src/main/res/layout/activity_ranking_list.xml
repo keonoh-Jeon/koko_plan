@@ -43,7 +43,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_gravity="center"
@@ -75,8 +75,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1.7">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -131,7 +132,7 @@
 
                 <ImageView
                     android:id="@+id/iv_rank"
-                    android:src="@drawable/rank_trophy"
+                    android:layout_margin="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -226,10 +227,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:textColor="#50586C"
             android:layout_margin="10dp"
-            android:gravity="bottom"
+            android:gravity="center|left"
+            android:layout_gravity="center"
             android:textSize="10sp"
             android:text="'좋아요' 버튼을 눌러 서로의 습관 실천을 응원(명언선물)하세요.
                             \n
@@ -239,8 +241,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:gravity="bottom">
 
             <com.google.android.gms.ads.AdView

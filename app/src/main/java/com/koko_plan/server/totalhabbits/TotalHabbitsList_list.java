@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,29 +28,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.R;
-import com.koko_plan.main.EditHabbit;
-import com.koko_plan.main.TodoList_Item;
 import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.main.MainActivity;
-import com.koko_plan.server.goodtext.SetMsgToUsers;
-import com.koko_plan.server.goodtext.SetMsgToUsers2;
-import com.koko_plan.sub.CustomToastMaker;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.sub.MySoundPlayer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -63,7 +65,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     private Context context = null;
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
-
+    private ImageView ivrank;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -166,6 +168,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @SuppressLint("SetTextI18n")
     private void initView()
     {
+        ivrank = findViewById(R.id.iv_rank);
+
         ranking_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -177,7 +181,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         rankingAdapter = new Ranking_Adapter(ranking_items, this, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(rankingAdapter);
-
 
         tvmyrank = findViewById(R.id.tv_myrank);
         tvranking = findViewById(R.id.tv_ranking);
@@ -204,10 +207,11 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
+                    private Drawable drawable;
                     private int myrank;
 
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                    @SuppressLint("SetTextI18n")
+                    @SuppressLint({"SetTextI18n", "DefaultLocale"})
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -224,7 +228,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                 rankingAdapter.notifyDataSetChanged();
                             }
 
-                            tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + myrank/(double)ranking_items.size()*100.0+"%에 속합니다. )");
+                            tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + String.format("%.2f", myrank/(double)ranking_items.size()*100.0)+"% 에 속합니다. )");
                             putrankimage(myrank/(double)ranking_items.size()*100.0);
                             editor.putLong("myranking", (long) (myrank/(double)ranking_items.size()*100.0));
                             editor.apply();
@@ -232,117 +236,133 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    private void putrankimage(double rankscore) {
 
-                    @SuppressLint("SetTextI18n")
-                    private void putrankimage(double v) {
-                        new Thread(() -> {
-                            tvranking.setText("Iron 4");
-                            editor.putString("rank", "Iron 4");
-                            if(v<=99.94) {
-                                tvranking.setText("Iron 3");
-                                editor.putString("rank", "Iron 3");
-                                if (v <= 99.64) {
-                                    tvranking.setText("Iron 2");
-                                    editor.putString("rank", "Iron 2");
-                                    if (v <= 98.94) {
-                                        tvranking.setText("Iron 1");
-                                        editor.putString("rank", "Iron 1");
-                                        if (v <= 97.93) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    private Drawable drawable;
+
+                                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                                    @Override
+                                    public void run() {
+                                        if(99.94 < rankscore && rankscore <= 100) {
+                                            tvranking.setText("Iron 4");
+                                            drawable = getResources().getDrawable(R.drawable.iron);
+                                            editor.putString("rank", "Iron 4");
+                                        } else if(99.64 < rankscore && rankscore <= 99.94) {
+                                            tvranking.setText("Iron 3");
+                                            drawable = getResources().getDrawable(R.drawable.iron);
+                                            editor.putString("rank", "Iron 3");
+                                        } else if (98.94 < rankscore && rankscore <= 99.64) {
+                                            tvranking.setText("Iron 2");
+                                            drawable = getResources().getDrawable(R.drawable.iron);
+                                            editor.putString("rank", "Iron 2");
+                                        } else if (97.93 < rankscore && rankscore <= 98.94) {
+                                            tvranking.setText("Iron 1");
+                                            drawable = getResources().getDrawable(R.drawable.iron);
+                                            editor.putString("rank", "Iron 1");
+                                        } else if (95.53 < rankscore && rankscore <= 97.93) {
                                             tvranking.setText("Bronze 4");
+                                            drawable = getResources().getDrawable(R.drawable.bronze);
                                             editor.putString("rank", "Bronze 4");
-                                            if (v <= 95.53) {
-                                                tvranking.setText("Bronze 3");
-                                                editor.putString("rank", "Bronze 3");
-                                                if (v <= 92.78) {
-                                                    tvranking.setText("Bronze 2");
-                                                    editor.putString("rank", "Bronze 2");
-                                                    if (v <= 88.73) {
-                                                        tvranking.setText("Bronze 1");
-                                                        editor.putString("rank", "Bronze 1");
-                                                        if (v <= 82.76) {
-                                                            tvranking.setText("Silver 4");
-                                                            editor.putString("rank", "Silver 4");
-                                                            if (v <= 73.61) {
-                                                                tvranking.setText("Silver 3");
-                                                                editor.putString("rank", "Silver 3");
-                                                                if (v <= 66.31) {
-                                                                    tvranking.setText("Silver 2");
-                                                                    editor.putString("rank", "Silver 2");
-                                                                    if (v <= 57.53) {
-                                                                        tvranking.setText("Silver 1");
-                                                                        editor.putString("rank", "Silver 1");
-                                                                        if (v <= 50.21) {
-                                                                            tvranking.setText("Gold 4");
-                                                                            editor.putString("rank", "Gold 4");
-                                                                            if (v <= 36.76) {
-                                                                                tvranking.setText("Gold 3");
-                                                                                editor.putString("rank", "Gold 3");
-                                                                                if (v <= 29.14) {
-                                                                                    tvranking.setText("Gold 2");
-                                                                                    editor.putString("rank", "Gold 2");
-                                                                                    if (v <= 22.53) {
-                                                                                        tvranking.setText("Gold 1");
-                                                                                        editor.putString("rank", "Gold 1");
-                                                                                        if (v <= 18.36) {
-                                                                                            tvranking.setText("Platinum 4");
-                                                                                            editor.putString("rank", "Platinum 4");
-                                                                                            if (v <= 10.58) {
-                                                                                                tvranking.setText("Platinum 3");
-                                                                                                editor.putString("rank", "Platinum 3");
-                                                                                                if (v <= 7.58) {
-                                                                                                    tvranking.setText("Platinum 2");
-                                                                                                    editor.putString("rank", "Platinum 2");
-                                                                                                    if (v <= 5.59) {
-                                                                                                        tvranking.setText("Platinum 1");
-                                                                                                        editor.putString("rank", "Platinum 1");
-                                                                                                        if (v <= 3.67) {
-                                                                                                            tvranking.setText("Diamond 4");
-                                                                                                            editor.putString("rank", "Diamond 4");
-                                                                                                            if (v <= 1.45) {
-                                                                                                                tvranking.setText("Diamond 3");
-                                                                                                                editor.putString("rank", "Diamond 3");
-                                                                                                                if (v <= 0.68) {
-                                                                                                                    tvranking.setText("Diamond 2");
-                                                                                                                    editor.putString("rank", "Diamond 2");
-                                                                                                                    if (v <= 0.31) {
-                                                                                                                        tvranking.setText("Diamond 1");
-                                                                                                                        editor.putString("rank", "Diamond 1");
-                                                                                                                        if (v <= 0.11) {
-                                                                                                                            tvranking.setText("Master");
-                                                                                                                            editor.putString("rank", "Master");
-                                                                                                                            if (v <= 0.06) {
-                                                                                                                                tvranking.setText("G_Master");
-                                                                                                                                editor.putString("rank", "G_Master");
-                                                                                                                                if (v <= 0.02) {
-                                                                                                                                    tvranking.setText("Challenger");
-                                                                                                                                    editor.putString("rank", "Challenger");
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                        } else if (92.78 < rankscore && rankscore <= 95.53) {
+                                            tvranking.setText("Bronze 3");
+                                            drawable = getResources().getDrawable(R.drawable.bronze);
+                                            editor.putString("rank", "Bronze 3");
+                                        } else if (88.73 < rankscore && rankscore <= 92.78) {
+                                            tvranking.setText("Bronze 2");
+                                            drawable = getResources().getDrawable(R.drawable.bronze);
+                                            editor.putString("rank", "Bronze 2");
+                                        } else if (82.76 < rankscore && rankscore <= 88.73) {
+                                            tvranking.setText("Bronze 1");
+                                            drawable = getResources().getDrawable(R.drawable.bronze);
+                                            editor.putString("rank", "Bronze 1");
+                                        } else if (73.61 < rankscore && rankscore <= 82.76) {
+                                            tvranking.setText("Silver 4");
+                                            drawable = getResources().getDrawable(R.drawable.silver);
+                                            editor.putString("rank", "Silver 4");
+                                        } else if (66.31 < rankscore && rankscore <= 73.61) {
+                                            tvranking.setText("Silver 3");
+                                            drawable = getResources().getDrawable(R.drawable.silver);
+                                            editor.putString("rank", "Silver 3");
+                                        } else if (57.53 < rankscore && rankscore <= 66.31) {
+                                            tvranking.setText("Silver 2");
+                                            drawable = getResources().getDrawable(R.drawable.silver);
+                                            editor.putString("rank", "Silver 2");
+                                        } else if (50.21 < rankscore && rankscore <= 57.53) {
+                                            tvranking.setText("Silver 1");
+                                            drawable = getResources().getDrawable(R.drawable.silver);
+                                            editor.putString("rank", "Silver 1");
+                                        } else if (36.76 < rankscore && rankscore <= 50.21) {
+                                            tvranking.setText("Gold 4");
+                                            drawable = getResources().getDrawable(R.drawable.gold);
+                                            editor.putString("rank", "Gold 4");
+                                        } else if (29.14 < rankscore && rankscore <= 36.76) {
+                                            tvranking.setText("Gold 3");
+                                            drawable = getResources().getDrawable(R.drawable.gold);
+                                            editor.putString("rank", "Gold 3");
+                                        } else if (22.53 < rankscore && rankscore <= 29.14) {
+                                            tvranking.setText("Gold 2");
+                                            drawable = getResources().getDrawable(R.drawable.gold);
+                                            editor.putString("rank", "Gold 2");
+                                        } else if (18.36 < rankscore && rankscore <= 22.53) {
+                                            tvranking.setText("Gold 1");
+                                            drawable = getResources().getDrawable(R.drawable.gold);
+                                            editor.putString("rank", "Gold 1");
+                                        } else if (10.58 < rankscore && rankscore <= 18.36) {
+                                            tvranking.setText("Platinum 4");
+                                            drawable = getResources().getDrawable(R.drawable.platinum);
+                                            editor.putString("rank", "Platinum 4");
+                                        } else if (7.58 < rankscore && rankscore <= 10.58) {
+                                            tvranking.setText("Platinum 3");
+                                            drawable = getResources().getDrawable(R.drawable.platinum);
+                                            editor.putString("rank", "Platinum 3");
+                                        } else if (5.59 < rankscore && rankscore <= 7.58) {
+                                            tvranking.setText("Platinum 2");
+                                            drawable = getResources().getDrawable(R.drawable.platinum);
+                                            editor.putString("rank", "Platinum 2");
+                                        } else if (3.67 < rankscore && rankscore <= 5.59) {
+                                            tvranking.setText("Platinum 1");
+                                            drawable = getResources().getDrawable(R.drawable.platinum);
+                                            editor.putString("rank", "Platinum 1");
+                                        } else if (1.45 < rankscore && rankscore <= 3.67) {
+                                            tvranking.setText("Diamond 4");
+                                            drawable = getResources().getDrawable(R.drawable.diamond);
+                                            editor.putString("rank", "Diamond 4");
+                                        } else if (0.68 < rankscore && rankscore <= 1.45) {
+                                            tvranking.setText("Diamond 3");
+                                            drawable = getResources().getDrawable(R.drawable.diamond);
+                                            editor.putString("rank", "Diamond 3");
+                                        } else if (0.31 < rankscore && rankscore <= 0.68) {
+                                            tvranking.setText("Diamond 2");
+                                            drawable = getResources().getDrawable(R.drawable.diamond);
+                                            editor.putString("rank", "Diamond 2");
+                                        } else if (0.11 < rankscore && rankscore <= 0.31) {
+                                            tvranking.setText("Diamond 1");
+                                            drawable = getResources().getDrawable(R.drawable.diamond);
+                                            editor.putString("rank", "Diamond 1");
+                                        } else if (0.06 < rankscore && rankscore <= 0.11) {
+                                            tvranking.setText("Master");
+                                            drawable = getResources().getDrawable(R.drawable.master);
+                                            editor.putString("rank", "Master");
+                                        } else if (0.02 < rankscore && rankscore <= 0.06) {
+                                            tvranking.setText("G_Master");
+                                            drawable = getResources().getDrawable(R.drawable.g_master);
+                                            editor.putString("rank", "G_Master");
+                                        } else if (0 < rankscore && rankscore <= 0.02) {
+                                            tvranking.setText("Challenger");
+                                            drawable = getResources().getDrawable(R.drawable.challenger);
+                                            editor.putString("rank", "Challenger");
                                         }
+                                        editor.putFloat("rankscore", (float) rankscore);
+                                        ivrank.setImageDrawable(drawable);
+                                        editor.apply();
                                     }
-                                }
+                                });
                             }
-                            editor.apply();
                         }).start();
                     }
                 });

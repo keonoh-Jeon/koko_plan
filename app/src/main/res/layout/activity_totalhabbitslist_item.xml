@@ -37,7 +37,7 @@
                     android:singleLine="true"
                     android:textStyle="bold"
                     android:textColor="#070952"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
 
@@ -48,7 +48,6 @@
                 android:layout_height="0dp"
                 android:layout_margin="3dp"
                 android:layout_weight="1">
-
 
                 <TextView
                     android:id="@+id/tv_routine"
@@ -94,7 +93,7 @@
             android:layout_gravity="bottom"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#009688"/>
+            android:background="#F67F76"/>
 
     </FrameLayout>
 
