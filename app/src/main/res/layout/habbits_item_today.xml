@@ -27,8 +27,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -37,8 +36,8 @@
                     android:hint="목록"
                     android:singleLine="true"
                     android:textStyle="bold"
+                    android:textSize="15sp"
                     android:textColor="#2196F3"
-                    android:textSize="20sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <TextView
@@ -46,8 +45,10 @@
                     android:layout_gravity="right"
                     android:gravity="right"
                     android:hint="진행율"
+                    android:textColor="#4CAF50"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:textStyle="bold"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
@@ -56,21 +57,20 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1.5">
+                android:layout_height="wrap_content">
 
 
                 <TextView
                     android:id="@+id/tv_curtime"
                     android:layout_width="0dp"
                     android:hint="진행"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:singleLine="true"
                     android:gravity="center"
+                    android:layout_gravity="center"
                     android:textStyle="bold"
                     android:textColor="#353535"
-                    android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
                 <FrameLayout
@@ -88,7 +88,7 @@
                     <ImageView
                         android:id="@+id/iv_minus"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:src="@drawable/minus"/>
 
@@ -102,21 +102,21 @@
                     <ImageView
                         android:id="@+id/iv_play"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:src="@drawable/play"/>
 
                     <ImageView
                         android:id="@+id/iv_pause"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:src="@drawable/pause"/>
 
                     <ImageView
                         android:id="@+id/iv_plus"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:src="@drawable/plus"/>
 
@@ -124,7 +124,7 @@
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:singleLine="true"
                     android:gravity="center"
@@ -137,13 +137,13 @@
                     android:id="@+id/tvTime"
                     android:layout_width="0dp"
                     android:hint="시간"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:singleLine="true"
                     android:gravity="center"
+                    android:layout_gravity="center"
                     android:textStyle="bold"
                     android:textColor="#353535"
-                    android:textSize="15sp"
                     tools:ignore="HardcodedText,NestedWeights" />
 
             </LinearLayout>

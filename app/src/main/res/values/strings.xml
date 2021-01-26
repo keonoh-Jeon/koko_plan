@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KOKO\nHabbit</string>
+    <string name="app_name">Kobbit</string>
     <string name="title_activity_maker">Maker</string>
     <string name="title_activity_field">Field</string>
     <string name="title_activity_marker">Marker</string>

@@ -260,7 +260,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.historyicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_history);
                         c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
@@ -281,7 +281,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon2);
                         c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*
@@ -385,7 +385,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.historyicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_history);
                         c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
@@ -406,7 +406,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon2);
                         c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*

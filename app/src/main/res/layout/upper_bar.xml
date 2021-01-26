@@ -26,13 +26,25 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:text="오늘의 실행 "
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:textColor="#9CC3D5"
+                    android:layout_height="wrap_content"
+                    tools:ignore="HardcodedText,SpUsage" />
+
+
+                <TextView
                     android:id="@+id/tv_todayprogress"
-                    android:text="오늘의 실행율 : "
+                    android:text=" %"
                     android:textSize="20sp"
                     android:layout_gravity="center"
                     android:layout_width="0dp"
-                    android:layout_weight="8"
-                    android:textColor="#9CC3D5"
+                    android:textStyle="bold"
+                    android:layout_weight="3"
+                    android:textColor="#CDDC39"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,SpUsage" />
 
@@ -51,6 +63,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_gravity="center"
+                    android:padding="5dp"
                     android:layout_height="wrap_content">
 
                     <ImageView
@@ -58,17 +71,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_margin="5dp"
                         android:src="@drawable/like_heart"/>
 
                     <TextView
                         android:id="@+id/tv_getcount"
                         android:text="0"
-                        android:layout_gravity="bottom|center"
+                        android:textSize="10sp"
+                        android:layout_gravity="bottom|right"
                         android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
                 </FrameLayout>
 
@@ -79,6 +92,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_gravity="center"
+                    android:padding="5dp"
                     android:layout_height="wrap_content">
 
                     <ImageView
@@ -86,17 +100,17 @@
                         android:layout_gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:src="@drawable/trophy"/>
 
                     <TextView
                         android:id="@+id/tv_myrankscore"
                         android:textColor="#FFFFFF"
                         android:text="0"
+                        android:textSize="10sp"
                         android:layout_gravity="bottom|center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText,SmallSp" />
 
                 </FrameLayout>
 

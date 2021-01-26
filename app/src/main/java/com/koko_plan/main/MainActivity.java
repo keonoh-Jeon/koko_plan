@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView recyclerView, recyclerView3;
 
     private ScrollView scrollview;
+    private RelativeLayout relativeview;
 
     public static SharedPreferences pref;
     public static SharedPreferences.Editor editor;
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TextView tvTodayProgress;
     private TextView nav_header_name_text;
-    private TextView tvgetcount;
+    private TextView tvgetcount, tvtodayget;
 
     private SimpleDateFormat timeformat, dayformat;
 
@@ -203,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int showcount = 0;
     private TextView tvmyrankscore;
     private String rank;
+    private long Back_Key_Before_Time = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -485,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                             Log.d(TAG, "Error getting documents: ", task.getException());
                                                         }
                                                         if(todoListItems.size()>0) today_progress = (long) (cur/todoListItems.size());
-                                                        tvTodayProgress.setText("오늘의 실천 : " + today_progress+ "%" );
+                                                        tvTodayProgress.setText(today_progress+ "%" );
 
                                                         piechartmaker();
                                                     }
@@ -617,6 +620,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void InitializeView() {
 
         scrollview = findViewById(R.id.scrollview);
+        relativeview = findViewById(R.id.view_relativeview);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -640,6 +644,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvmyrankscore = findViewById(R.id.tv_myrankscore);
 
         tvgetcount= findViewById(R.id.tv_getcount);
+        tvtodayget= findViewById(R.id.tv_todayget);
 
         pieChart = findViewById(R.id.piechart);
 
@@ -688,6 +693,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     class Profilebitmap extends Thread {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void run() {
 
             try{
@@ -855,7 +861,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     Paint pnt2 = new Paint();
                                                     pnt2.setAntiAlias(true);
                                                     pnt2.setColor(Color.RED);
-                                                    pnt2.setTextSize(20);
+                                                    pnt2.setTextSize(canvas.getWidth()*1/3);
                                                     canvas.drawText(st, canvas.getWidth()*1/4, canvas.getHeight() - 10, pnt2);
                                                 }
 
@@ -913,7 +919,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
-        ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, 3300));
+        ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, relativeview.getTop()));
 
         btnsavelist.setVisibility(View.GONE);
         btnsavelist.setOnClickListener(v -> {
@@ -958,7 +964,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
 
                                 if(todoListItems.size()>0) today_progress = (long) (cur/todoListItems.size());
-                                tvTodayProgress.setText("오늘의 실천 : " + today_progress+ "%" );
+                                tvTodayProgress.setText(today_progress+ "%" );
 
                                 Map<String, Object> dairyInfo = new HashMap<>();
                                 dairyInfo.put(todaydate, today_progress);
@@ -1432,6 +1438,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                            tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                         }
                     } else {
                         Log.d(TAG, "get failed with ", task.getException());
@@ -1521,7 +1528,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.historyicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_history);
                         c.drawText(text, background.centerX()-p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight , p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
 
@@ -1543,7 +1550,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon2);
                         c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*
@@ -1668,7 +1675,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (dX > 0) { //오른쪽으로 밀었을 때
                         //배경
                         Paint p = new Paint();
-                        p.setColor(Color.parseColor("#B1624E"));
+                        p.setColor(Color.parseColor("#FFFFFF"));
                         RectF background = new RectF((float) itemView.getLeft() + dX, (float) itemView.getTop(), (float) itemView.getLeft(), (float) itemView.getBottom());
                         c.drawRect(background, p);
                         //텍스트
@@ -1689,7 +1696,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else if (dX < 0) {
                         //배경
                         Paint p = new Paint();
-                        p.setColor(Color.parseColor("#FFE67C"));
+                        p.setColor(Color.parseColor("#FFFFFF"));
                         RectF background = new RectF((float) itemView.getRight() , (float) itemView.getTop(), (float) itemView.getRight() + dX, (float) itemView.getBottom());
                         c.drawRect(background, p);
                         //텍스트
@@ -1703,7 +1710,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         p2.getTextBounds(text, 0, text.length(), bounds);
                         int textheight = bounds.height();
                         //비트맵
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon);
+                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.deleteicon2);
                         c.drawText(text, background.centerX() - p2.measureText(text)/2, background.centerY() + (float)(bmp.getWidth()/2) + (float)textheight, p2);
                         c.drawBitmap(bmp, background.centerX() - (float)(bmp.getWidth()/2), background.centerY() - (float)(bmp.getHeight()/2), null);
                         /*
@@ -1763,5 +1770,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String setResetTime = format.format(new Date(resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY ));
 
         Log.e(TAG, "saveProgressAlarm: " + setResetTime);
+    }
+
+    @Override
+    public void onBackPressed() {long now = System.currentTimeMillis();
+
+        long result = now - Back_Key_Before_Time;
+        if(result < 2000)
+        {
+            finish();
+        }
+        else
+        {
+            Toast.makeText(MainActivity.this, "뒤로가기 버튼을 한번 더 누르면 종료합니다.", Toast.LENGTH_SHORT).show();
+            Back_Key_Before_Time = System.currentTimeMillis();
+        }
     }
 }

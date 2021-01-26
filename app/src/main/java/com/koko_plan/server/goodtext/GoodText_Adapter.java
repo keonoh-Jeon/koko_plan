@@ -150,7 +150,7 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
 
     //뷰 홀더 :리스트에 나타내는 항목의 내용을 세팅
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
+    @SuppressLint({"SetTextI18n", "DefaultLocale", "Range"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 
@@ -162,14 +162,12 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                 .into(viewHolder.profileview);
 
         viewHolder.timeview.setText(filterList.get(i).getTime());
-        if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
-
-        }
 
         String randomnum = String.valueOf(filterList.get(i).getRandomnum());
         DocumentReference documentReference = firebaseFirestore
                 .collection("randomsource")
                 .document("goodtexts");
+
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -190,6 +188,12 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                 }
             }
         });
+
+        if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
+            viewHolder.timeview.setTextColor(Color.parseColor("#000000"));
+            viewHolder.textview.setTextColor(Color.parseColor("#000000"));
+            viewHolder.profileview.setAlpha((float) 2.55);
+        }
     }
 
     @Override

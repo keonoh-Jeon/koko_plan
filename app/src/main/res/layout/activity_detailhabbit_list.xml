@@ -43,7 +43,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_gravity="center"
@@ -110,7 +110,7 @@
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:textStyle="bold"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textColor="#2196F3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -139,10 +139,10 @@
 
                 <TextView
                     android:id="@+id/tv_countsum"
-                    android:text="총 시행 횟수"
+                    android:text="총 시행"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="28sp"
+                    android:textSize="20sp"
                     android:textColor="#FF9800"
                     tools:ignore="HardcodedText" />
 
@@ -154,10 +154,10 @@
 
                 <TextView
                     android:id="@+id/tv_curtimesum"
-                    android:text="전체 시행 시간"
+                    android:text="전체 시간"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     tools:ignore="HardcodedText" />
 
@@ -178,7 +178,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="평균적으로 "
+                    android:text="하루 평균,  "
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -202,7 +202,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textColor="#4CAF50"
                     tools:ignore="HardcodedText" />
 
@@ -215,11 +215,6 @@
             </LinearLayout>
 
 
-
-
-
-
-
         </LinearLayout>
 
 
@@ -230,7 +225,69 @@
             android:layout_weight="9"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#DAF0F9"
+                android:paddingLeft="10sp"
+                android:paddingRight="10sp"
+                tools:ignore="DisableBaselineAlignment">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="InefficientWeight">
+
+                    <TextView
+                        android:id="@+id/tv_habbitdate"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
+                        android:hint="일자"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:textColor="#2196F3"
+                        tools:ignore="HardcodedText,NestedWeights" />
+
+
+                    <TextView
+                        android:id="@+id/tv_curtime"
+                        android:layout_width="0dp"
+                        android:hint="실천 시간"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:singleLine="true"
+                        android:gravity="center"
+                        android:textColor="#353535"
+                        tools:ignore="HardcodedText,NestedWeights" />
+
+                    <TextView
+                        android:id="@+id/tv_progress"
+                        android:layout_gravity="right"
+                        android:gravity="center"
+                        android:hint="진행율"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.5"
+                        tools:ignore="HardcodedText,RtlHardcoded" />
+
+                    <TextView
+                        android:id="@+id/tvTime"
+                        android:layout_width="0dp"
+                        android:hint="목표"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:singleLine="true"
+                        android:gravity="center"
+                        android:textColor="#353535"
+                        tools:ignore="HardcodedText,NestedWeights" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_detailhabbit"

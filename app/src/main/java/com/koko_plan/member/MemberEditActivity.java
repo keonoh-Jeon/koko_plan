@@ -139,9 +139,9 @@ public class MemberEditActivity extends AppCompatActivity {
         bitmap.setImageBitmap(MainActivity.profile);
         if(MainActivity.profile == null) {
         Bitmap bt = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-            bitmap.setImageBitmap(bt);}
-        bitmap.setBackground(new ShapeDrawable(new OvalShape()));
-        bitmap.setClipToOutline(true);
+            bitmap.setImageBitmap(bt);
+//            bitmap.setBackground(new ShapeDrawable(new OvalShape()));
+            bitmap.setClipToOutline(true);}
 
         findViewById(R.id.MemberCheckBtn).setOnClickListener(OnClickListener);
         findViewById(R.id.edit_name).setOnClickListener(OnClickListener);

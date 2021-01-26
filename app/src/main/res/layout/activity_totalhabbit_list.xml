@@ -139,14 +139,13 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="6.7">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_margin="5dp"
+                android:layout_margin="10sp"
                 tools:ignore="ObsoleteLayoutParam">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -181,7 +180,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
             android:gravity="bottom">
 
@@ -190,6 +189,7 @@
                 android:id="@+id/adView_totalhabbit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="bottom"
                 ads:adSize="BANNER"
                 ads:adUnitId="@string/google_ads_banner_api_key">
             </com.google.android.gms.ads.AdView>

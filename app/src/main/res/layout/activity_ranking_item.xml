@@ -22,17 +22,27 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="#448AFF"
-            android:textSize="15sp"
             tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/tv_ranker"
+            android:layout_weight="1.5"
+            android:layout_width="0dp"
+            android:hint="수준"
+            android:textSize="10sp"
+            android:textColor="#BC9151"
+            android:layout_height="wrap_content"
+            tools:ignore="HardcodedText,SmallSp" />
 
         <TextView
             android:id="@+id/rk_name"
             android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:hint="닉네임"
             android:textColor="#000000"
-            android:textSize="15sp"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -43,25 +53,25 @@
             android:gravity="center"
             android:hint="시간"
             android:textColor="#888A8A"
-            android:textSize="15sp"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
         <TextView
             android:id="@+id/rk_progress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:hint="성취율"
-            android:textColor="#888A8A"
-            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FF8278"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
         <FrameLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp">
+            android:layout_marginRight="10dp"
+            tools:ignore="RtlHardcoded">
 
             <ImageView
                 android:id="@+id/iv_cheerup"

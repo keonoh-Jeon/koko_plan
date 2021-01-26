@@ -216,7 +216,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                             long h = (long) document.getData().get("totalsec") / 60 / 60;
                             long m = (long) document.getData().get("totalsec") / 60 % 60;
                             long s = (long) document.getData().get("totalsec") % 60;
-                            viewHolder.tv1counttime.setText(String.format("목표 " + "%02d:%02d:%02d", h, m, s));
+                            viewHolder.tv1counttime.setText(String.format("%02d:%02d:%02d", h, m, s));
 
                         } else {
                             Log.d(TAG, "No such document");

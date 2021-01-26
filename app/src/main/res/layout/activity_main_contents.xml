@@ -141,6 +141,7 @@
                     android:layout_height="30dp"/>
 
                 <RelativeLayout
+                    android:id="@+id/view_relativeview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -156,7 +157,6 @@
                             android:textSize="15sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             tools:ignore="HardcodedText" />
 
                         <TextView
@@ -167,11 +167,32 @@
                             android:layout_height="wrap_content"
                             tools:ignore="HardcodedText" />
 
-                        <ImageView
-                            android:layout_marginLeft="10dp"
+                        <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/like_heart2"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_gravity="center"
+                            tools:ignore="RtlHardcoded">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/like_heart2"
+                                tools:ignore="RtlHardcoded" />
+
+                            <TextView
+                                android:id="@+id/tv_todayget"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="right|bottom"
+                                android:gravity="center"
+                                android:text="0"
+                                android:textSize="10sp"
+                                tools:ignore="HardcodedText" />
+
+                        </FrameLayout>
+
+
 
                     </LinearLayout>
 
