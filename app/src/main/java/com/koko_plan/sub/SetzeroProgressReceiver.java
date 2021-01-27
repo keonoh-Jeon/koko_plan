@@ -78,6 +78,7 @@ public class SetzeroProgressReceiver extends BroadcastReceiver {
 
                 Map<String, Object> getcount = new HashMap<>();
                 getcount.put("getcount", 0);
+                getcount.put("progress", 0);
 
                 firebaseFirestore
                         .collection("users")

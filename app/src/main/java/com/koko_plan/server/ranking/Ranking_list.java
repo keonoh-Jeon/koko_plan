@@ -203,12 +203,13 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         if (firebaseUser != null) {
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                    .orderBy(todaydate, Query.Direction.DESCENDING)
+                    .orderBy("progress", Query.Direction.DESCENDING)
+                    .orderBy("getcount", Query.Direction.DESCENDING)
+                    .orderBy("todaytarget", Query.Direction.DESCENDING)
 
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
-                        private Drawable drawable;
                         private int myrank;
 
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -229,7 +230,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     rankingAdapter.notifyDataSetChanged();
                                 }
 
-                                tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중에서 상위 " + String.format("%.2f", myrank/(double)ranking_items.size()*100.0)+"% 에 속합니다. )");
+                                tvtotalranker.setText("( 전체 "+ ranking_items.size()+"명 중, 상위 " + String.format("%.2f", myrank/(double)ranking_items.size()*100.0)+"% 에 속합니다. )");
                                 putrankimage(myrank/(double)ranking_items.size()*100.0);
                                 editor.putLong("myranking", (long) (myrank/(double)ranking_items.size()*100.0));
                                 editor.apply();
