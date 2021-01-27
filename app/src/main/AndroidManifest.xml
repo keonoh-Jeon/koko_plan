@@ -95,6 +95,7 @@
 
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
+        <receiver android:name=".sub.SetzeroProgressReceiver" />
 
         <activity
             android:name="com.koko_plan.server.totalhabbits.TotalHabbitsList_list"

@@ -3,6 +3,8 @@ package com.koko_plan.server.detailhabbit;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.koko_plan.R;
 import com.koko_plan.main.MainActivity;
@@ -47,6 +51,7 @@ import java.util.Objects;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
 
 public class DetailHabbit extends AppCompatActivity implements Detailhabbit_ViewListener
@@ -55,7 +60,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     private Context context = null;
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
-    private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum, tvaverage;
+    private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum, tvaverage, tvdayproaverage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -111,6 +116,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
         //파이어베이스 필드 검색
         new Thread(() -> {
+            assert detail != null;
             DocumentReference documentReference = firebaseFirestore
                     .collection("users")
                     .document(firebaseUser.getUid())
@@ -127,7 +133,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                 DocumentSnapshot document = task.getResult();
                                 if (document != null) {
                                     if (document.exists()) {
-                                        tvstartdate.setText(""+document.getData().get("start"));
+                                        tvstartdate.setText(""+ Objects.requireNonNull(document.getData()).get("start"));
 
                                         String from = todaydate;
                                         @SuppressLint("SimpleDateFormat") SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -160,6 +166,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                         long m = (average / 60) % 60;
                                         long h = (average / 3600) % 24;
                                         tvaverage.setText(h+"시간 "+ m+"분 " +s+"초");
+
                                     } else {
                                         Log.d(TAG, "No such document");
                                     }
@@ -196,6 +203,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         tvcountsum = findViewById(R.id.tv_countsum);
         tvcurtimesum = findViewById(R.id.tv_curtimesum);
         tvaverage = findViewById(R.id.tv_average);
+        tvdayproaverage = findViewById(R.id.tv_dayproaverage);
 
         detailhabbitItems = new ArrayList<>();
 
@@ -230,9 +238,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     @SuppressLint("SetTextI18n")
     private void listenerDoc(String detail){
 
-        tvdetailtitle.setText(detail + " Timeline");
+        tvdetailtitle.setText(detail + " 상세");
 
-        //파이어베이스 필드 검색
         new Thread(() -> {
             assert detail != null;
             firebaseFirestore
@@ -243,40 +250,32 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                     .collection("dates")
                     .orderBy("date", Query.Direction.DESCENDING)
 
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @SuppressLint({"SetTextI18n", "DefaultLocale"})
                         @Override
-                        public void onEvent(@Nullable QuerySnapshot snapshots,
-                                            @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w("listen:error", e);
-                                return;                        }
-
-                            assert snapshots != null;
-                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        Log.w("ADDED","Data: " + dc.getDocument().getData());
-                                        detailhabbitItems.add(detailhabbitItems.size(), dc.getDocument().toObject(Detailhabbit_Item.class));
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case MODIFIED:
-                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    maketoast("this club is already exist.");
-//                                    rankingAdapter.notifyDataSetChanged();
-                                        break;
-                                    case REMOVED:
-                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
-//                                    clubAdapter.notifyDataSetChanged();
-                                        break;
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            long cursum = 0;
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    detailhabbitItems.add(document.toObject(Detailhabbit_Item.class));
+                                    long total = (long) document.getData().get("totalsec");
+                                    cursum += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
+                                    Log.e(TAG, "onComplete: 확인 "+  document.getData().get("totalsec"));
                                 }
+                            } else {
+                                Log.d(TAG, "Error getting documents: ", task.getException());
                             }
                             detailhabbitAdapter.notifyDataSetChanged();
+
+                            long dayprogress = 0;
+                            if(detailhabbitItems.size()>0)dayprogress = (long) (cursum/detailhabbitItems.size());
+                            tvdayproaverage.setText(dayprogress+ "%" );
                         }
                     });
         }).start();
-
     }
 
     @Override

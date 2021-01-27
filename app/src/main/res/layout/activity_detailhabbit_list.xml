@@ -198,12 +198,13 @@
                     tools:ignore="HardcodedText" />
 
                 <TextView
+                    android:id="@+id/tv_dayproaverage"
                     android:text="0%"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="20sp"
-                    android:textColor="#4CAF50"
+                    android:textColor="#3F51B5"
                     tools:ignore="HardcodedText" />
 
                 <TextView

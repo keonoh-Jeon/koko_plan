@@ -104,6 +104,7 @@ import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
+import com.koko_plan.sub.SetzeroProgressReceiver;
 import com.koko_plan.sub.Utils;
 import com.koko_plan.sub.subscribe;
 
@@ -259,10 +260,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(showcount >= 10) RequestReview.show(this);
 
         saveProgressAlarm(this);
+        setzeroProgressAlarm(this);
     }
 
     private void listenerhabbitlistDoc2() {
-
         if(firebaseUser!=null){
 
             firebaseFirestore
@@ -453,8 +454,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 @Override
                                 public void run() {
                                     setdidlist();
-                                    tvTodayProgress.setText("실행한 습관이 없슴");
-
                                     //달력추가
                                     EventCalendarMaker(date);
                                     LineChartMaker();
@@ -1765,11 +1764,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
+    }
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY ));
+    //자정마다 실행 (리시버)
+    void setzeroProgressAlarm(Context context){
+        //알람 매니저 생성
+        AlarmManager setzeroProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        //리시브 받을 클래스 연결
+        Intent setzeroProgressIntent = new Intent(context, SetzeroProgressReceiver.class);
+        PendingIntent setzeroSender = PendingIntent.getBroadcast(context, 0, setzeroProgressIntent, 0);
 
-        Log.e(TAG, "saveProgressAlarm: " + setResetTime);
+        //실행 시간
+        Calendar setzeroCal = Calendar.getInstance();
+        setzeroCal.setTimeInMillis(System.currentTimeMillis());
+        setzeroCal.set(Calendar.HOUR_OF_DAY, 0);
+        setzeroCal.set(Calendar.MINUTE, 1);
+        setzeroCal.set(Calendar.SECOND, 0);
+
+        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
+        setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
+                , AlarmManager.INTERVAL_DAY, setzeroSender);
     }
 
     @Override

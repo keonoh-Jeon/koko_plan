@@ -680,8 +680,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         v.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MySoundPlayer.play(MySoundPlayer.CLICK);
-                makedialogtitle(v, holder.getAdapterPosition());
+                /*MySoundPlayer.play(MySoundPlayer.CLICK);
+                makedialogtitle(v, holder.getAdapterPosition());*/
             }
         });
         return holder;
@@ -735,8 +735,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                 .collection("users")
                                 .document(firebaseUser.getUid())
                                 .collection("total")
-                                .document(todoListItems.get(position).getHabbittitle())
-                                .set(data);
+                                .document(edittext.getText().toString())
+                                .set(data, SetOptions.merge()); 
                     }).start();
                 });
         builder.setNegativeButton("취소",

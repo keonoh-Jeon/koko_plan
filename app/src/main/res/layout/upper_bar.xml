@@ -26,11 +26,11 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:text="오늘의 실행 "
+                    android:text="오늘의 실행   "
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_weight="4"
+                    android:textSize="20sp"
+                    android:layout_width="wrap_content"
                     android:textColor="#9CC3D5"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,SpUsage" />
@@ -44,75 +44,85 @@
                     android:layout_width="0dp"
                     android:textStyle="bold"
                     android:layout_weight="3"
-                    android:textColor="#CDDC39"
+                    android:textColor="#9CC3D5"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,SpUsage" />
 
-                <Button
-                    android:id="@+id/btn_savelist"
-                    android:text="순서저장"
-                    android:background="@drawable/button_background"
-                    android:textColor="#0063B2"
-                    android:layout_gravity="center"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:ignore="HardcodedText,RtlHardcoded" />
-
-                <FrameLayout
-                    android:id="@+id/view_like"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
+                    android:gravity="right"
                     android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:id="@+id/iv_getcount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+
+                    <Button
+                        android:id="@+id/btn_savelist"
+                        android:text="순서저장"
+                        android:background="@drawable/button_background"
+                        android:textColor="#0063B2"
+                        android:layout_margin="5dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/like_heart"/>
-
-                    <TextView
-                        android:id="@+id/tv_getcount"
-                        android:text="0"
-                        android:textSize="10sp"
-                        android:layout_gravity="bottom|right"
-                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+                        tools:ignore="HardcodedText,RtlHardcoded" />
 
-                </FrameLayout>
-
-
-
-                <FrameLayout
-                    android:id="@+id/view_trophy"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/iv_trophy"
+                    <FrameLayout
+                        android:id="@+id/view_like"
+                        android:layout_width="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/trophy"/>
+                        android:padding="5dp"
+                        android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/tv_myrankscore"
-                        android:textColor="#FFFFFF"
-                        android:text="0"
-                        android:textSize="10sp"
-                        android:layout_gravity="bottom|center"
+                        <ImageView
+                            android:id="@+id/iv_getcount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/like_heart"/>
+
+                        <TextView
+                            android:id="@+id/tv_getcount"
+                            android:text="0"
+                            android:textSize="10sp"
+                            android:layout_gravity="bottom|right"
+                            android:textColor="#FFFFFF"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+
+                    </FrameLayout>
+
+
+
+                    <FrameLayout
+                        android:id="@+id/view_trophy"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:ignore="HardcodedText,SmallSp" />
+                        android:layout_gravity="center"
+                        android:padding="5dp"
+                        android:layout_height="wrap_content">
 
-                </FrameLayout>
+                        <ImageView
+                            android:id="@+id/iv_trophy"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/trophy"/>
+
+                        <TextView
+                            android:id="@+id/tv_myrankscore"
+                            android:textColor="#FFFFFF"
+                            android:text="0"
+                            android:textSize="10sp"
+                            android:layout_gravity="bottom|center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText,SmallSp" />
+
+                    </FrameLayout>
+
+
+                </LinearLayout>
+
+
 
 
 
