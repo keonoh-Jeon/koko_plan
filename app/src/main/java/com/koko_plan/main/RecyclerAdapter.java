@@ -161,6 +161,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 {
                     count++;
                     lastsec = count;
+                    Log.e(TAG, "run 확인: " + timegap);
 
                     long second = count % 60;
                     long minute = (count / 60) % 60;

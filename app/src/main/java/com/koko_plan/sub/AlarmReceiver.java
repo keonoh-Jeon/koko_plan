@@ -1,5 +1,6 @@
 package com.koko_plan.sub;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,11 +50,13 @@ public class AlarmReceiver extends BroadcastReceiver {
     private Calendar calendar;
     private SimpleDateFormat dateformat;
     private String newtoday;
+    private PowerManager.WakeLock sCpuWakeLock;
 
+    @SuppressLint({"WakelockTimeout", "InvalidWakeLockTag"})
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.e(TAG, "onReceive: " + "알람리시버");
+
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //연결되는 액티비티(돌아갈 액티비티)
@@ -97,7 +101,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setWhen(System.currentTimeMillis())
                 .setTicker("{Time to watch some cool stuff!}")
                 .setContentTitle("습관 할당 시간 100% 도달!")
-                .setContentText("'"+ pref.getString("alarmtitle", null) + "' 의 목표 시간을 달성하였습니다.")
+                .setContentText("'"+ pref.getString("alarmtitle", null) + "목표 시간을 달성하였습니다.")
                 .setContentInfo("INFO")
                 .setOngoing(true) // 사용자가 직접 못지우게 계속 실행하기.
                 .setContentIntent(pendingI) //눌렀을때 액티비티 이동
@@ -107,7 +111,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             // 노티피케이션 동작시킴
             notificationManager.notify(1234, builder.build());
-            Calendar nextNotifyTime = Calendar.getInstance();
+            /*Calendar nextNotifyTime = Calendar.getInstance();
 
             // 내일 같은 시간으로 알람시간 결정
             nextNotifyTime.add(Calendar.DATE, 1);
@@ -118,9 +122,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             Date currentDateTime = nextNotifyTime.getTime();
             String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(currentDateTime);
-            Toast.makeText(context.getApplicationContext(),"다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(),"다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();*/
         }
     }
+
 
 
 }

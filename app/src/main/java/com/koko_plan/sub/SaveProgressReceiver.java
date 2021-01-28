@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -40,10 +41,28 @@ import static com.koko_plan.main.MainActivity.todoListItems;
 public class SaveProgressReceiver extends BroadcastReceiver {
 
     private Calendar calendar = Calendar.getInstance();
+    private PowerManager.WakeLock sCpuWakeLock;
 
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint({"WakelockTimeout", "InvalidWakeLockTag","SimpleDateFormat"})
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        if (sCpuWakeLock != null) {
+            return;
+        }
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        sCpuWakeLock = pm.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                        PowerManager.ON_AFTER_RELEASE, "hi");
+
+        sCpuWakeLock.acquire();
+
+        if (sCpuWakeLock != null) {
+            sCpuWakeLock.release();
+            sCpuWakeLock = null;
+        }
+
         new Thread(() -> {
             if(firebaseUser != null){
                 firebaseFirestore

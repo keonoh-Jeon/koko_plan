@@ -218,8 +218,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Utils.setStatusBarColor(this, Utils.StatusBarColorType.GREEN_STATUS_BAR);
 
-        // 회원정보 확인 후, 상세 정보 없으면 정보 기입으로 이동
-        initprofile();
+
+        //객체 초기화
+        InitializeView();
 
         //어플 업데이트 매니저
         Appupdatemanager();
@@ -236,11 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         crashlytics.log("E/TAG: my message");
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
-        // 파이어베이스 회원 정보 모으기
-        getprofile();
-
-        //객체 초기화
-        InitializeView();
+        initprofile();
 
         initSwipe2();
 
@@ -510,11 +507,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
                 Log.e(TAG, "onCalendarScroll: "+ "스크롤");
                 timegap = 0;
-                /*if(timerTask != null)
-                {
-                    timerTask.cancel();
-                    timerTask = null;
-                }*/
             }
 
             @Override
@@ -903,16 +895,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
 
-        timegap =0;
-
-        /*roomdb.todoDao().getAll(todaydate).observe(this, new Observer<List<Todo>>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onChanged(List<Todo> data) {
-                adapter.setItem(data);
-            }
-        });*/
-
         btnPlus.setOnClickListener(v -> {
             myStartActivity(EditHabbit.class);
         });
@@ -922,7 +904,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         btnsavelist.setVisibility(View.GONE);
         btnsavelist.setOnClickListener(v -> {
-            timegap =0;
+            timegap = 0;
             resetId();
             btnsavelist.setVisibility(View.GONE);
             like.setVisibility(View.VISIBLE);
@@ -1177,17 +1159,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         timegap = 0;
         showcount++;
 
-        //해당 항목(오늘 날짜에 해당되는 아이템 리스트)을 어뎁터에 부어버림
-//        adapter.setItem(roomdb.todoDao().search(todaydate));
         todayitemsize = todoListItems.size();
-
-        editor.putInt("showcount", showcount);
-        editor.putLong("stoptime", 0);
-        editor.putInt("todayitemsize", todayitemsize);
-        editor.apply();
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
+
+            editor.putInt("showcount", showcount);
+            editor.putLong("stoptime", 0);
+            editor.putInt("todayitemsize", todayitemsize);
+            editor.apply();
+
             for(int i=0 ; i < todayitemsize ; i++) {
                 if(todoListItems.get(i).getIsrunning()) {
                     todoListItems.get(i).setCurtime(lastsec-1);
@@ -1203,6 +1184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
+                    Log.e(TAG, "onPause: stoptime "+ now);
                     editor.apply();
                 }
             }
@@ -1263,11 +1245,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStop() {
         super.onStop();
 
-        //현재의 밀리세컨 구함
-        long now = System.currentTimeMillis();
-        editor.putLong("stoptime", now);
-        editor.apply();
-
 //플레이 중이면 스레드 중지
         if(timerTask != null)
         {
@@ -1298,6 +1275,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+
+        // 파이어베이스 회원 정보 모으기
+        getprofile();
 
         // 현재 날짜 구하기
         gettodaydate();

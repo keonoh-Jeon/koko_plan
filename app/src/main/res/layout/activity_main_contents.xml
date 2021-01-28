@@ -34,14 +34,23 @@
                         android:layout_height="wrap_content"
                         app:textColorNormal="#FFFFFF"
                         android:background="#23DDCB"/>
+
                 </LinearLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_view"
-                    android:layout_margin="10dp"
-                    android:layout_height="match_parent"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    tools:ignore="ScrollViewSize" />
+                    android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_view"
+                        android:layout_margin="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:ignore="ScrollViewSize" />
+
+                </RelativeLayout>
+
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
