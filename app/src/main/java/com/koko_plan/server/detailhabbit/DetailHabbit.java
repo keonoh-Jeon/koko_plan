@@ -229,6 +229,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
         detailhabbitItems.removeAll(detailhabbitItems);
 //        ranking_items = new ArrayList<>();
+        System.gc();
     }
     @Override
     protected void onResume() {

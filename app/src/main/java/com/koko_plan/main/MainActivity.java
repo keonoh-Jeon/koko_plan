@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -34,6 +35,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,6 +108,7 @@ import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.SetzeroProgressReceiver;
 import com.koko_plan.sub.Utils;
+import com.koko_plan.sub.kat_OverdrawActivity;
 import com.koko_plan.sub.subscribe;
 
 import java.io.IOException;
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_APP_UPDATE = 600;
+    private static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1;
 
     //파이어베이스 사용
     @SuppressLint("StaticFieldLeak")
@@ -164,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int lastsec, timegap, totalprogress;
 
     private TextView tvTodayProgress;
-    private TextView nav_header_name_text;
+    private TextView nav_header_name_text, nav_header_mail_text;
     private TextView tvgetcount, tvtodayget;
 
     private SimpleDateFormat timeformat, dayformat;
@@ -218,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Utils.setStatusBarColor(this, Utils.StatusBarColorType.GREEN_STATUS_BAR);
 
-
         //객체 초기화
         InitializeView();
 
@@ -258,6 +261,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         saveProgressAlarm(this);
         setzeroProgressAlarm(this);
+
+        getPermission();
     }
 
     private void listenerhabbitlistDoc2() {
@@ -624,10 +629,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View nav_header_view = navigationView.getHeaderView(0);
         nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
         nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
-        TextView nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
-        nav_header_name_text.setText(name + " ");
-        nav_header_mail_text.setText(email + " ");
-        probitmap();
+        nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
 
         ivgetcount = findViewById(R.id.iv_getcount);
         ivTrophy = findViewById(R.id.iv_trophy);
@@ -914,6 +916,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listenerDoc();
     }
 
+    public void getPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
+            if (!Settings.canDrawOverlays(this)) {              // 체크
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                Log.e(TAG, "getPermission: 확인1" + getPackageName());
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+            } else {
+                startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
+                Log.e(TAG, "getPermission: 확인2" + "Intent");
+            }
+        } else {
+            startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
+            Log.e(TAG, "getPermission: 확인3" + "Intent");
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (!Settings.canDrawOverlays(this)) {
+                // TODO 동의를 얻지 못했을 경우의 처리
+
+            } else {
+                startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
+            }
+        }
+
+        //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                startToast("새 습관이 추가되었습니다.");
+            }
+        }
+    }
+
     private void listenerhabbitlistDoc() {
         new Thread(() -> {
             todoListItems.clear();
@@ -1018,18 +1058,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
             }
         }).start();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                startToast("새 습관이 추가되었습니다.");
-            }
-        }
     }
 
     private void myStartActivity(Class c) {
@@ -1184,7 +1212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
-                    Log.e(TAG, "onPause: stoptime "+ now);
                     editor.apply();
                 }
             }
@@ -1278,6 +1305,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // 파이어베이스 회원 정보 모으기
         getprofile();
+
+        probitmap();
+        nav_header_name_text.setText(name + " ");
+        nav_header_mail_text.setText(email + " ");
 
         // 현재 날짜 구하기
         gettodaydate();

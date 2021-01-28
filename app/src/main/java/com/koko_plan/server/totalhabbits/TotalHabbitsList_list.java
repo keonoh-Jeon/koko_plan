@@ -170,6 +170,8 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
         totalhabbitlist_items.removeAll(totalhabbitlist_items);
         totalHabbitsListReady_items.removeAll(totalHabbitsListReady_items);
+
+        System.gc();
     }
     @Override
     protected void onResume() {
