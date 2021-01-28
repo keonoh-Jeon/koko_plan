@@ -4,13 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".server.ranking.Ranking_list">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -69,6 +64,11 @@
                 android:background="@color/colorPrimaryDark"/>
 
         </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -137,66 +137,75 @@
 
         </LinearLayout>
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_margin="10sp"
                 tools:ignore="ObsoleteLayoutParam">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_totlahabbitlist"
-                    android:layout_height="wrap_content"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:nestedScrollingEnabled="false"
-                    tools:ignore="UnusedAttribute">
-                </androidx.recyclerview.widget.RecyclerView>
-
-                <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="20sp"
-                    android:text="대기 중 습관"
-                    android:textStyle="italic"
-                    android:textColor="#7C7C7C"
-                    tools:ignore="HardcodedText,RtlHardcoded" />
+                    android:orientation="vertical">
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_totlahabbitlist"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:nestedScrollingEnabled="false"
+                        tools:ignore="UnusedAttribute">
+                    </androidx.recyclerview.widget.RecyclerView>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_totlahabbitlistforready"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:nestedScrollingEnabled="false"
-                    tools:ignore="UnusedAttribute">
-                </androidx.recyclerview.widget.RecyclerView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="20sp"
+                        android:text="대기 중 습관"
+                        android:textStyle="italic"
+                        android:textColor="#7C7C7C"
+                        tools:ignore="HardcodedText,RtlHardcoded" />
 
-            </LinearLayout>
-        </ScrollView>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_totlahabbitlistforready"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:nestedScrollingEnabled="false"
+                        tools:ignore="UnusedAttribute">
+                    </androidx.recyclerview.widget.RecyclerView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:gravity="bottom">
+                </LinearLayout>
 
-            <com.google.android.gms.ads.AdView
-                xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adView_totalhabbit"
+            </ScrollView>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/google_ads_banner_api_key">
-            </com.google.android.gms.ads.AdView>
+                android:layout_gravity="bottom"
+                android:gravity="bottom">
+
+                <com.google.android.gms.ads.AdView
+                    xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/adView_totalhabbit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    ads:adSize="BANNER"
+                    ads:adUnitId="@string/google_ads_banner_api_key">
+                </com.google.android.gms.ads.AdView>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
 

@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -262,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         saveProgressAlarm(this);
         setzeroProgressAlarm(this);
 
-        getPermission();
+
     }
 
     private void listenerhabbitlistDoc2() {
@@ -921,17 +922,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (!Settings.canDrawOverlays(this)) {              // 체크
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + getPackageName()));
-                Log.e(TAG, "getPermission: 확인1" + getPackageName());
                 startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
             } else {
                 startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
-                Log.e(TAG, "getPermission: 확인2" + "Intent");
             }
         } else {
             startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
-            Log.e(TAG, "getPermission: 확인3" + "Intent");
         }
     }
+
+    void startMain(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(this, kat_OverdrawActivity.class));
+        } else {
+            startService(new Intent(this, kat_OverdrawActivity.class));
+        }
+    }
+
+
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -940,10 +948,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             if (!Settings.canDrawOverlays(this)) {
                 // TODO 동의를 얻지 못했을 경우의 처리
-
+                finish();
             } else {
                 startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
             }
+
         }
 
         //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
@@ -1222,6 +1231,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         savehabbitportion();
         System.gc();
+
+//        getPermission();
     }
 
     private void savehabbitportion() {

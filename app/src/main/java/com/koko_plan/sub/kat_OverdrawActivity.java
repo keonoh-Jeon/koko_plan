@@ -34,13 +34,14 @@ public class kat_OverdrawActivity extends Service {
         super.onCreate();
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = layoutInflater.inflate(R.layout.activity_main_contents, null);
+        view = layoutInflater.inflate(R.layout.activity_subscribe_popup, null);
 
         @SuppressLint("InlinedApi") WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
+
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
                 PixelFormat.TRANSLUCENT
         );
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
