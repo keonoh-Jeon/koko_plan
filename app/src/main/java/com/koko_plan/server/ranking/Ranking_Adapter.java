@@ -140,61 +140,72 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
 
     @SuppressLint("SetTextI18n")
     private void showrankername(double rankscore, ViewHolder viewHolder) {
-        new Thread(() -> {
-            if(99.94 < rankscore && rankscore <= 100) {
-                viewHolder.tvrankerview.setText("Iron 4");
-            } else if(99.64 < rankscore && rankscore <= 99.94) {
-                viewHolder.tvrankerview.setText("Iron 3");
-            } else if (98.94 < rankscore && rankscore <= 99.64) {
-                viewHolder.tvrankerview.setText("Iron 2");
-            } else if (97.93 < rankscore && rankscore <= 98.94) {
-                viewHolder.tvrankerview.setText("Iron 1");
-            } else if (95.53 < rankscore && rankscore <= 97.93) {
-                viewHolder.tvrankerview.setText("Bronze 4");
-            } else if (92.78 < rankscore && rankscore <= 95.53) {
-                viewHolder.tvrankerview.setText("Bronze 3");
-            } else if (88.73 < rankscore && rankscore <= 92.78) {
-                viewHolder.tvrankerview.setText("Bronze 2");
-            } else if (82.76 < rankscore && rankscore <= 88.73) {
-                viewHolder.tvrankerview.setText("Bronze 1");
-            } else if (73.61 < rankscore && rankscore <= 82.76) {
-                viewHolder.tvrankerview.setText("Silver 4");
-            } else if (66.31 < rankscore && rankscore <= 73.61) {
-                viewHolder.tvrankerview.setText("Silver 3");
-            } else if (57.53 < rankscore && rankscore <= 66.31) {
-                viewHolder.tvrankerview.setText("Silver 2");
-            } else if (50.21 < rankscore && rankscore <= 57.53) {
-                viewHolder.tvrankerview.setText("Silver 1");
-            } else if (36.76 < rankscore && rankscore <= 50.21) {
-                viewHolder.tvrankerview.setText("Gold 4");
-            } else if (29.14 < rankscore && rankscore <= 36.76) {
-                viewHolder.tvrankerview.setText("Gold 3");
-            } else if (22.53 < rankscore && rankscore <= 29.14) {
-                viewHolder.tvrankerview.setText("Gold 2");
-            } else if (18.36 < rankscore && rankscore <= 22.53) {
-                viewHolder.tvrankerview.setText("Gold 1");
-            } else if (10.58 < rankscore && rankscore <= 18.36) {
-                viewHolder.tvrankerview.setText("Platinum 4");
-            } else if (7.58 < rankscore && rankscore <= 10.58) {
-                viewHolder.tvrankerview.setText("Platinum 3");
-            } else if (5.59 < rankscore && rankscore <= 7.58) {
-                viewHolder.tvrankerview.setText("Platinum 2");
-            } else if (3.67 < rankscore && rankscore <= 5.59) {
-                viewHolder.tvrankerview.setText("Platinum 1");
-            } else if (1.45 < rankscore && rankscore <= 3.67) {
-                viewHolder.tvrankerview.setText("Diamond 4");
-            } else if (0.68 < rankscore && rankscore <= 1.45) {
-                viewHolder.tvrankerview.setText("Diamond 3");
-            } else if (0.31 < rankscore && rankscore <= 0.68) {
-                viewHolder.tvrankerview.setText("Diamond 2");
-            } else if (0.11 < rankscore && rankscore <= 0.31) {
-                viewHolder.tvrankerview.setText("Diamond 1");
-            } else if (0.06 < rankscore && rankscore <= 0.11) {
-                viewHolder.tvrankerview.setText("Master");
-            } else if (0.02 < rankscore && rankscore <= 0.06) {
-                viewHolder.tvrankerview.setText("G_Master");
-            } else if (0 < rankscore && rankscore <= 0.02) {
-                viewHolder.tvrankerview.setText("Challenger");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+                    }
+                });
+            }
+
+            private void runOnUiThread(Runnable runnable) {
+                if(99.94 < rankscore && rankscore <= 100) {
+                    viewHolder.tvrankerview.setText("Iron 4");
+                } else if(99.64 < rankscore && rankscore <= 99.94) {
+                    viewHolder.tvrankerview.setText("Iron 3");
+                } else if (98.94 < rankscore && rankscore <= 99.64) {
+                    viewHolder.tvrankerview.setText("Iron 2");
+                } else if (97.93 < rankscore && rankscore <= 98.94) {
+                    viewHolder.tvrankerview.setText("Iron 1");
+                } else if (95.53 < rankscore && rankscore <= 97.93) {
+                    viewHolder.tvrankerview.setText("Bronze 4");
+                } else if (92.78 < rankscore && rankscore <= 95.53) {
+                    viewHolder.tvrankerview.setText("Bronze 3");
+                } else if (88.73 < rankscore && rankscore <= 92.78) {
+                    viewHolder.tvrankerview.setText("Bronze 2");
+                } else if (82.76 < rankscore && rankscore <= 88.73) {
+                    viewHolder.tvrankerview.setText("Bronze 1");
+                } else if (73.61 < rankscore && rankscore <= 82.76) {
+                    viewHolder.tvrankerview.setText("Silver 4");
+                } else if (66.31 < rankscore && rankscore <= 73.61) {
+                    viewHolder.tvrankerview.setText("Silver 3");
+                } else if (57.53 < rankscore && rankscore <= 66.31) {
+                    viewHolder.tvrankerview.setText("Silver 2");
+                } else if (50.21 < rankscore && rankscore <= 57.53) {
+                    viewHolder.tvrankerview.setText("Silver 1");
+                } else if (36.76 < rankscore && rankscore <= 50.21) {
+                    viewHolder.tvrankerview.setText("Gold 4");
+                } else if (29.14 < rankscore && rankscore <= 36.76) {
+                    viewHolder.tvrankerview.setText("Gold 3");
+                } else if (22.53 < rankscore && rankscore <= 29.14) {
+                    viewHolder.tvrankerview.setText("Gold 2");
+                } else if (18.36 < rankscore && rankscore <= 22.53) {
+                    viewHolder.tvrankerview.setText("Gold 1");
+                } else if (10.58 < rankscore && rankscore <= 18.36) {
+                    viewHolder.tvrankerview.setText("Platinum 4");
+                } else if (7.58 < rankscore && rankscore <= 10.58) {
+                    viewHolder.tvrankerview.setText("Platinum 3");
+                } else if (5.59 < rankscore && rankscore <= 7.58) {
+                    viewHolder.tvrankerview.setText("Platinum 2");
+                } else if (3.67 < rankscore && rankscore <= 5.59) {
+                    viewHolder.tvrankerview.setText("Platinum 1");
+                } else if (1.45 < rankscore && rankscore <= 3.67) {
+                    viewHolder.tvrankerview.setText("Diamond 4");
+                } else if (0.68 < rankscore && rankscore <= 1.45) {
+                    viewHolder.tvrankerview.setText("Diamond 3");
+                } else if (0.31 < rankscore && rankscore <= 0.68) {
+                    viewHolder.tvrankerview.setText("Diamond 2");
+                } else if (0.11 < rankscore && rankscore <= 0.31) {
+                    viewHolder.tvrankerview.setText("Diamond 1");
+                } else if (0.06 < rankscore && rankscore <= 0.11) {
+                    viewHolder.tvrankerview.setText("Master");
+                } else if (0.02 < rankscore && rankscore <= 0.06) {
+                    viewHolder.tvrankerview.setText("G_Master");
+                } else if (0 < rankscore && rankscore <= 0.02) {
+                    viewHolder.tvrankerview.setText("Challenger");
+                }
             }
         }).start();
 

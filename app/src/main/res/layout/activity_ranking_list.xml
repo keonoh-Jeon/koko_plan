@@ -53,11 +53,9 @@
                     tools:ignore="HardcodedText" />
 
                 <ImageView
-                    android:id="@+id/mc_menu"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:gravity="center"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

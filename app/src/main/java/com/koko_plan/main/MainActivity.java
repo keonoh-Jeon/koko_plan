@@ -16,6 +16,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -244,17 +245,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initprofile();
 
         initSwipe2();
-
-//        HabbitTodayListmaker();
-//        HabbitListmaker();
+        // 가로 달력 구현
+        horizontalCalendarmaker(calendar);
 
         listenerhabbitlistDoc2();
 
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListInit();
-
-        // 가로 달력 구현
-        horizontalCalendarmaker(calendar);
 
         GoodTextListmaker();
 
@@ -262,8 +259,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         saveProgressAlarm(this);
         setzeroProgressAlarm(this);
-
-
     }
 
     private void listenerhabbitlistDoc2() {
@@ -345,14 +340,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("SimpleDateFormat")
     private void gettodaydate() {
-        date = new Date();
-        calendar = Calendar.getInstance();
-        calendar.setTime(date);
+            date = new Date();
+            calendar = Calendar.getInstance();
+            calendar.setTime(date);
 
-        //날짜 표시 형식 지정
-        dateformat = new SimpleDateFormat("yyyy-MM-dd");
-        todaydate = dateformat.format(date);
-        selecteddata = todaydate;
+            //날짜 표시 형식 지정
+            dateformat = new SimpleDateFormat("yyyy-MM-dd");
+            todaydate = dateformat.format(date);
+            selecteddata = todaydate;
+
+            //가로 달력 시작시, 선택날짜와 이동
+            horizontalCalendar.selectDate(calendar, true);
     }
 
     private String getdayofweek() {
@@ -434,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .defaultSelectedDate(calendar)
                 .datesNumberOnScreen(7)
                 .build();
-//todo
+        //todo
         //가로 달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -499,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             });
                         }
+
                     }).start();
 
                 } else {
@@ -547,11 +546,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(Intent.createChooser(msg, "앱을 선택해 주세요"));
 
         } else if (id == R.id.totallisticon) {
-            MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(TotalHabbitsList_list.class);
 
         } else if (id == R.id.primium) {
-            MySoundPlayer.play(MySoundPlayer.CLICK);
             myStartActivity(subscribe.class);
 
         } else if (id == R.id.ranker) {
@@ -673,17 +670,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void probitmap() {
-        Profilebitmap thread = new Profilebitmap();
-        thread.start();
-        try{
-            thread.join();
-            nav_header_photo_image.setImageBitmap(profile);
-            nav_header_photo_image.setBackground(new ShapeDrawable(new OvalShape()));
-            nav_header_photo_image.setClipToOutline(true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+                            nav_header_photo_image.setImageBitmap(profile);
+                            nav_header_photo_image.setBackground(new ShapeDrawable(new OvalShape()));
+                            nav_header_photo_image.setClipToOutline(true);
+                            nav_header_name_text.setText(name + " ");
+                            nav_header_mail_text.setText(email + " ");
+                    }
+                });
+            }
+        }).start();
 
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
+
+
+        new Thread(() -> {
+            Profilebitmap thread = new Profilebitmap();
+            thread.start();
+
+        }).start();
     }
 
     class Profilebitmap extends Thread {
@@ -801,93 +811,95 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showcalendardayprogress() {
-        events = new ArrayList<>();
-        int year = calendarView.getCurrentPageDate().get(Calendar.YEAR);
-        int month = calendarView.getCurrentPageDate().get(Calendar.MONTH)+1;
-        // 해당 달력 마지막 날짜
-        int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+        new Thread(() -> {
+            events = new ArrayList<>();
+            int year = calendarView.getCurrentPageDate().get(Calendar.YEAR);
+            int month = calendarView.getCurrentPageDate().get(Calendar.MONTH)+1;
+            // 해당 달력 마지막 날짜
+            int lastday = calendarView.getCurrentPageDate().getActualMaximum(Calendar.DAY_OF_MONTH);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
 
-        //변수를 동적으로 만드는 방법
-        Map<String, Calendar> map = new HashMap<String, Calendar>();
-        for (int i = 1; i <= lastday; i++) {
-            map.put("calendar" + i, Calendar.getInstance());
-            @SuppressLint("DefaultLocale") String str = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", i);
-            try {
-                date = sdf.parse(str);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            assert date != null;
-            Objects.requireNonNull(map.get("calendar" + i)).setTime(date);
+            //변수를 동적으로 만드는 방법
+            Map<String, Calendar> map = new HashMap<String, Calendar>();
+            for (int i = 1; i <= lastday; i++) {
+                map.put("calendar" + i, Calendar.getInstance());
+                @SuppressLint("DefaultLocale") String str = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", i);
+                try {
+                    date = sdf.parse(str);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                assert date != null;
+                Objects.requireNonNull(map.get("calendar" + i)).setTime(date);
 
-            if (firebaseUser != null) {
+                if (firebaseUser != null) {
 
-                DocumentReference documentReference = firebaseFirestore
-                        .collection("users")
-                        .document(firebaseUser.getUid());
+                    DocumentReference documentReference = firebaseFirestore
+                            .collection("users")
+                            .document(firebaseUser.getUid());
 
-                int finalI = i;
-                documentReference
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    int finalI = i;
+                    documentReference
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document != null) {
-                                        if (document.exists() && document.get(str) != null) {
-                                            Log.d(TAG, "DocumentSnapshot data: " + map.get("calendar" + finalI));
-                                            events.add(new EventDay(map.get("calendar" + finalI), new Drawable() {
-                                                @SuppressLint("CanvasSize")
-                                                @Override
-                                                public void draw(@NonNull Canvas canvas) {
-                                                    //캔버스 바탕 설정
-                                                    Paint pnt = new Paint();
-                                                    //가로로 설정
-                                                    pnt.setAntiAlias(true);
-                                                    pnt.setColor(Color.LTGRAY);
-                                                    String st = document.get(str) + "%";
-                                                    canvas.drawRect(0, 0, canvas.getWidth() * Integer.parseInt(String.valueOf(document.get(str))) / 100, 53, pnt);
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document != null) {
+                                            if (document.exists() && document.get(str) != null) {
+                                                Log.d(TAG, "DocumentSnapshot data: " + map.get("calendar" + finalI));
+                                                events.add(new EventDay(map.get("calendar" + finalI), new Drawable() {
+                                                    @SuppressLint("CanvasSize")
+                                                    @Override
+                                                    public void draw(@NonNull Canvas canvas) {
+                                                        //캔버스 바탕 설정
+                                                        Paint pnt = new Paint();
+                                                        //가로로 설정
+                                                        pnt.setAntiAlias(true);
+                                                        pnt.setColor(Color.LTGRAY);
+                                                        String st = document.get(str) + "%";
+                                                        canvas.drawRect(0, 0, canvas.getWidth() * Integer.parseInt(String.valueOf(document.get(str))) / 100, 53, pnt);
 
-                                                    Paint pnt2 = new Paint();
-                                                    pnt2.setAntiAlias(true);
-                                                    pnt2.setColor(Color.RED);
-                                                    pnt2.setTextSize(canvas.getWidth()*1/3);
-                                                    canvas.drawText(st, canvas.getWidth()*1/4, canvas.getHeight() - 10, pnt2);
-                                                }
+                                                        Paint pnt2 = new Paint();
+                                                        pnt2.setAntiAlias(true);
+                                                        pnt2.setColor(Color.RED);
+                                                        pnt2.setTextSize(canvas.getWidth()*1/3);
+                                                        canvas.drawText(st, canvas.getWidth()*1/4, canvas.getHeight() - 10, pnt2);
+                                                    }
 
-                                                @Override
-                                                public void setAlpha(int i) {
-                                                }
+                                                    @Override
+                                                    public void setAlpha(int i) {
+                                                    }
 
-                                                @Override
-                                                public void setColorFilter(@Nullable ColorFilter colorFilter) {
-                                                }
+                                                    @Override
+                                                    public void setColorFilter(@Nullable ColorFilter colorFilter) {
+                                                    }
 
-                                                /**
-                                                 * @deprecated
-                                                 */
-                                                @SuppressLint("WrongConstant")
-                                                @Override
-                                                public int getOpacity() {
-                                                    return 0;
-                                                }
-                                            }));
-                                            calendarView.setEvents(events);
-                                        } else {
-                                            Log.d(TAG, "No such document");
+                                                    /**
+                                                     * @deprecated
+                                                     */
+                                                    @SuppressLint("WrongConstant")
+                                                    @Override
+                                                    public int getOpacity() {
+                                                        return 0;
+                                                    }
+                                                }));
+                                                calendarView.setEvents(events);
+                                            } else {
+                                                Log.d(TAG, "No such document");
+                                            }
                                         }
+                                    } else {
+                                        Log.d(TAG, "get failed with ", task.getException());
                                     }
-                                } else {
-                                    Log.d(TAG, "get failed with ", task.getException());
                                 }
-                            }
-                        });
+                            });
+                }
             }
-        }
+        }).start();
     }
     private void CalendarEvents(Calendar calendar) {
         showcalendardayprogress();
@@ -989,6 +1001,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         adapter.notifyDataSetChanged();
                                         today += total;
                                     }
+                                    piechartmaker();
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
@@ -1016,7 +1029,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             public void onFailure(@NonNull Exception e) {
                                             }
                                         });
-                                piechartmaker();
                             }
                         });
             }
@@ -1200,7 +1212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
-
             editor.putInt("showcount", showcount);
             editor.putLong("stoptime", 0);
             editor.putInt("todayitemsize", todayitemsize);
@@ -1297,29 +1308,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
-        //업데이트 가능 시, 연결해서 업데이트
-        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.updateAvailability()
-                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                // If an in-app update is already running, resume the update.
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            IMMEDIATE,
-                            this,
-                            REQUEST_APP_UPDATE);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            //업데이트 가능 시, 연결해서 업데이트
+            appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+                if (appUpdateInfo.updateAvailability()
+                        == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                    // If an in-app update is already running, resume the update.
+                    try {
+                        appUpdateManager.startUpdateFlowForResult(
+                                appUpdateInfo,
+                                IMMEDIATE,
+                                this,
+                                REQUEST_APP_UPDATE);
+                    } catch (IntentSender.SendIntentException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }).start();
 
         // 파이어베이스 회원 정보 모으기
         getprofile();
 
         probitmap();
-        nav_header_name_text.setText(name + " ");
-        nav_header_mail_text.setText(email + " ");
+
 
         // 현재 날짜 구하기
         gettodaydate();
@@ -1327,9 +1339,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getdocforgetlike();
 
         todaysgoodtextsize = 0;
-
-        //가로 달력 시작시, 선택날짜와 이동
-        horizontalCalendar.selectDate(calendar, true);
 
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
@@ -1446,27 +1455,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getdocforgetlike() {
-        if (firebaseUser != null) {
-            DocumentReference documentReference = firebaseFirestore
-                    .collection("users")
-                    .document(firebaseUser.getUid());
+        new Thread(() -> {
+            if (firebaseUser != null) {
+                DocumentReference documentReference = firebaseFirestore
+                        .collection("users")
+                        .document(firebaseUser.getUid());
 
-            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null) {
-                            tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
-                            tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document != null) {
+                                tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                                tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
                         }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
                     }
-                }
-            });
-        }
+                });
+            }
+        }).start();
     }
 
     //스와이프 기능 헬퍼 연결
@@ -1755,14 +1766,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getprofile() {
-        if (firebaseUser != null) {
-            for (UserInfo profile : firebaseUser.getProviderData()) {
-                name = profile.getDisplayName();
-                email = profile.getEmail();
-                Uri photo = profile.getPhotoUrl();
-                photourl = String.valueOf(photo);
+        new Thread(() -> {
+            if (firebaseUser != null) {
+                for (UserInfo profile : firebaseUser.getProviderData()) {
+                    name = profile.getDisplayName();
+                    email = profile.getEmail();
+                    Uri photo = profile.getPhotoUrl();
+                    photourl = String.valueOf(photo);
+                }
             }
-        }
+        }).start();
     }
 
     //자정마다 실행 (리시버)

@@ -154,46 +154,43 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 
-//        viewHolder.backgraound.setBackgroundColor(Color.GRAY);
-
         String imageUrl = filterList.get(i).getFrom();
         Glide.with(context)
                 .load(imageUrl)
                 .into(viewHolder.profileview);
 
-        viewHolder.timeview.setText(filterList.get(i).getTime());
+            viewHolder.timeview.setText(filterList.get(i).getTime());
 
-        String randomnum = String.valueOf(filterList.get(i).getRandomnum());
-        DocumentReference documentReference = firebaseFirestore
-                .collection("randomsource")
-                .document("goodtexts");
+            String randomnum = String.valueOf(filterList.get(i).getRandomnum());
+            DocumentReference documentReference = firebaseFirestore
+                    .collection("randomsource")
+                    .document("goodtexts");
 
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            text = (String) document.get(randomnum);
-                            viewHolder.textview.setText(text);
-                        } else {
-                            Log.d(TAG, "No such document");
+            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null) {
+                            if (document.exists()) {
+                                text = (String) document.get(randomnum);
+                                viewHolder.textview.setText(text);
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
                         }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            }
-        });
+            });
 
-        if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
-            viewHolder.timeview.setTextColor(Color.parseColor("#000000"));
-            viewHolder.textview.setTextColor(Color.parseColor("#000000"));
-            viewHolder.profileview.setAlpha((float) 2.55);
-        }
+            if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
+                viewHolder.timeview.setTextColor(Color.parseColor("#000000"));
+                viewHolder.textview.setTextColor(Color.parseColor("#000000"));
+                viewHolder.profileview.setAlpha((float) 2.55);
+            }
     }
 
     @Override

@@ -72,11 +72,10 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         initView();
 
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
-        findViewById(R.id.mc_menu).setOnClickListener(OnClickListener);
 
-        /*AdView adBanner = findViewById(R.id.adView);
+        AdView adBanner = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);*/
+        adBanner.loadAd(adRequest);
 
     }
 
@@ -87,10 +86,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                 case R.id.iv_back:
                     MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(MainActivity.class);
-                    break;
-
-                case R.id.mc_menu:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     break;
             }
         }
@@ -228,7 +223,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         super.onPause();
 
         detailhabbitItems.removeAll(detailhabbitItems);
-//        ranking_items = new ArrayList<>();
         System.gc();
     }
     @Override

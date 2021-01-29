@@ -17,7 +17,8 @@
             android:id="@+id/scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="false">
+            android:fillViewport="false"
+            tools:ignore="UselessParent">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -50,11 +51,10 @@
 
                 </RelativeLayout>
 
-
-
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30sp"/>
+                    android:layout_height="30sp"
+                    tools:ignore="UselessLeaf" />
 
                 <TextView
                     android:text="하루 중, 습관 비중 추이"
@@ -75,7 +75,8 @@
 
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="300dp">
+                        android:layout_height="300dp"
+                        tools:ignore="UselessParent">
 
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/chart"
@@ -85,16 +86,16 @@
                             <com.github.mikephil.charting.charts.PieChart
                                 android:id="@+id/piechart"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:layout_margin="10dp"
                                 tools:ignore="ScrollViewSize" />
                         </com.github.mikephil.charting.charts.LineChart>
 
-                        <!--<com.github.mmin18.widget.RealtimeBlurView
+                        <com.github.mmin18.widget.RealtimeBlurView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
-                            app:realtimeOverlayColor="#88FFFFFF"/>-->
+                            app:realtimeOverlayColor="#88FFFFFF"/>
 
                     </FrameLayout>
 
@@ -112,7 +113,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30sp"/>
+                    android:layout_height="30sp"
+                    tools:ignore="UselessLeaf" />
 
                 <TextView
                     android:text="월간 성취율"
@@ -129,10 +131,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.applandeo.materialcalendarview.CalendarView
-                        android:id="@+id/calendarView2"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content"
+                        tools:ignore="UselessParent">
+
+                        <com.applandeo.materialcalendarview.CalendarView
+                            android:id="@+id/calendarView2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <com.github.mmin18.widget.RealtimeBlurView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:realtimeBlurRadius="5dp"
+                            app:realtimeOverlayColor="#88FFFFFF"/>
+
+                    </FrameLayout>
 
                 </RelativeLayout>
 
@@ -147,7 +162,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"/>
+                    android:layout_height="30dp"
+                    tools:ignore="UselessLeaf" />
 
                 <RelativeLayout
                     android:id="@+id/view_relativeview"
@@ -159,7 +175,8 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        tools:ignore="UselessParent">
 
                         <TextView
                             android:text="선물 받은 명언  "
@@ -187,7 +204,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/like_heart2"
-                                tools:ignore="RtlHardcoded" />
+                                tools:ignore="ContentDescription,RtlHardcoded" />
 
                             <TextView
                                 android:id="@+id/tv_todayget"
@@ -197,10 +214,9 @@
                                 android:gravity="center"
                                 android:text="0"
                                 android:textSize="10sp"
-                                tools:ignore="HardcodedText" />
+                                tools:ignore="HardcodedText,SmallSp" />
 
                         </FrameLayout>
-
 
 
                     </LinearLayout>
@@ -213,7 +229,8 @@
 
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        tools:ignore="UselessParent">
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_msg"
@@ -221,21 +238,17 @@
                             android:layout_height="match_parent"
                             android:layout_width="match_parent"
                             android:nestedScrollingEnabled="false"
-                            tools:ignore="ScrollViewSize" />
+                            tools:ignore="ScrollViewSize,UnusedAttribute" />
 
-                        <!--<com.github.mmin18.widget.RealtimeBlurView
+                        <com.github.mmin18.widget.RealtimeBlurView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
-                            app:realtimeOverlayColor="#88FFFFFF"/>-->
+                            app:realtimeOverlayColor="#88FFFFFF"/>
 
                     </FrameLayout>
 
-
-
                 </RelativeLayout>
-
-
 
             </LinearLayout>
 

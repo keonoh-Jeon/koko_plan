@@ -77,7 +77,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         initView();
 
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
-        findViewById(R.id.mc_menu).setOnClickListener(OnClickListener);
 
         AdView adBanner = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -92,12 +91,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.iv_back:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
+//                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(MainActivity.class);
-                    break;
-
-                case R.id.mc_menu:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     break;
             }
         }
