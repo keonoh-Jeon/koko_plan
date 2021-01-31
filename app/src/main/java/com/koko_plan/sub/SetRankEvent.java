@@ -8,26 +8,42 @@ import com.koko_plan.R;
 
 import java.util.HashMap;
 
+import static com.koko_plan.main.MainActivity.tveventeffect;
 import static com.koko_plan.main.MainActivity.tvrankereffect;
 
 public class SetRankEvent {
 
-    public static boolean fulladview = true;
-    public static boolean adview1 = true;
-    public static boolean adview2 = true;
-    public static boolean adview3 = true;
-    public static boolean adview4 = true;
-    public static boolean adview5 = true;
-    public static boolean adview6 = true;
-    public static boolean blurview1 = true;
-    public static boolean blurview2 = true;
-    public static boolean blurview3 = true;
+    public static boolean fulladview;
+    public static boolean adview1;
+    public static boolean adview2;
+    public static boolean adview3;
+    public static boolean adview4;
+    public static boolean adview5;
+    public static boolean adview6;
+    public static boolean blurview1;
+    public static boolean blurview2;
+    public static boolean blurview3;
 
     @SuppressLint("SetTextI18n")
     public static void set(float rankscore) {
         new Thread(() -> {
+
+            fulladview = true;
+            adview1 = true;
+            adview2 = true;
+            adview3 = true;
+            adview4 = true;
+            adview5 = true;
+            adview6 = true;
+            blurview1 = true;
+            blurview2 = true;
+            blurview3 = true;
+
             if(99.94 < rankscore && rankscore <= 100) {
                 tvrankereffect.setText("Iron IV 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제" +
+                        "\n월간 성취율 보기" +
+                        "\n선물받은 명언 보기");
                 fulladview = true;
                 adview1 = true;
                 adview2 = true;
@@ -36,10 +52,11 @@ public class SetRankEvent {
                 adview5 = true;
                 adview6 = true;
                 blurview1 = true;
-                blurview2 = true;
-                blurview3 = true;
+                blurview2 = false;
+                blurview3 = false;
             } else if(99.64 < rankscore && rankscore <= 99.94) {
                 tvrankereffect.setText("Iron III 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제");
                 fulladview = true;
                 adview1 = true;
                 adview2 = true;
@@ -52,6 +69,7 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (98.94 < rankscore && rankscore <= 99.64) {
                 tvrankereffect.setText("Iron II 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제");
                 fulladview = true;
                 adview1 = true;
                 adview2 = true;
@@ -64,6 +82,7 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (97.93 < rankscore && rankscore <= 98.94) {
                 tvrankereffect.setText("Iron I 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제");
                 fulladview = true;
                 adview1 = true;
                 adview2 = true;
@@ -76,6 +95,7 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (95.53 < rankscore && rankscore <= 97.93) {
                 tvrankereffect.setText("Bronze IV 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제");
                 fulladview = true;
                 adview1 = true;
                 adview2 = true;
@@ -88,6 +108,7 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (92.78 < rankscore && rankscore <= 95.53) {
                 tvrankereffect.setText("Bronze III 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제");
                 fulladview = true;
                 adview1 = true;
                 adview2 = false;
@@ -100,6 +121,7 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (88.73 < rankscore && rankscore <= 92.78) {
                 tvrankereffect.setText("Bronze II 보상 발동 중");
+                tveventeffect.setText("배너 광고 삭제");
                 fulladview = true;
                 adview1 = false;
                 adview2 = false;
@@ -112,6 +134,8 @@ public class SetRankEvent {
                 blurview3 = true;
             } else if (82.76 < rankscore && rankscore <= 88.73) {
                 tvrankereffect.setText("Bronze I 보상 발동 중");
+                tveventeffect.setText("배너 광고 삭제" +
+                        "/n선물 받은 명언 보기");
                 fulladview = true;
                 adview1 = false;
                 adview2 = false;
@@ -124,6 +148,9 @@ public class SetRankEvent {
                 blurview3 = false;
             } else if (73.61 < rankscore && rankscore <= 82.76) {
                 tvrankereffect.setText("Silver IV 보상 발동 중");
+                tveventeffect.setText("일부 배너 광고 삭제" +
+                                "/n월간 성취율 보기" +
+                                "/n선물받은 명언 보기");
                 fulladview = true;
                 adview1 = false;
                 adview2 = false;

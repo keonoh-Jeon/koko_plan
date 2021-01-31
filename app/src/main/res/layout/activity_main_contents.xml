@@ -48,7 +48,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
+                        android:paddingLeft="10dp"
                         android:layout_gravity="center"
                         android:text="골드 1 효과 발동중 "
                         tools:ignore="HardcodedText,SmallSp" />
@@ -71,12 +71,15 @@
                     tools:ignore="UselessLeaf">
 
                     <TextView
+                        android:id="@+id/tv_eventeffect"
                         android:text="효과 소개"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:gravity="center"
+                        android:paddingLeft="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="#2D7830"
                         android:layout_height="wrap_content"
-                        tools:ignore="HardcodedText" />
+                        tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
 
                     <ImageView
                         android:id="@+id/iv_uparrow"
@@ -162,6 +165,7 @@
                         </com.github.mikephil.charting.charts.LineChart>
 
                         <com.github.mmin18.widget.RealtimeBlurView
+                            android:id="@+id/v_blur1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
@@ -212,6 +216,7 @@
                             android:layout_height="match_parent" />
 
                         <com.github.mmin18.widget.RealtimeBlurView
+                            android:id="@+id/v_blur2"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
@@ -311,6 +316,7 @@
                             tools:ignore="ScrollViewSize,UnusedAttribute" />
 
                         <com.github.mmin18.widget.RealtimeBlurView
+                            android:id="@+id/v_blur3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"

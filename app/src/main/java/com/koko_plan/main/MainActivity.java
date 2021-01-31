@@ -145,6 +145,9 @@ import static com.koko_plan.sub.SetRankEvent.adview1;
 import static com.koko_plan.sub.SetRankEvent.adview2;
 import static com.koko_plan.sub.SetRankEvent.adview3;
 import static com.koko_plan.sub.SetRankEvent.adview4;
+import static com.koko_plan.sub.SetRankEvent.blurview1;
+import static com.koko_plan.sub.SetRankEvent.blurview2;
+import static com.koko_plan.sub.SetRankEvent.blurview3;
 import static com.koko_plan.sub.SetRankEvent.fulladview;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
@@ -223,9 +226,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int showcount = 0;
     private TextView tvmyrankscore, tveffectintro;
     public static TextView tvrankereffect;
+    public static TextView tveventeffect;
     private String rank;
     private long Back_Key_Before_Time = 0;
     private LinearLayout veffectintro;
+    private View vblur1, vblur2, vblur3;
 
     private AdView adBanner, adBanner2, adBanner3, adBanner4;
 
@@ -719,8 +724,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         veffectintro = findViewById(R.id.v_effectintro);
         veffectintro.setVisibility(View.GONE);
 
+        vblur1= findViewById(R.id.v_blur1);
+        vblur1.setVisibility(View.GONE);
+        vblur2= findViewById(R.id.v_blur2);
+        vblur2.setVisibility(View.GONE);
+        vblur3= findViewById(R.id.v_blur3);
+        vblur3.setVisibility(View.GONE);
+
         tvmyrankscore = findViewById(R.id.tv_myrankscore);
         tvrankereffect = findViewById(R.id.tv_rankereffect);
+        tveventeffect = findViewById(R.id.tv_eventeffect);
 
         tvgetcount= findViewById(R.id.tv_getcount);
         tvtodayget= findViewById(R.id.tv_todayget);
@@ -751,8 +764,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //효과음 초기화
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        if(fulladview = true) Log.e(TAG, "InitializeView: " + fulladview);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -1441,6 +1452,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         float rankscore = pref.getFloat("rankscore", 100);
         float eventscore = pref.getFloat("eventscore", 100);
         SetRankEvent.set(eventscore);
+        Log.e(TAG, "onResume: " + eventscore);
         tvmyrankscore.setText(rank+"");
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
@@ -1449,38 +1461,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
 
-        showbanner();
+        showbannerblur();
     }
 
-    private void showbanner() {
+    private void showbannerblur() {
 
         adBanner.setVisibility(View.GONE);
         adBanner2.setVisibility(View.GONE);
         adBanner3.setVisibility(View.GONE);
         adBanner4.setVisibility(View.GONE);
 
-        if(adview1 = true){
+        if(adview1){
             AdRequest adRequest = new AdRequest.Builder().build();
             adBanner.setVisibility(View.VISIBLE);
             adBanner.loadAd(adRequest);
         }
 
-        if(adview2 = true){
+        if(adview2){
             AdRequest adRequest2 = new AdRequest.Builder().build();
             adBanner2.setVisibility(View.VISIBLE);
             adBanner2.loadAd(adRequest2);
         }
 
-        if(adview3 = true){
+        if(adview3){
             AdRequest adRequest3 = new AdRequest.Builder().build();
             adBanner3.setVisibility(View.VISIBLE);
             adBanner3.loadAd(adRequest3);
         }
 
-        if(adview4 = true){
+        if(adview4){
             AdRequest adRequest4 = new AdRequest.Builder().build();
             adBanner4.setVisibility(View.VISIBLE);
             adBanner4.loadAd(adRequest4);
+        }
+
+        if(blurview1){
+            vblur1.setVisibility(View.VISIBLE);
+        }
+
+        if(blurview2){
+            vblur2.setVisibility(View.VISIBLE);
+        }
+
+        if(blurview3){
+            vblur3.setVisibility(View.VISIBLE);
         }
 
 
