@@ -44,6 +44,7 @@ import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.sub.SetRankEvent.adview5;
 
 public class TotalHabbitsList_list extends AppCompatActivity implements TotalHabbitsList_ViewListener, TotalHabbitsListReady_ViewListener {
 
@@ -59,8 +60,8 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
     private Calendar calendar;
 
-    ImageView mcplushabbit;
     private TextView tvpercentage, tvtodaytarget;
+    private AdView adBanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,9 +78,8 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
 
-        AdView adBanner = findViewById(R.id.adView_totalhabbit);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);
+        adBanner = findViewById(R.id.adView_totalhabbit);
+
     }
 
     private View.OnClickListener OnClickListener = new View.OnClickListener() {
@@ -177,6 +177,15 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
     protected void onResume() {
 
         super.onResume();
+
+        adBanner.setVisibility(View.GONE);
+
+        if(adview5) {
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner.setVisibility(View.VISIBLE);
+            adBanner.loadAd(adRequest);
+        }
+
         listenerDoc();
         listenerDoc2();
     }

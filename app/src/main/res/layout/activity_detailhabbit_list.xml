@@ -127,7 +127,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right">
+                android:gravity="right"
+                tools:ignore="RtlHardcoded">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -143,6 +144,8 @@
                     android:textSize="20sp"
                     android:textColor="#FF9800"
                     tools:ignore="HardcodedText" />
+
+
 
                 <TextView
                     android:text=", "
@@ -288,13 +291,32 @@
 
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_detailhabbit"
-                android:layout_height="wrap_content"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:nestedScrollingEnabled="false"
-                tools:ignore="UnusedAttribute">
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:ignore="UselessParent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_detailhabbit"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:nestedScrollingEnabled="false"
+                        tools:ignore="UnusedAttribute">
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                    <com.github.mmin18.widget.RealtimeBlurView
+                        android:id="@+id/v_blur"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:realtimeBlurRadius="5dp"
+                        app:realtimeOverlayColor="#88FFFFFF"/>
+                </FrameLayout>
+
+            </LinearLayout>
 
 
         </LinearLayout>

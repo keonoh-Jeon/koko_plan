@@ -46,12 +46,12 @@
                     <TextView
                         android:id="@+id/tv_rankereffect"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
                         android:layout_gravity="center"
                         android:text="골드 1 효과 발동중 "
-                        tools:ignore="HardcodedText,SmallSp" />
+                        tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
                     <ImageView
                         android:id="@+id/iv_downarrow"
@@ -74,9 +74,8 @@
                         android:id="@+id/tv_eventeffect"
                         android:text="효과 소개"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:paddingLeft="10dp"
-                        android:layout_marginLeft="10dp"
                         android:textColor="#2D7830"
                         android:layout_height="wrap_content"
                         tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />

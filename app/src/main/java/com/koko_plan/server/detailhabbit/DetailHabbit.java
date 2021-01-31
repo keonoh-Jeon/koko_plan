@@ -53,6 +53,9 @@ import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
+import static com.koko_plan.sub.SetRankEvent.adview6;
+import static com.koko_plan.sub.SetRankEvent.adview7;
+import static com.koko_plan.sub.SetRankEvent.blurview4;
 
 public class DetailHabbit extends AppCompatActivity implements Detailhabbit_ViewListener
 {
@@ -61,6 +64,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
     private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum, tvaverage, tvdayproaverage;
+    private AdView adBanner;
+    private View vblur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -213,9 +218,12 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         recyclerView.setAdapter(detailhabbitAdapter);
 
         //배너 광고 표기
-        AdView adBanner = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);
+        adBanner = findViewById(R.id.adView);
+        adBanner.setVisibility(View.GONE);
+
+        vblur = findViewById(R.id.v_blur);
+        vblur.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -228,6 +236,16 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(adview6){
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner.setVisibility(View.VISIBLE);
+            adBanner.loadAd(adRequest);
+        }
+
+        if(blurview4){
+            vblur.setVisibility(View.VISIBLE);
+        }
     }
 
     @SuppressLint("SetTextI18n")

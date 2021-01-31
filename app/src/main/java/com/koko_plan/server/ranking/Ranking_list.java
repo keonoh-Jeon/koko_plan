@@ -57,6 +57,8 @@ import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.photourl;
 import static com.koko_plan.main.MainActivity.todaydate;
+import static com.koko_plan.sub.SetRankEvent.adview6;
+import static com.koko_plan.sub.SetRankEvent.adview7;
 
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener
 {
@@ -66,6 +68,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
     private ImageView ivrank;
+    private AdView adBanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,9 +81,9 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
         findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
 
-        AdView adBanner = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);
+        adBanner = findViewById(R.id.adView);
+        adBanner.setVisibility(View.GONE);
+
 
         realtimelistenerDoc();
 
@@ -191,6 +194,13 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     }
     @Override
     protected void onResume() {
+
+        if(adview7){
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner.setVisibility(View.VISIBLE);
+            adBanner.loadAd(adRequest);
+        }
+
         super.onResume();
     }
 //todo
