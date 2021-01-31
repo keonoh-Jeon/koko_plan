@@ -673,7 +673,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         v.findViewById(R.id.tvTime).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MySoundPlayer.play(MySoundPlayer.CLICK);
+//                MySoundPlayer.play(MySoundPlayer.CLICK);
                 showPopupCountTime(v, holder.getAdapterPosition());
             }
         });

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,13 +26,30 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.pref;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class SetzeroProgressReceiver extends BroadcastReceiver {
 
-    @SuppressLint("SimpleDateFormat")
+    private PowerManager.WakeLock sCpuWakeLock;
+
+    @SuppressLint({"SimpleDateFormat", "InvalidWakeLockTag"})
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        if (sCpuWakeLock != null) {
+            return;
+        }
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        sCpuWakeLock = pm.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                        PowerManager.ON_AFTER_RELEASE, "hi");
+
+        sCpuWakeLock.acquire();
+
+        if (sCpuWakeLock != null) {
+            sCpuWakeLock.release();
+            sCpuWakeLock = null;
+        }
 
         new Thread(() -> {
             if(firebaseUser != null){
@@ -50,6 +68,7 @@ public class SetzeroProgressReceiver extends BroadcastReceiver {
 
                                         Map<String, Object> curtime = new HashMap<>();
                                         curtime.put("curtime", 0);
+                                        curtime.put("curcount", 0);
 
                                         assert habbit != null;
                                         firebaseFirestore

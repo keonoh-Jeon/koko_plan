@@ -84,7 +84,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.iv_back:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
+//                    MySoundPlayer.play(MySoundPlayer.CLICK);
                     myStartActivity(MainActivity.class);
                     break;
             }
@@ -275,8 +275,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        myStartActivity(MainActivity.class);
     }
 }

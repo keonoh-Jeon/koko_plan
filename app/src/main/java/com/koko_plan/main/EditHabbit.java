@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -27,6 +29,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
@@ -69,6 +72,7 @@ public class EditHabbit extends AppCompatActivity {
         this.SetListener();
 
         et_habbittitle = (EditText) findViewById(R.id.et_habbittitle);
+        et_habbittitle.setFilters(new InputFilter[]{specialCharacterFilter});
 
         vieweveryday = findViewById(R.id.view_everyday);
         vieweveryday.setVisibility(View.INVISIBLE);
@@ -105,6 +109,23 @@ public class EditHabbit extends AppCompatActivity {
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         editor = pref.edit();
     }
+
+    /** 이모티콘이 있을경우 "" 리턴, 그렇지 않을 경우 null 리턴 **/
+    private InputFilter specialCharacterFilter = new InputFilter() {
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            for (int i = start; i < end; i++) {
+                // 이모티콘 패턴
+                Pattern unicodeOutliers = Pattern.compile("[\\uD83C-\\uDBFF\\uDC00-\\uDFFF]+");
+                // '-' 입력 받고 싶을 경우 : unicodeOutliers.matcher(source).matches() && !source.toString().matches(".*-.*")
+                if(unicodeOutliers.matcher(source).matches()) {
+                    startToast("이모티콘 제한");
+                    return ""; }
+            }
+            return null;
+        }
+    };
 
     private void SetListener() {
         View.OnClickListener Listener = new View.OnClickListener() {
@@ -211,5 +232,12 @@ public class EditHabbit extends AppCompatActivity {
 
     private void startToast(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

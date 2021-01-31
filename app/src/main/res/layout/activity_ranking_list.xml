@@ -109,6 +109,7 @@
 
 
                 </LinearLayout>
+
                 <TextView
                     android:id="@+id/tv_totalranker"
                     android:text="전체에서"
@@ -116,6 +117,15 @@
                     android:layout_marginLeft="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:layout_marginLeft="15sp"
+                    android:textColor="#448AFF"
+                    android:text=" 오른 쪽 트로피를 눌러, 혜택을 누리세요. (매일 1회) "
                     tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
             </LinearLayout>

@@ -44,6 +44,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -108,6 +109,8 @@ import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
+import com.koko_plan.sub.SaveRankReceiver;
+import com.koko_plan.sub.SetRankEvent;
 import com.koko_plan.sub.SetzeroProgressReceiver;
 import com.koko_plan.sub.Utils;
 import com.koko_plan.sub.kat_OverdrawActivity;
@@ -129,13 +132,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimerTask;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
+import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
+import static com.koko_plan.sub.SetRankEvent.adview1;
+import static com.koko_plan.sub.SetRankEvent.adview2;
+import static com.koko_plan.sub.SetRankEvent.adview3;
+import static com.koko_plan.sub.SetRankEvent.adview4;
+import static com.koko_plan.sub.SetRankEvent.fulladview;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
 
@@ -150,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("StaticFieldLeak")
     public static Button btnsavelist;
+    @SuppressLint("StaticFieldLeak")
     public static View like, trophy;
 
     public static String name, email;
@@ -186,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String selecteddata;
     private Date date, today, selected;
     private AppUpdateManager appUpdateManager;
-    private ImageView nav_header_photo_image, ivTrophy, ivgetcount;
+    private ImageView nav_header_photo_image, ivTrophy, ivgetcount, ivdownarrow, ivuparrow;
     private Calendar calendar;
     private HorizontalCalendar horizontalCalendar;
     private PieChart pieChart;
@@ -210,9 +221,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseCrashlytics crashlytics;
     private int todaysgoodtextsize;
     private int showcount = 0;
-    private TextView tvmyrankscore;
+    private TextView tvmyrankscore, tveffectintro;
+    public static TextView tvrankereffect;
     private String rank;
     private long Back_Key_Before_Time = 0;
+    private LinearLayout veffectintro;
+
+    private AdView adBanner, adBanner2, adBanner3, adBanner4;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -259,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         saveProgressAlarm(this);
         setzeroProgressAlarm(this);
+        setrankAlarm(this);
     }
 
     private void listenerhabbitlistDoc2() {
@@ -351,6 +367,73 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //가로 달력 시작시, 선택날짜와 이동
             horizontalCalendar.selectDate(calendar, true);
+
+            if(!todaydate.equals(pref.getString("yesterday", null))) {
+                new Thread(() -> {
+                    if(firebaseUser != null){
+                        firebaseFirestore
+                                .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                                .document(firebaseUser.getUid())
+                                .collection("total")
+
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                String habbit = (String) document.getData().get("habbittitle");
+
+                                                Map<String, Object> curtime = new HashMap<>();
+                                                curtime.put("curtime", 0);
+                                                curtime.put("curcount", 0);
+
+                                                assert habbit != null;
+                                                firebaseFirestore
+                                                        .collection("users")
+                                                        .document(firebaseUser.getUid())
+                                                        .collection("total")
+                                                        .document(habbit)
+
+                                                        .set(curtime, SetOptions.merge())
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                            }
+                                                        });
+                                            }
+                                        } else {
+                                            Log.d(TAG, "Error getting documents: ", task.getException());
+                                        }
+                                    }
+                                });
+
+                        Map<String, Object> getcount = new HashMap<>();
+                        getcount.put("getcount", 0);
+                        getcount.put("progress", 0);
+
+                        firebaseFirestore
+                                .collection("users")
+                                .document(firebaseUser.getUid())
+                                .set(getcount, SetOptions.merge())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
+                    }
+                }).start();
+            }
     }
 
     private String getdayofweek() {
@@ -510,7 +593,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
-                Log.e(TAG, "onCalendarScroll: "+ "스크롤");
                 timegap = 0;
             }
 
@@ -631,8 +713,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ivgetcount = findViewById(R.id.iv_getcount);
         ivTrophy = findViewById(R.id.iv_trophy);
+        ivdownarrow = findViewById(R.id.iv_downarrow);
+        ivuparrow = findViewById(R.id.iv_uparrow);
+
+        veffectintro = findViewById(R.id.v_effectintro);
+        veffectintro.setVisibility(View.GONE);
 
         tvmyrankscore = findViewById(R.id.tv_myrankscore);
+        tvrankereffect = findViewById(R.id.tv_rankereffect);
 
         tvgetcount= findViewById(R.id.tv_getcount);
         tvtodayget= findViewById(R.id.tv_todayget);
@@ -647,13 +735,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
         //배너 광고 표기
-        AdView adBanner = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adBanner.loadAd(adRequest);
-
-        AdView adBanner2 = findViewById(R.id.adView2);
-        AdRequest adRequest2 = new AdRequest.Builder().build();
-        adBanner2.loadAd(adRequest2);
+        adBanner = findViewById(R.id.ad_View1);
+        adBanner2 = findViewById(R.id.ad_View2);
+        adBanner3 = findViewById(R.id.ad_View3);
+        adBanner4 = findViewById(R.id.ad_View4);
 
 //        recyclerView.setVisibility(View.GONE);
 //        recyclerView2 = findViewById(R.id.rv_habbitview2);
@@ -666,6 +751,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //효과음 초기화
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        if(fulladview = true) Log.e(TAG, "InitializeView: " + fulladview);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -686,8 +773,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
             }
         }).start();
-
-
 
         new Thread(() -> {
             Profilebitmap thread = new Profilebitmap();
@@ -917,7 +1002,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
         ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, relativeview.getTop()));
 
+        ivdownarrow.setOnClickListener(v ->  veffectintro.setVisibility(View.VISIBLE));
+        ivuparrow.setOnClickListener(v ->  veffectintro.setVisibility(View.GONE));
+
         btnsavelist.setVisibility(View.GONE);
+
         btnsavelist.setOnClickListener(v -> {
             timegap = 0;
             resetId();
@@ -968,7 +1057,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
-        if (requestCode == 1) {
+        if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 startToast("새 습관이 추가되었습니다.");
             }
@@ -1083,7 +1172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(this, c);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, 2);
         overridePendingTransition(0, 0);
     }
 
@@ -1215,11 +1304,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             editor.putInt("showcount", showcount);
             editor.putLong("stoptime", 0);
             editor.putInt("todayitemsize", todayitemsize);
+            editor.putString("yesterday", todaydate);
             editor.apply();
 
             for(int i=0 ; i < todayitemsize ; i++) {
                 if(todoListItems.get(i).getIsrunning()) {
                     todoListItems.get(i).setCurtime(lastsec-1);
+
                     Map<String, Object> data = new HashMap<>();
                     data.put("curtime", lastsec-1);
                     firebaseFirestore
@@ -1308,6 +1399,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
+        veffectintro.setVisibility(View.GONE);
+
         new Thread(() -> {
             //업데이트 가능 시, 연결해서 업데이트
             appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
@@ -1332,7 +1425,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         probitmap();
 
-
         // 현재 날짜 구하기
         gettodaydate();
 
@@ -1347,6 +1439,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         long stoptime = pref.getLong("stoptime", 0);
         rank = pref.getString("rank", "");
         float rankscore = pref.getFloat("rankscore", 100);
+        float eventscore = pref.getFloat("eventscore", 100);
+        SetRankEvent.set(eventscore);
         tvmyrankscore.setText(rank+"");
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
@@ -1354,6 +1448,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
+
+        showbanner();
+    }
+
+    private void showbanner() {
+
+        adBanner.setVisibility(View.GONE);
+        adBanner2.setVisibility(View.GONE);
+        adBanner3.setVisibility(View.GONE);
+        adBanner4.setVisibility(View.GONE);
+
+        if(adview1 = true){
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner.setVisibility(View.VISIBLE);
+            adBanner.loadAd(adRequest);
+        }
+
+        if(adview2 = true){
+            AdRequest adRequest2 = new AdRequest.Builder().build();
+            adBanner2.setVisibility(View.VISIBLE);
+            adBanner2.loadAd(adRequest2);
+        }
+
+        if(adview3 = true){
+            AdRequest adRequest3 = new AdRequest.Builder().build();
+            adBanner3.setVisibility(View.VISIBLE);
+            adBanner3.loadAd(adRequest3);
+        }
+
+        if(adview4 = true){
+            AdRequest adRequest4 = new AdRequest.Builder().build();
+            adBanner4.setVisibility(View.VISIBLE);
+            adBanner4.loadAd(adRequest4);
+        }
+
+
     }
 
     private void settrophyimage(float rankscore) {
@@ -1367,85 +1497,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
                     @Override
                     public void run() {
-                        drawable = getResources().getDrawable(R.drawable.iron);
-                        if(rankscore<=99.94) {
-                            drawable = getResources().getDrawable(R.drawable.iron);
-                            if (rankscore <= 99.64) {
-                                drawable = getResources().getDrawable(R.drawable.iron);
-                                if (rankscore <= 98.94) {
-                                    drawable = getResources().getDrawable(R.drawable.iron);
-                                    if (rankscore <= 97.93) {
-                                        drawable = getResources().getDrawable(R.drawable.bronze);
-                                        if (rankscore <= 95.53) {
-                                            drawable = getResources().getDrawable(R.drawable.bronze);
-                                            if (rankscore <= 92.78) {
-                                                drawable = getResources().getDrawable(R.drawable.bronze);
-                                                if (rankscore <= 88.73) {
-                                                    drawable = getResources().getDrawable(R.drawable.bronze);
-                                                    if (rankscore <= 82.76) {
-                                                        drawable = getResources().getDrawable(R.drawable.silver);
-                                                        if (rankscore <= 73.61) {
-                                                            drawable = getResources().getDrawable(R.drawable.silver);
-                                                            if (rankscore <= 66.31) {
-                                                                drawable = getResources().getDrawable(R.drawable.silver);
-                                                                if (rankscore <= 57.53) {
-                                                                    drawable = getResources().getDrawable(R.drawable.silver);
-                                                                    if (rankscore <= 50.21) {
-                                                                        drawable = getResources().getDrawable(R.drawable.gold);
-                                                                        if (rankscore <= 36.76) {
-                                                                            drawable = getResources().getDrawable(R.drawable.gold);
-                                                                            if (rankscore <= 29.14) {
-                                                                                drawable = getResources().getDrawable(R.drawable.gold);
-                                                                                if (rankscore <= 22.53) {
-                                                                                    drawable = getResources().getDrawable(R.drawable.gold);
-                                                                                    if (rankscore <= 18.36) {
-                                                                                        drawable = getResources().getDrawable(R.drawable.platinum);
-                                                                                        if (rankscore <= 10.58) {
-                                                                                            drawable = getResources().getDrawable(R.drawable.platinum);
-                                                                                            if (rankscore <= 7.58) {
-                                                                                                drawable = getResources().getDrawable(R.drawable.platinum);
-                                                                                                if (rankscore <= 5.59) {
-                                                                                                    drawable = getResources().getDrawable(R.drawable.platinum);
-                                                                                                    if (rankscore <= 3.67) {
-                                                                                                        drawable = getResources().getDrawable(R.drawable.diamond);
-                                                                                                        if (rankscore <= 1.45) {
-                                                                                                            drawable = getResources().getDrawable(R.drawable.diamond);
-                                                                                                            if (rankscore <= 0.68) {
-                                                                                                                drawable = getResources().getDrawable(R.drawable.diamond);
-                                                                                                                if (rankscore <= 0.31) {
-                                                                                                                    drawable = getResources().getDrawable(R.drawable.diamond);
-                                                                                                                    if (rankscore <= 0.11) {
-                                                                                                                        drawable = getResources().getDrawable(R.drawable.master);
-                                                                                                                        if (rankscore <= 0.06) {
-                                                                                                                            drawable = getResources().getDrawable(R.drawable.g_master);
-                                                                                                                            if (rankscore <= 0.02) {
-                                                                                                                                drawable = getResources().getDrawable(R.drawable.challenger);
 
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        if (97.93 < rankscore && rankscore <= 100) {
+                            drawable = getResources().getDrawable(R.drawable.iron);
+                        } else if (82.76 < rankscore && rankscore <= 97.93) {
+                            drawable = getResources().getDrawable(R.drawable.bronze);
+                        } else if (50.21 < rankscore && rankscore <= 82.76) {
+                            drawable = getResources().getDrawable(R.drawable.silver);
+                        } else if (18.36 < rankscore && rankscore <= 50.21) {
+                            drawable = getResources().getDrawable(R.drawable.gold);
+                        } else if (3.67 < rankscore && rankscore <= 18.36) {
+                            drawable = getResources().getDrawable(R.drawable.platinum);
+                        } else if (0.11 < rankscore && rankscore <= 3.67) {
+                            drawable = getResources().getDrawable(R.drawable.diamond);
+                        } else if (0.06 < rankscore && rankscore <= 0.11) {
+                            drawable = getResources().getDrawable(R.drawable.master);
+                        } else if (0.02 < rankscore && rankscore <= 0.06) {
+                            drawable = getResources().getDrawable(R.drawable.g_master);
+                        } else if (0 < rankscore && rankscore <= 0.02) {
+                            drawable = getResources().getDrawable(R.drawable.challenger);
                         }
                         ivTrophy.setImageDrawable(drawable);
                     }
@@ -1819,6 +1889,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, setzeroSender);
+    }
+
+    //자정마다 실행 (리시버)
+    void setrankAlarm(Context context){
+        //알람 매니저 생성
+        AlarmManager setrankAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        //리시브 받을 클래스 연결
+        Intent setrankProgressIntent = new Intent(context, SaveRankReceiver.class);
+        PendingIntent setrankSender = PendingIntent.getBroadcast(context, 0, setrankProgressIntent, 0);
+
+        //실행 시간
+        Calendar setrankCal = Calendar.getInstance();
+        setrankCal.setTimeInMillis(System.currentTimeMillis());
+        setrankCal.set(Calendar.HOUR_OF_DAY, 0);
+        setrankCal.set(Calendar.MINUTE, 0);
+        setrankCal.set(Calendar.SECOND, 0);
+
+        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
+        setrankAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setrankCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
+                , AlarmManager.INTERVAL_DAY, setrankSender);
     }
 
     @Override
