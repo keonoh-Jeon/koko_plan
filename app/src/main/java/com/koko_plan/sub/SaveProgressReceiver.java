@@ -100,7 +100,7 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                                         Map<String, Object> todayprogresslist = new HashMap<>();
                                         if(isrun) {
                                             long now = System.currentTimeMillis();
-                                            long stoptime = pref.getLong("stoptime", 0);
+                                            long stoptime = pref.getLong("stoptime", System.currentTimeMillis());
                                             int timegap = (int)((now-stoptime)/1000);
                                             todayprogresslist.put("curtime", curtime + timegap);
                                         } else {

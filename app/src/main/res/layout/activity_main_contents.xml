@@ -51,7 +51,7 @@
                         android:paddingLeft="10dp"
                         android:layout_gravity="center"
                         android:text="골드 1 효과 발동중 "
-                        tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+                        tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry,SmallSp" />
 
                     <ImageView
                         android:id="@+id/iv_downarrow"
@@ -85,6 +85,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
                         android:src="@drawable/uparrow"
                         tools:ignore="RtlHardcoded" />
 
@@ -167,7 +168,7 @@
                             android:id="@+id/v_blur1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            app:realtimeBlurRadius="5dp"
+                            app:realtimeBlurRadius="7dp"
                             app:realtimeOverlayColor="#88FFFFFF"/>
 
                     </FrameLayout>
@@ -218,7 +219,7 @@
                             android:id="@+id/v_blur2"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            app:realtimeBlurRadius="5dp"
+                            app:realtimeBlurRadius="7dp"
                             app:realtimeOverlayColor="#88FFFFFF"/>
 
                     </FrameLayout>
@@ -314,12 +315,12 @@
                             android:nestedScrollingEnabled="false"
                             tools:ignore="ScrollViewSize,UnusedAttribute" />
 
-                        <com.github.mmin18.widget.RealtimeBlurView
+                        <!--<com.github.mmin18.widget.RealtimeBlurView
                             android:id="@+id/v_blur3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
-                            app:realtimeOverlayColor="#88FFFFFF"/>
+                            app:realtimeOverlayColor="#88FFFFFF"/>-->
 
                     </FrameLayout>
 

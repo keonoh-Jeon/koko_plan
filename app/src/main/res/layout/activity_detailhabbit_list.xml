@@ -124,102 +124,108 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                tools:ignore="RtlHardcoded">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        tools:ignore="RtlHardcoded">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="지금까지 총 "
-                    tools:ignore="HardcodedText" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="지금까지 총 "
+                            tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:id="@+id/tv_countsum"
-                    android:text="총 시행"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textColor="#FF9800"
-                    tools:ignore="HardcodedText" />
+                        <TextView
+                            android:id="@+id/tv_countsum"
+                            android:text="총 시행"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:textColor="#FF9800"
+                            tools:ignore="HardcodedText" />
 
 
 
-                <TextView
-                    android:text=", "
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:ignore="HardcodedText" />
+                        <TextView
+                            android:text=", "
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:id="@+id/tv_curtimesum"
-                    android:text="전체 시간"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                        <TextView
+                            android:id="@+id/tv_curtimesum"
+                            android:text="전체 시간"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:text=" 동안 실시"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:ignore="HardcodedText" />
+                        <TextView
+                            android:text=" 동안 실시"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="15dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="하루 평균,  "
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/tv_average"
+                            android:text="0시간 0분 0초"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/ day   , "
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/tv_dayproaverage"
+                            android:text="0%"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:textColor="#3F51B5"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/ day"
+                            tools:ignore="HardcodedText" />
+
+                    </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp"
-                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="하루 평균,  "
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tv_average"
-                    android:text="0시간 0분 0초"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    tools:ignore="HardcodedText" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="/ day   ,"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tv_dayproaverage"
-                    android:text="0%"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    android:textColor="#3F51B5"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="/ day"
-                    tools:ignore="HardcodedText" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/google_ads_banner_api_key">
+        </com.google.android.gms.ads.AdView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -312,8 +318,9 @@
                         android:id="@+id/v_blur"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:realtimeBlurRadius="5dp"
+                        app:realtimeBlurRadius="7dp"
                         app:realtimeOverlayColor="#88FFFFFF"/>
+
                 </FrameLayout>
 
             </LinearLayout>

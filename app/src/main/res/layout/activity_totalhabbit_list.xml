@@ -142,6 +142,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <com.google.android.gms.ads.AdView
+                xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/adView_totalhabbit2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/google_ads_banner_api_key">
+            </com.google.android.gms.ads.AdView>
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

@@ -119,15 +119,6 @@
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp"
-                    android:layout_marginLeft="15sp"
-                    android:textColor="#448AFF"
-                    android:text=" 오른 쪽 트로피를 눌러, 혜택을 누리세요. (매일 1회) "
-                    tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -155,6 +146,15 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/google_ads_banner_api_key">
+        </com.google.android.gms.ads.AdView>
 
         <LinearLayout
             android:layout_width="match_parent"

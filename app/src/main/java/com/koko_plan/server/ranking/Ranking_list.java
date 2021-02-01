@@ -51,14 +51,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.koko_plan.main.MainActivity.adview10;
+import static com.koko_plan.main.MainActivity.adview7;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.photourl;
 import static com.koko_plan.main.MainActivity.todaydate;
-import static com.koko_plan.sub.SetRankEvent.adview6;
-import static com.koko_plan.sub.SetRankEvent.adview7;
 
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener
 {
@@ -68,7 +68,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     public static ArrayList<Ranking_Item> ranking_items = null;
     private Ranking_Adapter rankingAdapter = null;
     private ImageView ivrank;
-    private AdView adBanner;
+    private AdView adBanner, adBanner2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,6 +83,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
 
         adBanner = findViewById(R.id.adView);
         adBanner.setVisibility(View.GONE);
+        adBanner2 = findViewById(R.id.adView2);
+        adBanner2.setVisibility(View.GONE);
 
 
         realtimelistenerDoc();
@@ -195,11 +197,17 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @Override
     protected void onResume() {
 
-        if(adview7){
+        if(adview10){
             AdRequest adRequest = new AdRequest.Builder().build();
             adBanner.setVisibility(View.VISIBLE);
             adBanner.loadAd(adRequest);
         }
+        if(adview7){
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner2.setVisibility(View.VISIBLE);
+            adBanner2.loadAd(adRequest);
+        }
+
 
         super.onResume();
     }
@@ -257,99 +265,99 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                         @Override
                                         public void run() {
                                             if(99.94 < rankscore && rankscore <= 100) {
-                                                tvranking.setText("Iron 4");
+                                                tvranking.setText("Iron IV");
                                                 drawable = getResources().getDrawable(R.drawable.iron);
                                                 editor.putString("rank", "Iron IV");
                                             } else if(99.64 < rankscore && rankscore <= 99.94) {
-                                                tvranking.setText("Iron 3");
+                                                tvranking.setText("Iron III");
                                                 drawable = getResources().getDrawable(R.drawable.iron);
                                                 editor.putString("rank", "Iron III");
                                             } else if (98.94 < rankscore && rankscore <= 99.64) {
-                                                tvranking.setText("Iron 2");
+                                                tvranking.setText("Iron II");
                                                 drawable = getResources().getDrawable(R.drawable.iron);
                                                 editor.putString("rank", "Iron II");
                                             } else if (97.93 < rankscore && rankscore <= 98.94) {
-                                                tvranking.setText("Iron 1");
+                                                tvranking.setText("Iron I");
                                                 drawable = getResources().getDrawable(R.drawable.iron);
                                                 editor.putString("rank", "Iron I");
                                             } else if (95.53 < rankscore && rankscore <= 97.93) {
-                                                tvranking.setText("Bronze 4");
+                                                tvranking.setText("Bronze IV");
                                                 drawable = getResources().getDrawable(R.drawable.bronze);
                                                 editor.putString("rank", "Bronze IV");
                                             } else if (92.78 < rankscore && rankscore <= 95.53) {
-                                                tvranking.setText("Bronze 3");
+                                                tvranking.setText("Bronze III");
                                                 drawable = getResources().getDrawable(R.drawable.bronze);
                                                 editor.putString("rank", "Bronze III");
                                             } else if (88.73 < rankscore && rankscore <= 92.78) {
-                                                tvranking.setText("Bronze 2");
+                                                tvranking.setText("Bronze II");
                                                 drawable = getResources().getDrawable(R.drawable.bronze);
                                                 editor.putString("rank", "Bronze II");
                                             } else if (82.76 < rankscore && rankscore <= 88.73) {
-                                                tvranking.setText("Bronze 1");
+                                                tvranking.setText("Bronze I");
                                                 drawable = getResources().getDrawable(R.drawable.bronze);
                                                 editor.putString("rank", "Bronze I");
                                             } else if (73.61 < rankscore && rankscore <= 82.76) {
-                                                tvranking.setText("Silver 4");
+                                                tvranking.setText("Silver IV");
                                                 drawable = getResources().getDrawable(R.drawable.silver);
                                                 editor.putString("rank", "Silver IV");
                                             } else if (66.31 < rankscore && rankscore <= 73.61) {
-                                                tvranking.setText("Silver 3");
+                                                tvranking.setText("Silver III");
                                                 drawable = getResources().getDrawable(R.drawable.silver);
                                                 editor.putString("rank", "Silver III");
                                             } else if (57.53 < rankscore && rankscore <= 66.31) {
-                                                tvranking.setText("Silver 2");
+                                                tvranking.setText("Silver II");
                                                 drawable = getResources().getDrawable(R.drawable.silver);
                                                 editor.putString("rank", "Silver II");
                                             } else if (50.21 < rankscore && rankscore <= 57.53) {
-                                                tvranking.setText("Silver 1");
+                                                tvranking.setText("Silver I");
                                                 drawable = getResources().getDrawable(R.drawable.silver);
                                                 editor.putString("rank", "Silver I");
                                             } else if (36.76 < rankscore && rankscore <= 50.21) {
-                                                tvranking.setText("Gold 4");
+                                                tvranking.setText("Gold IV");
                                                 drawable = getResources().getDrawable(R.drawable.gold);
                                                 editor.putString("rank", "Gold IV");
                                             } else if (29.14 < rankscore && rankscore <= 36.76) {
-                                                tvranking.setText("Gold 3");
+                                                tvranking.setText("Gold III");
                                                 drawable = getResources().getDrawable(R.drawable.gold);
                                                 editor.putString("rank", "Gold III");
                                             } else if (22.53 < rankscore && rankscore <= 29.14) {
-                                                tvranking.setText("Gold 2");
+                                                tvranking.setText("Gold II");
                                                 drawable = getResources().getDrawable(R.drawable.gold);
                                                 editor.putString("rank", "Gold II");
                                             } else if (18.36 < rankscore && rankscore <= 22.53) {
-                                                tvranking.setText("Gold 1");
+                                                tvranking.setText("Gold I");
                                                 drawable = getResources().getDrawable(R.drawable.gold);
                                                 editor.putString("rank", "Gold I");
                                             } else if (10.58 < rankscore && rankscore <= 18.36) {
-                                                tvranking.setText("Platinum 4");
+                                                tvranking.setText("Platinum IV");
                                                 drawable = getResources().getDrawable(R.drawable.platinum);
                                                 editor.putString("rank", "Platinum IV");
                                             } else if (7.58 < rankscore && rankscore <= 10.58) {
-                                                tvranking.setText("Platinum 3");
+                                                tvranking.setText("Platinum III");
                                                 drawable = getResources().getDrawable(R.drawable.platinum);
                                                 editor.putString("rank", "Platinum III");
                                             } else if (5.59 < rankscore && rankscore <= 7.58) {
-                                                tvranking.setText("Platinum 2");
+                                                tvranking.setText("Platinum II");
                                                 drawable = getResources().getDrawable(R.drawable.platinum);
                                                 editor.putString("rank", "Platinum II");
                                             } else if (3.67 < rankscore && rankscore <= 5.59) {
-                                                tvranking.setText("Platinum 1");
+                                                tvranking.setText("Platinum I");
                                                 drawable = getResources().getDrawable(R.drawable.platinum);
                                                 editor.putString("rank", "Platinum I");
                                             } else if (1.45 < rankscore && rankscore <= 3.67) {
-                                                tvranking.setText("Diamond 4");
+                                                tvranking.setText("Diamond IV");
                                                 drawable = getResources().getDrawable(R.drawable.diamond);
                                                 editor.putString("rank", "Diamond IV");
                                             } else if (0.68 < rankscore && rankscore <= 1.45) {
-                                                tvranking.setText("Diamond 3");
+                                                tvranking.setText("Diamond III");
                                                 drawable = getResources().getDrawable(R.drawable.diamond);
                                                 editor.putString("rank", "Diamond III");
                                             } else if (0.31 < rankscore && rankscore <= 0.68) {
-                                                tvranking.setText("Diamond 2");
+                                                tvranking.setText("Diamond II");
                                                 drawable = getResources().getDrawable(R.drawable.diamond);
                                                 editor.putString("rank", "Diamond II");
                                             } else if (0.11 < rankscore && rankscore <= 0.31) {
-                                                tvranking.setText("Diamond 1");
+                                                tvranking.setText("Diamond I");
                                                 drawable = getResources().getDrawable(R.drawable.diamond);
                                                 editor.putString("rank", "Diamond I");
                                             } else if (0.06 < rankscore && rankscore <= 0.11) {

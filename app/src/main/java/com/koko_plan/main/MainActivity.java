@@ -141,14 +141,6 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
-import static com.koko_plan.sub.SetRankEvent.adview1;
-import static com.koko_plan.sub.SetRankEvent.adview2;
-import static com.koko_plan.sub.SetRankEvent.adview3;
-import static com.koko_plan.sub.SetRankEvent.adview4;
-import static com.koko_plan.sub.SetRankEvent.blurview1;
-import static com.koko_plan.sub.SetRankEvent.blurview2;
-import static com.koko_plan.sub.SetRankEvent.blurview3;
-import static com.koko_plan.sub.SetRankEvent.fulladview;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
 
@@ -231,8 +223,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long Back_Key_Before_Time = 0;
     private LinearLayout veffectintro;
     private View vblur1, vblur2, vblur3;
+    private ProgressDialog pd;
 
     private AdView adBanner, adBanner2, adBanner3, adBanner4;
+
+    public static boolean fulladview;
+    public static boolean adview1;
+    public static boolean adview2;
+    public static boolean adview3;
+    public static boolean adview4;
+    public static boolean adview5;
+    public static boolean adview6;
+    public static boolean adview7;
+    public static boolean adview8;
+    public static boolean adview9;
+    public static boolean adview10;
+    public static boolean blurview1;
+    public static boolean blurview2;
+    public static boolean blurview3;
+    public static boolean blurview4;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -566,7 +575,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         long cur = 0;
                                                         if (task.isSuccessful()) {
                                                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                                                Log.d(TAG, document.getId() + " => " + document.getData());
                                                                 todoListItems.add(document.toObject(TodoList_Item.class));
                                                                 long total = (long) document.getData().get("totalsec");
                                                                 cur += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
@@ -700,70 +708,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void InitializeView() {
 
-        scrollview = findViewById(R.id.scrollview);
-        relativeview = findViewById(R.id.view_relativeview);
+            scrollview = findViewById(R.id.scrollview);
+            relativeview = findViewById(R.id.view_relativeview);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+            navigationView.setNavigationItemSelectedListener(this);
 
-        View nav_header_view = navigationView.getHeaderView(0);
-        nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
-        nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
-        nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
+            View nav_header_view = navigationView.getHeaderView(0);
+            nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
+            nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
+            nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
 
-        ivgetcount = findViewById(R.id.iv_getcount);
-        ivTrophy = findViewById(R.id.iv_trophy);
-        ivdownarrow = findViewById(R.id.iv_downarrow);
-        ivuparrow = findViewById(R.id.iv_uparrow);
+            ivgetcount = findViewById(R.id.iv_getcount);
+            ivTrophy = findViewById(R.id.iv_trophy);
+            ivdownarrow = findViewById(R.id.iv_downarrow);
+            ivuparrow = findViewById(R.id.iv_uparrow);
 
-        veffectintro = findViewById(R.id.v_effectintro);
-        veffectintro.setVisibility(View.GONE);
+            veffectintro = findViewById(R.id.v_effectintro);
+            veffectintro.setVisibility(View.GONE);
 
-        vblur1= findViewById(R.id.v_blur1);
-        vblur1.setVisibility(View.GONE);
-        vblur2= findViewById(R.id.v_blur2);
-        vblur2.setVisibility(View.GONE);
-        vblur3= findViewById(R.id.v_blur3);
-        vblur3.setVisibility(View.GONE);
+            vblur1= findViewById(R.id.v_blur1);
+            vblur1.setVisibility(View.GONE);
+            vblur2= findViewById(R.id.v_blur2);
+            vblur2.setVisibility(View.GONE);
+//            vblur3= findViewById(R.id.v_blur3);
+//            vblur3.setVisibility(View.GONE);
 
-        tvmyrankscore = findViewById(R.id.tv_myrankscore);
-        tvrankereffect = findViewById(R.id.tv_rankereffect);
-        tveventeffect = findViewById(R.id.tv_eventeffect);
+            tvmyrankscore = findViewById(R.id.tv_myrankscore);
+            tvrankereffect = findViewById(R.id.tv_rankereffect);
+            tveventeffect = findViewById(R.id.tv_eventeffect);
 
-        tvgetcount= findViewById(R.id.tv_getcount);
-        tvtodayget= findViewById(R.id.tv_todayget);
+            tvgetcount= findViewById(R.id.tv_getcount);
+            tvtodayget= findViewById(R.id.tv_todayget);
 
-        pieChart = findViewById(R.id.piechart);
+            pieChart = findViewById(R.id.piechart);
 
-        btnPlus = findViewById(R.id.btnPlus);
-        btnsavelist = findViewById(R.id.btn_savelist);
-        like = findViewById(R.id.view_like);
-        trophy = findViewById(R.id.view_trophy);
+            btnPlus = findViewById(R.id.btnPlus);
+            btnsavelist = findViewById(R.id.btn_savelist);
+            like = findViewById(R.id.view_like);
+            trophy = findViewById(R.id.view_trophy);
 
-        tvTodayProgress = findViewById(R.id.tv_todayprogress);
+            tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
-        //배너 광고 표기
-        adBanner = findViewById(R.id.ad_View1);
-        adBanner2 = findViewById(R.id.ad_View2);
-        adBanner3 = findViewById(R.id.ad_View3);
-        adBanner4 = findViewById(R.id.ad_View4);
+            //배너 광고 표기
+            adBanner = findViewById(R.id.ad_View1);
+            adBanner2 = findViewById(R.id.ad_View2);
+            adBanner3 = findViewById(R.id.ad_View3);
+            adBanner4 = findViewById(R.id.ad_View4);
+            recyclerView3 = findViewById(R.id.rv_msg);
 
-//        recyclerView.setVisibility(View.GONE);
-//        recyclerView2 = findViewById(R.id.rv_habbitview2);
-//        recyclerView2.setVisibility(View.GONE);
-        recyclerView3 = findViewById(R.id.rv_msg);
+            goodtextsize = findViewById(R.id.tv_goodtextsize);
+            calendarView = findViewById(R.id.calendarView2);
 
-        goodtextsize = findViewById(R.id.tv_goodtextsize);
-        calendarView = findViewById(R.id.calendarView2);
-
-        //효과음 초기화
-        MySoundPlayer.initSounds(getApplicationContext());
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+            //효과음 초기화
+            MySoundPlayer.initSounds(getApplicationContext());
+            setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -838,72 +842,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //어플 업데이트 관리
     private void Appupdatemanager() {
-        appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
-        com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            // Checks that the platform will allow the specified type of update.
-            if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
-                    && appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE))
-            {
-                // Request the update.
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            IMMEDIATE,
-                            this,
-                            REQUEST_APP_UPDATE);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
+            com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+                // Checks that the platform will allow the specified type of update.
+                if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
+                        && appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE))
+                {
+                    // Request the update.
+                    try {
+                        appUpdateManager.startUpdateFlowForResult(
+                                appUpdateInfo,
+                                IMMEDIATE,
+                                this,
+                                REQUEST_APP_UPDATE);
+                    } catch (IntentSender.SendIntentException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }).start();
     }
 
     //하단 달력 설정
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void EventCalendarMaker(Calendar calendar){
 
-        // https://github.com/Applandeo/Material-Calendar-View
+            // https://github.com/Applandeo/Material-Calendar-View
 
-        try {
-            calendarView.setDate(calendar);
-        } catch (OutOfDateRangeException e) {
-            e.printStackTrace();
-        }
+            try {
+                calendarView.setDate(calendar);
+            } catch (OutOfDateRangeException e) {
+                e.printStackTrace();
+            }
 
-        CalendarEvents(calendar);
+            CalendarEvents(calendar);
 //or
         /*events.add(new EventDay(calendar2, new Drawable()));
 //or if you want to specify event label color
         events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
 
 
-        //달력클릭
-        calendarView.setOnDayClickListener(new OnDayClickListener() {
+            //달력클릭
+            calendarView.setOnDayClickListener(new OnDayClickListener() {
 
-            @Override
-            public void onDayClick(EventDay eventDay) {
-                Calendar clickedDayCalendar = eventDay.getCalendar();
-                horizontalCalendar.selectDate(clickedDayCalendar, true);
-                selecteddata = dateformat.format(clickedDayCalendar.getTime());
-                scrollview.scrollTo(0,0);
-            }
-        });
+                @Override
+                public void onDayClick(EventDay eventDay) {
+                    Calendar clickedDayCalendar = eventDay.getCalendar();
+                    horizontalCalendar.selectDate(clickedDayCalendar, true);
+                    selecteddata = dateformat.format(clickedDayCalendar.getTime());
+                    scrollview.scrollTo(0,0);
+                }
+            });
 
-        calendarView.setOnPreviousPageChangeListener(new OnCalendarPageChangeListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onChange() {
-                showcalendardayprogress();
-            }
-        });
+            calendarView.setOnPreviousPageChangeListener(new OnCalendarPageChangeListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onChange() {
+                    showcalendardayprogress();
+                }
+            });
 
-        calendarView.setOnForwardPageChangeListener(new OnCalendarPageChangeListener() {
-            @Override
-            public void onChange() {
-                showcalendardayprogress();
-            }
-        });
+            calendarView.setOnForwardPageChangeListener(new OnCalendarPageChangeListener() {
+                @Override
+                public void onChange() {
+                    showcalendardayprogress();
+                }
+            });
     }
 
     private void showcalendardayprogress() {
@@ -1013,8 +1019,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
         ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, relativeview.getTop()));
 
-        ivdownarrow.setOnClickListener(v ->  veffectintro.setVisibility(View.VISIBLE));
-        ivuparrow.setOnClickListener(v ->  veffectintro.setVisibility(View.GONE));
+        ivdownarrow.setOnClickListener(v ->  {
+            veffectintro.setVisibility(View.VISIBLE);
+            ivdownarrow.setVisibility(View.INVISIBLE);
+        });
+
+        ivuparrow.setOnClickListener(v -> {
+            veffectintro.setVisibility(View.GONE);
+            ivdownarrow.setVisibility(View.VISIBLE);
+        });
 
         btnsavelist.setVisibility(View.GONE);
 
@@ -1094,7 +1107,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 long today = 0;
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d(TAG, document.getId() + " => " + document.getData());
                                         todoListItems.add(document.toObject(TodoList_Item.class));
                                         long total = (long) document.getData().get("totalsec");
                                         cur += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
@@ -1122,6 +1134,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
+
+                                                pd.dismiss();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -1313,7 +1327,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
             editor.putInt("showcount", showcount);
-            editor.putLong("stoptime", 0);
+            editor.putLong("stoptime", System.currentTimeMillis());
             editor.putInt("todayitemsize", todayitemsize);
             editor.putString("yesterday", todaydate);
             editor.apply();
@@ -1413,6 +1427,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         veffectintro.setVisibility(View.GONE);
 
         new Thread(() -> {
+
+            //로딩 화면 만들기
+            pd = null;
+            pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
+
             //업데이트 가능 시, 연결해서 업데이트
             appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
                 if (appUpdateInfo.updateAvailability()
@@ -1447,11 +1466,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 현재시간을 date 변수에 저장한다.
 
         todayitemsize = pref.getInt("todayitemsize", 0);
-        long stoptime = pref.getLong("stoptime", 0);
+        long stoptime = pref.getLong("stoptime", System.currentTimeMillis());
         rank = pref.getString("rank", "");
         float rankscore = pref.getFloat("rankscore", 100);
         float eventscore = pref.getFloat("eventscore", 100);
-        SetRankEvent.set(eventscore);
+        SetRank(eventscore);
         Log.e(TAG, "onResume: " + eventscore);
         tvmyrankscore.setText(rank+"");
         settrophyimage(rankscore);
@@ -1464,50 +1483,573 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         showbannerblur();
     }
 
+    @SuppressLint("SetTextI18n")
+    private void SetRank(float rankscore) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+
+                        fulladview = true;
+                        adview1 = true;
+                        adview2 = true;
+                        adview3 = true;
+                        adview4 = true;
+                        adview5 = true;
+                        adview6 = true;
+                        adview7 = true;
+                        adview8 = true;
+                        adview9 = true;
+                        adview10 = true;
+                        blurview1 = true;
+                        blurview2 = true;
+                        blurview3 = true;
+                        blurview4 = true;
+
+                        if(99.94 < rankscore && rankscore <= 100) {
+                            tvrankereffect.setText("Iron IV 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                        } else if(99.64 < rankscore && rankscore <= 99.94) {
+                            tvrankereffect.setText("Iron III 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                        } else if (98.94 < rankscore && rankscore <= 99.64) {
+                            tvrankereffect.setText("Iron II 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                        } else if (97.93 < rankscore && rankscore <= 98.94) {
+                            tvrankereffect.setText("Iron I 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                        } else if (95.53 < rankscore && rankscore <= 97.93) {
+                            tvrankereffect.setText("Bronze IV 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                        } else if (92.78 < rankscore && rankscore <= 95.53) {
+                            tvrankereffect.setText("Bronze III 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                        } else if (88.73 < rankscore && rankscore <= 92.78) {
+                            tvrankereffect.setText("Bronze II 보상 없슴");
+                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                        } else if (82.76 < rankscore && rankscore <= 88.73) {
+                            tvrankereffect.setText("Bronze I 보상 발동 중");
+                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                        } else if (73.61 < rankscore && rankscore <= 82.76) {
+                            tvrankereffect.setText("Silver IV 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (66.31 < rankscore && rankscore <= 73.61) {
+                            tvrankereffect.setText("Silver III 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (57.53 < rankscore && rankscore <= 66.31) {
+                            tvrankereffect.setText("Silver II 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (50.21 < rankscore && rankscore <= 57.53) {
+                            tvrankereffect.setText("Silver I 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (36.76 < rankscore && rankscore <= 50.21) {
+                            tvrankereffect.setText("Gold IV 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관상세] 상단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = false;
+                            adview9 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (29.14 < rankscore && rankscore <= 36.76) {
+                            tvrankereffect.setText("Gold III 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (22.53 < rankscore && rankscore <= 29.14) {
+                            tvrankereffect.setText("Gold II 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+
+                        } else if (18.36 < rankscore && rankscore <= 22.53) {
+                            tvrankereffect.setText("Gold I 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = false;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (10.58 < rankscore && rankscore <= 18.36) {
+                            tvrankereffect.setText("Platinum IV 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (7.58 < rankscore && rankscore <= 10.58) {
+                            tvrankereffect.setText("Platinum III 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = true;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (5.59 < rankscore && rankscore <= 7.58) {
+                            tvrankereffect.setText("Platinum II 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거+" +
+                                    "\n - [전체 습관] 하단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (3.67 < rankscore && rankscore <= 5.59) {
+                            tvrankereffect.setText("Platinum I 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (1.45 < rankscore && rankscore <= 3.67) {
+                            tvrankereffect.setText("Diamond IV 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (0.68 < rankscore && rankscore <= 1.45) {
+                            tvrankereffect.setText("Diamond III 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거");
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (0.31 < rankscore && rankscore <= 0.68) {
+                            tvrankereffect.setText("Diamond II 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거"+
+                                    "\n - [오늘의 습관] 배너광고 제거");
+                            fulladview = true;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = true;
+                        } else if (0.11 < rankscore && rankscore <= 0.31) {
+                            tvrankereffect.setText("Diamond I 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거"+
+                                    "\n - [오늘의 습관] 배너광고 제거"+
+                                    "\n - [상세 습관] 보이기");
+                            fulladview = true;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = false;
+                            blurview4 = false;
+                        } else if (0.06 < rankscore && rankscore <= 0.11) {
+                            tvrankereffect.setText("Master 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거"+
+                                    "\n - [오늘의 습관] 배너광고 제거"+
+                                    "\n - [상세 습관] 보이기"+
+                                    "\n - [월간 성취율] 보이기");
+                            fulladview = true;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = true;
+                            blurview2 = false;
+                            blurview3 = false;
+                            blurview4 = false;
+                        } else if (0.02 < rankscore && rankscore <= 0.06) {
+                            tvrankereffect.setText("G_Master 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거"+
+                                    "\n - [오늘의 습관] 배너광고 제거"+
+                                    "\n - [상세 습관] 보이기"+
+                                    "\n - [월간 성취율] 보이기"+
+                                    "\n - [습관 비중] 보이기");
+                            fulladview = true;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = false;
+                            blurview2 = false;
+                            blurview3 = false;
+                            blurview4 = false;
+                        } else if (0 < rankscore && rankscore <= 0.02) {
+                            tvrankereffect.setText("Challenger 보상 발동 중");
+                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
+                                    "\n - [습관 상세] 상단 배너광고 제거"+
+                                    "\n - [전체 습관] 상단 배너광고 제거"+
+                                    "\n - [달성 순위] 상단 배너광고 제거"+
+                                    "\n - [선물받은 명언] 배너광고 제거"+
+                                    "\n - [월간 성취율] 배너광고 제거"+
+                                    "\n - [상세 습관] 하단 배너광고 제거"+
+                                    "\n - [전체 습관] 하단 배너광고 제거"+
+                                    "\n - [달성 순위] 하단 배너광고 제거"+
+                                    "\n - [습관 비중] 배너광고 제거"+
+                                    "\n - [오늘의 습관] 배너광고 제거"+
+                                    "\n - [상세 습관] 보이기"+
+                                    "\n - [월간 성취율] 보이기"+
+                                    "\n - [습관 비중] 보이기"+
+                                    "\n - 전면 광고 제거");
+                            fulladview = false;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = false;
+                            blurview2 = false;
+                            blurview3 = false;
+                            blurview4 = false;
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void showbannerblur() {
 
-        adBanner.setVisibility(View.GONE);
-        adBanner2.setVisibility(View.GONE);
-        adBanner3.setVisibility(View.GONE);
-        adBanner4.setVisibility(View.GONE);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    private Drawable drawable;
 
-        if(adview1){
-            AdRequest adRequest = new AdRequest.Builder().build();
-            adBanner.setVisibility(View.VISIBLE);
-            adBanner.loadAd(adRequest);
-        }
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+                        adBanner.setVisibility(View.GONE);
+                        adBanner2.setVisibility(View.GONE);
+                        adBanner3.setVisibility(View.GONE);
+                        adBanner4.setVisibility(View.GONE);
 
-        if(adview2){
-            AdRequest adRequest2 = new AdRequest.Builder().build();
-            adBanner2.setVisibility(View.VISIBLE);
-            adBanner2.loadAd(adRequest2);
-        }
+                        if(adview1){
+                            AdRequest adRequest = new AdRequest.Builder().build();
+                            adBanner.setVisibility(View.VISIBLE);
+                            adBanner.loadAd(adRequest);
+                        }
+                        if(adview2){
+                            AdRequest adRequest2 = new AdRequest.Builder().build();
+                            adBanner2.setVisibility(View.VISIBLE);
+                            adBanner2.loadAd(adRequest2);
+                        }
+                        if(adview3){
+                            AdRequest adRequest3 = new AdRequest.Builder().build();
+                            adBanner3.setVisibility(View.VISIBLE);
+                            adBanner3.loadAd(adRequest3);
+                        }
+                        if(adview4){
+                            AdRequest adRequest4 = new AdRequest.Builder().build();
+                            adBanner4.setVisibility(View.VISIBLE);
+                            adBanner4.loadAd(adRequest4);
+                        }
 
-        if(adview3){
-            AdRequest adRequest3 = new AdRequest.Builder().build();
-            adBanner3.setVisibility(View.VISIBLE);
-            adBanner3.loadAd(adRequest3);
-        }
+                        if(blurview1){
+                            vblur1.setVisibility(View.VISIBLE);
+                        }
 
-        if(adview4){
-            AdRequest adRequest4 = new AdRequest.Builder().build();
-            adBanner4.setVisibility(View.VISIBLE);
-            adBanner4.loadAd(adRequest4);
-        }
+                        if(blurview2){
+                            vblur2.setVisibility(View.VISIBLE);
+                        }
 
-        if(blurview1){
-            vblur1.setVisibility(View.VISIBLE);
-        }
-
-        if(blurview2){
-            vblur2.setVisibility(View.VISIBLE);
-        }
-
-        if(blurview3){
-            vblur3.setVisibility(View.VISIBLE);
-        }
+                        /*if(blurview3){
+                            vblur3.setVisibility(View.VISIBLE);
+                        }*/
 
 
+                    }
+
+                });
+            }
+        }).start();
     }
 
     private void settrophyimage(float rankscore) {

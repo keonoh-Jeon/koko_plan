@@ -48,14 +48,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
+import static com.koko_plan.main.MainActivity.adview6;
+import static com.koko_plan.main.MainActivity.adview8;
+import static com.koko_plan.main.MainActivity.blurview4;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
-import static com.koko_plan.sub.SetRankEvent.adview6;
-import static com.koko_plan.sub.SetRankEvent.adview7;
-import static com.koko_plan.sub.SetRankEvent.blurview4;
 
 public class DetailHabbit extends AppCompatActivity implements Detailhabbit_ViewListener
 {
@@ -64,7 +64,7 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
     public static ArrayList<Detailhabbit_Item> detailhabbitItems = null;
     private Detailhabbit_Adapter detailhabbitAdapter = null;
     private TextView tvdetailtitle, tvduedate, tvstartdate , tvcountsum, tvcurtimesum, tvaverage, tvdayproaverage;
-    private AdView adBanner;
+    private AdView adBanner, adBanner2;
     private View vblur;
 
     @Override
@@ -220,6 +220,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         //배너 광고 표기
         adBanner = findViewById(R.id.adView);
         adBanner.setVisibility(View.GONE);
+        adBanner2 = findViewById(R.id.adView2);
+        adBanner2.setVisibility(View.GONE);
 
         vblur = findViewById(R.id.v_blur);
         vblur.setVisibility(View.GONE);
@@ -241,6 +243,12 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
             AdRequest adRequest = new AdRequest.Builder().build();
             adBanner.setVisibility(View.VISIBLE);
             adBanner.loadAd(adRequest);
+        }
+
+        if(adview8){
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adBanner2.setVisibility(View.VISIBLE);
+            adBanner2.loadAd(adRequest);
         }
 
         if(blurview4){
