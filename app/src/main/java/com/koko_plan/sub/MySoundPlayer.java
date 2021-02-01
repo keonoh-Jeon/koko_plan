@@ -11,14 +11,14 @@ import com.koko_plan.R;
 import java.util.HashMap;
 
 public class MySoundPlayer {
-    public static final int CAMERA = R.raw.sound_cameraopen;
-    public static final int PUTTING = R.raw.sound_putting;
-    public static final int SWING = R.raw.sound_swing;
-    public static final int TARGET = R.raw.sound_target;
+    public static final int TEAR = R.raw.tearingpaper;
+    public static final int POP = R.raw.pop;
+    public static final int PAGE = R.raw.page;
+    public static final int PLAY = R.raw.playbutton;
     public static final int CLICK = R.raw.sound_click;
-    public static final int PARSELECT = R.raw.sound_parselect;
-    public static final int HOLEPOINT = R.raw.sound_holepoint;
-    public static final int START = R.raw.start;
+    public static final int BEEP = R.raw.beep;
+    public static final int PAUSE = R.raw.pausebutton;
+    public static final int POP2 = R.raw.pop2;
 
     private static SoundPool soundPool;
     private static HashMap<Integer, Integer> soundPoolMap;
@@ -38,14 +38,14 @@ public class MySoundPlayer {
                     .build();
         }
         soundPoolMap = new HashMap<Integer, Integer>(8);
-        soundPoolMap.put(CAMERA, soundPool.load(context, CAMERA, 1));
-        soundPoolMap.put(PUTTING, soundPool.load(context, PUTTING, 2));
-        soundPoolMap.put(SWING, soundPool.load(context, SWING, 3));
-        soundPoolMap.put(TARGET, soundPool.load(context, TARGET, 4));
+        soundPoolMap.put(TEAR, soundPool.load(context, TEAR, 1));
+        soundPoolMap.put(POP, soundPool.load(context, POP, 2));
+        soundPoolMap.put(PAGE, soundPool.load(context, PAGE, 3));
+        soundPoolMap.put(PLAY, soundPool.load(context, PLAY, 4));
         soundPoolMap.put(CLICK, soundPool.load(context, CLICK, 5));
-        soundPoolMap.put(PARSELECT, soundPool.load(context, PARSELECT, 6));
-        soundPoolMap.put(HOLEPOINT, soundPool.load(context, HOLEPOINT, 7));
-        soundPoolMap.put(START, soundPool.load(context, START, 8));
+        soundPoolMap.put(BEEP, soundPool.load(context, BEEP, 6));
+        soundPoolMap.put(PAUSE, soundPool.load(context, PAUSE, 7));
+        soundPoolMap.put(POP2, soundPool.load(context, POP2, 8));
     }
 
     public static void play(int raw_id){

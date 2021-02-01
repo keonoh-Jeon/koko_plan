@@ -94,6 +94,20 @@
 
                 </FrameLayout>
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/nswe"/>
+
+                </LinearLayout>
+
+
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -122,16 +136,7 @@
 
                 </FrameLayout>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:singleLine="true"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:textColor="#353535"
-                    android:textSize="15sp"
-                    tools:ignore="HardcodedText" />
+
 
                 <TextView
                     android:id="@+id/tvTime"

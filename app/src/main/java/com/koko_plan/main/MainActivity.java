@@ -41,7 +41,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,7 +50,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.components.Legend;
-import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -110,7 +108,6 @@ import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.SaveRankReceiver;
-import com.koko_plan.sub.SetRankEvent;
 import com.koko_plan.sub.SetzeroProgressReceiver;
 import com.koko_plan.sub.Utils;
 import com.koko_plan.sub.kat_OverdrawActivity;
@@ -132,13 +129,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimerTask;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
-import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
@@ -1017,7 +1012,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         ivTrophy.setOnClickListener(v -> myStartActivity2(Ranking_list.class));
-        ivgetcount.setOnClickListener(v -> scrollview.smoothScrollTo(0, relativeview.getTop()));
+        ivgetcount.setOnClickListener(v -> {
+            MySoundPlayer.play(MySoundPlayer.POP);
+            scrollview.smoothScrollTo(0, relativeview.getTop());
+        });
 
         ivdownarrow.setOnClickListener(v ->  {
             veffectintro.setVisibility(View.VISIBLE);
@@ -1246,8 +1244,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ArrayList NoOfTotalsec = new ArrayList();
             total = 0;
             for (int i = 0; i < todoListItems.size(); i++) {
-                if(adapter.getItems().get(i).getTotalsec()!=0){
-                    NoOfTotalsec.add(new Entry(adapter.getItems().get(i).getTotalsec(), 0));
+                if(todoListItems.get(i).getTotalsec()!=0){
+                    NoOfTotalsec.add(new Entry(todoListItems.get(i).getTotalsec(), 0));
                 }
                 total += todoListItems.get(i).getTotalsec();
             }
@@ -1259,9 +1257,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //차트 항목 타이틀 지정
             ArrayList title = new ArrayList();
-            for (int i = 0; i < adapter.getItemCount(); i++) {
-                if(adapter.getItems().get(i).getHabbittitle()!=null) {
-                    title.add(adapter.getItems().get(i).getHabbittitle());
+            for (int i = 0; i < todoListItems.size(); i++) {
+                if(todoListItems.get(i).getHabbittitle()!=null) {
+                    title.add(todoListItems.get(i).getHabbittitle());
                 } else {
                     startToast("해당일에는 실행한 습관이 없습니다.");
                 }
@@ -1426,8 +1424,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         veffectintro.setVisibility(View.GONE);
 
-        new Thread(() -> {
-
             //로딩 화면 만들기
             pd = null;
             pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
@@ -1448,7 +1444,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
             });
-        }).start();
 
         // 파이어베이스 회원 정보 모으기
         getprofile();
@@ -1471,7 +1466,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         float rankscore = pref.getFloat("rankscore", 100);
         float eventscore = pref.getFloat("eventscore", 100);
         SetRank(eventscore);
-        Log.e(TAG, "onResume: " + eventscore);
         tvmyrankscore.setText(rank+"");
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
@@ -2131,6 +2125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
+                    MySoundPlayer.play(MySoundPlayer.TEAR);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -2165,6 +2160,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).start();
                 }else {
                     //오른쪽으로 밀었을때.
+                    MySoundPlayer.play(MySoundPlayer.PAGE);
                     myStartActivity3(todoListItems.get(position).getHabbittitle(), DetailHabbit.class);
                 }
             }
@@ -2266,6 +2262,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
+                    MySoundPlayer.play(MySoundPlayer.TEAR);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -2301,6 +2298,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }).start();
 
                 } else {
+                    MySoundPlayer.play(MySoundPlayer.PAGE);
                     if(!goodText_items.get(position).getFromid().equals(firebaseUser.getUid())){
                         new Thread(new Runnable() {
                             @Override

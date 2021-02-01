@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -166,6 +167,10 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         //리스트 스와이프 기능 초기화
         initSwipe2();
 
+        //효과음 초기화
+        MySoundPlayer.initSounds(getApplicationContext());
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
     }
 
     @Override
@@ -213,6 +218,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
                 //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
+                    MySoundPlayer.play(MySoundPlayer.TEAR);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -247,6 +253,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                     }).start();
 
                 } else {
+                    MySoundPlayer.play(MySoundPlayer.PAGE);
                     myStartActivity2(totalhabbitlist_items.get(position).getHabbittitle(), DetailHabbit.class);
                                             
                 }
@@ -338,6 +345,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
 
                 //왼쪽으로 밀었을때.
                 if (direction == ItemTouchHelper.LEFT) {
+                    MySoundPlayer.play(MySoundPlayer.TEAR);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -372,8 +380,8 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                     }).start();
 
                 } else {
+                    MySoundPlayer.play(MySoundPlayer.PAGE);
                     myStartActivity2(totalHabbitsListReady_items.get(position).getHabbittitle(), DetailHabbit.class);
-
                 }
             }
 

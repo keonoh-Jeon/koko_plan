@@ -336,6 +336,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editPlay() {
+            MySoundPlayer.play(MySoundPlayer.PLAY);
             timegap = 0;
             if(isRunning = false){
                 ivPause.setVisibility(View.VISIBLE);
@@ -499,6 +500,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editPause() {
+            MySoundPlayer.play(MySoundPlayer.PAUSE);
             timegap = 0;
             alramset(false);
             if(timerTask != null)
@@ -534,8 +536,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editPlus() {
+            MySoundPlayer.play(MySoundPlayer.POP2);
             timegap = 0;
-
             int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
             int curcount = todoListItems.get(index).getCurcount();
             int countsum = todoListItems.get(index).getCountsum();
@@ -594,6 +596,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void editMinus() {
+            MySoundPlayer.play(MySoundPlayer.POP2);
             timegap = 0;
             int unitsec = todoListItems.get(index).getTotalsec()/todoListItems.get(index).getCount();
             int curcount = todoListItems.get(index).getCurcount();

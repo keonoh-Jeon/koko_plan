@@ -256,7 +256,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                 @Override
                 public void onClick(View v) {
 
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    MySoundPlayer.play(MySoundPlayer.POP);
 
                     int pos = getAdapterPosition();
                     if (pos != RecyclerView.NO_POSITION)
