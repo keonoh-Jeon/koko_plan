@@ -1,18 +1,15 @@
 package com.koko_plan.sub;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,20 +30,19 @@ import com.koko_plan.main.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.koko_plan.main.MainActivity.editor;
+import static com.koko_plan.main.MainActivity.pref;
+
 
 public class subscribe extends AppCompatActivity implements PurchasesUpdatedListener {
 
     private static final String TAG = "subscribe";
     private int ballcount, additionball;
 
-    public SharedPreferences pref;
-    private SharedPreferences.Editor editor;
-
     private BillingClient billingClient;
 
-    SkuDetails skuDetails300, skuDetails500, skuDetails1000, skuDetails2500, skuDetails5000, skuDetails10000;
-    String skuID300, skuID500, skuID1000, skuID2500, skuID5000, skuID10000;
-
+    private SkuDetails skuDetails300, skuDetails500, skuDetails1000, skuDetails2500, skuDetails5000, skuDetails10000;
+    private String skuID300 = "ballbasket_300", skuID500 = "ballbasket_500", skuID1000, skuID2500, skuID5000, skuID10000;
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -55,36 +51,26 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscribe_popup);
 
-        pref = getSharedPreferences("pref", MODE_PRIVATE);
-        editor = pref.edit();
-
-        skuID300 = "ballbasket_300";
-        skuID500 = "ballbasket_500";
-        skuID1000 = "ballbasket_1000";
-        skuID2500 = "ballbasket_2500";
-        skuID5000 = "ballbasket_5000";
-        skuID10000 = "ballbasket_10000";
-
         findViewById(R.id.iv_basket300).setOnClickListener(OnClickListener);
-        findViewById(R.id.iv_basket500).setOnClickListener(OnClickListener);
+//        findViewById(R.id.iv_basket500).setOnClickListener(OnClickListener);
 
         MySoundPlayer.initSounds(getApplicationContext());
 
-        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener(this).build();
-        billingClient.startConnection(new BillingClientStateListener() {
+        billingClient = BillingClient.newBuilder(this)
+                .enablePendingPurchases()
+                .setListener(this)
+                .build();
 
+        billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+
                     // The BillingClient is ready. You can query purchases here.
                     // 구글 상품 정보들의 ID를 만들어 줌
                     List<String> skuList = new ArrayList<> ();
                     skuList.add(skuID300);
                     skuList.add(skuID500);
-                    skuList.add(skuID1000);
-                    skuList.add(skuID2500);
-                    skuList.add(skuID5000);
-                    skuList.add(skuID10000);
 
                     // SkuDetailsList 객체를 만듬
                     SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
@@ -93,7 +79,7 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                     // 비동기 상태로 앱의 정보를 가지고 옴
                     billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
                                 @Override
-                                public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+                                public void onSkuDetailsResponse(@NonNull BillingResult billingResult, List<SkuDetails> skuDetailsList) {
                                     if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
                                         for (SkuDetails skuDetails : skuDetailsList) {
                                             String sku = skuDetails.getSku();
@@ -102,14 +88,6 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                                                 skuDetails300 = skuDetails;
                                             } else if(skuID500.equals(sku)) {
                                                 skuDetails500 = skuDetails;
-                                            } else if(skuID1000.equals(sku)) {
-                                                skuDetails1000 = skuDetails;
-                                            } else if(skuID2500.equals(sku)) {
-                                                skuDetails2500 = skuDetails;
-                                            } else if(skuID5000.equals(sku)) {
-                                                skuDetails5000 = skuDetails;
-                                            } else if(skuID10000.equals(sku)) {
-                                                skuDetails10000 = skuDetails;
                                             }
                                         }
                                     }
@@ -129,34 +107,12 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         });
     }
 
-    ConsumeResponseListener consumeListener = new ConsumeResponseListener() {
-        @Override
-        public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
-            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                Log.d(TAG, "상품을 성공적으로 소모하였습니다. 소모된 상품 => " + purchaseToken);
-                return;
-            } else {
-                Log.d(TAG, "상품 소모에 실패하였습니다. 오류코드 (" + billingResult.getResponseCode() + "), 대상 상품 코드: " + purchaseToken);
-                return;
-                // Handle the success of the consume operation.
-                // For example, increase the number of coins inside the user's basket.
-            }
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
         //결제에 성공한 경우
-        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                && purchases != null) {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
             Log.d(TAG, "결제에 성공했으며, 아래에 구매한 상품들이 나열됨");
             for (Purchase purchase : purchases) {
-                Log.e(TAG, "purchases: " + purchases);
                 handlePurchase(purchase);
                 addball(additionball);
             }
@@ -174,6 +130,7 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
 
     //실제 구입 처리를 하는 메소드
     private void doBillingFlow(SkuDetails skuDetails) {
+
         BillingFlowParams flowParams = BillingFlowParams.newBuilder()
                 .setSkuDetails(skuDetails)
                 .build();
@@ -191,6 +148,25 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         billingClient.consumeAsync(ConsumeParams.newBuilder().setPurchaseToken(purchaseToken).build(), consumeListener);
     }
 
+    ConsumeResponseListener consumeListener = new ConsumeResponseListener() {
+        @Override
+        public void onConsumeResponse(BillingResult billingResult, @NonNull String purchaseToken) {
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                Log.d(TAG, "상품을 성공적으로 소모하였습니다. 소모된 상품 => " + purchaseToken);
+            } else {
+                Log.d(TAG, "상품 소모에 실패하였습니다. 오류코드 (" + billingResult.getResponseCode() + "), 대상 상품 코드: " + purchaseToken);
+                // Handle the success of the consume operation.
+                // For example, increase the number of coins inside the user's basket.
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
     private View.OnClickListener OnClickListener = new View.OnClickListener() {
 
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -202,10 +178,10 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                     doBillingFlow(skuDetails300);
                     additionball = 300;
                     break;
-                case R.id.iv_basket500:
+                /*case R.id.iv_basket500:
                     doBillingFlow(skuDetails500);
                     additionball = 500;
-                    break;
+                    break;*/
             }
         }
     };
@@ -220,7 +196,6 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void loaddata() {
-
         ballcount = pref.getInt("ballcount", 0);
     }
 

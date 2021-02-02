@@ -5,7 +5,8 @@
     android:background="#FFFFFF"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="20sp">
 
     <!-- 타이틀바 -->
     <LinearLayout
@@ -14,13 +15,13 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:text="프리미엄 서비스"
+            android:text="Kobbit Premium"
             android:padding="10dp"
             android:textSize="30sp"
-            android:textColor="#797979"
+            android:textColor="#02343F"
             android:gravity="center"
             android:textStyle="bold"
-            android:background="#FFC107"
+            android:background="#F0EDCC"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:ignore="HardcodedText" />
@@ -37,55 +38,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp"
             tools:ignore="DisableBaselineAlignment">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-                <ImageView
-                    android:id="@+id/iv_basket300"
-                    android:layout_margin="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:ignore="ContentDescription" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    android:layout_margin="20dp"
-                    android:text="한달 서비스"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:text="광고없이, 흐림없이\n 모든 기능 사용"
                     tools:ignore="HardcodedText" />
 
-            </FrameLayout>
+                <TextView
+                    android:id="@+id/iv_basket300"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="20dp"
+                    android:padding="10dp"
+                    android:text="무료 체험하기"
+                    android:background="#2196F3"
+                    tools:ignore="HardcodedText" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:ignore="NestedWeights">
-
-            <ImageView
-                android:id="@+id/iv_basket500"
-                android:layout_margin="10dp"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:ignore="ContentDescription" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    android:layout_margin="20dp"
-                    android:text="평생"
-                    tools:ignore="HardcodedText" />
-
-            </FrameLayout>
+                android:text="일주일 무료 체험   \1,900/월 \n부가세 별도   "
+                android:gravity="center"
+                tools:ignore="HardcodedText" />
 
         </LinearLayout>
 

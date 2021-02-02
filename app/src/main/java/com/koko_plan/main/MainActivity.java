@@ -53,6 +53,7 @@ import android.widget.Toast;
 import com.github.mikephil.charting.components.Legend;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
@@ -845,25 +846,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //어플 업데이트 관리
     private void Appupdatemanager() {
         new Thread(() -> {
+            //어플 업데이트 관리
             appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
-            com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-                // Checks that the platform will allow the specified type of update.
-                if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
-                        && appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE))
-                {
-                    // Request the update.
-                    try {
-                        appUpdateManager.startUpdateFlowForResult(
-                                appUpdateInfo,
-                                IMMEDIATE,
-                                this,
-                                REQUEST_APP_UPDATE);
-                    } catch (IntentSender.SendIntentException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            appUpdateManager.getAppUpdateInfo().addOnSuccessListener(
+                    appUpdateInfo -> {
+                        // Checks that the platform will allow the specified type of update.
+                        if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
+                                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+                        {
+                            // Request the update.
+                            try {
+                                appUpdateManager.startUpdateFlowForResult(
+                                        appUpdateInfo,
+                                        AppUpdateType.IMMEDIATE,
+                                        this,
+                                        REQUEST_APP_UPDATE);
+                            } catch (IntentSender.SendIntentException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
         }).start();
     }
 
