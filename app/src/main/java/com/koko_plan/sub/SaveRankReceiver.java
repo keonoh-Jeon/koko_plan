@@ -40,10 +40,8 @@ import static com.koko_plan.main.MainActivity.todaydate;
 
 public class SaveRankReceiver extends BroadcastReceiver {
 
-    private Calendar calendar = Calendar.getInstance();
     private PowerManager.WakeLock sCpuWakeLock;
     public static ArrayList<TodoList_Item> todoListItems = null;
-    private long today_progress;
 
     @SuppressLint({"WakelockTimeout", "InvalidWakeLockTag","SimpleDateFormat"})
     @Override
@@ -71,9 +69,6 @@ public class SaveRankReceiver extends BroadcastReceiver {
             if (firebaseUser != null) {
                 firebaseFirestore
                         .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
-                        .orderBy("progress", Query.Direction.DESCENDING)
-                        .orderBy("getcount", Query.Direction.DESCENDING)
-                        .orderBy("todaytarget", Query.Direction.DESCENDING)
 
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -87,8 +82,6 @@ public class SaveRankReceiver extends BroadcastReceiver {
 
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                        Log.d(TAG, document.getId() + " => " + document.getData());
                                         todoListItems.add(document.toObject(TodoList_Item.class));
                                         if(Objects.equals(document.getData().get("name"), name)) {
                                             myrank = todoListItems.size();

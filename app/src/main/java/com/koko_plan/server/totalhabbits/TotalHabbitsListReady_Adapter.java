@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -63,6 +64,7 @@ public class TotalHabbitsListReady_Adapter extends RecyclerView.Adapter<TotalHab
         TextView tv1counttime = null;
         TextView tvcountsum = null;
         TextView tvcurtimesum = null;
+        ImageView ivleftright = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
@@ -74,6 +76,8 @@ public class TotalHabbitsListReady_Adapter extends RecyclerView.Adapter<TotalHab
             tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
             tvcountsum = (TextView)view.findViewById(R.id.tv_countsum);
             tvcurtimesum = (TextView)view.findViewById(R.id.tv_curtimesum);
+            ivleftright = (ImageView)view.findViewById(R.id.iv_leftright);
+            ivleftright.setAlpha(0.2f);
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -160,7 +164,6 @@ public class TotalHabbitsListReady_Adapter extends RecyclerView.Adapter<TotalHab
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
                             viewHolder.tvtitle.setText((String) Objects.requireNonNull(document.getData()).get("habbittitle"));
 

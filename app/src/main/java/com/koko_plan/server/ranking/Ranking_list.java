@@ -79,14 +79,6 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         // 뷰 초기화
         initView();
 
-        findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
-
-        adBanner = findViewById(R.id.adView);
-        adBanner.setVisibility(View.GONE);
-        adBanner2 = findViewById(R.id.adView2);
-        adBanner2.setVisibility(View.GONE);
-
-
         realtimelistenerDoc();
 
     }
@@ -94,11 +86,9 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     private View.OnClickListener OnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.iv_back:
-//                    MySoundPlayer.play(MySoundPlayer.CLICK);
-                    myStartActivity(MainActivity.class);
-                    break;
+            if (v.getId() == R.id.iv_back) {
+                //MySoundPlayer.play(MySoundPlayer.CLICK);
+                myStartActivity(MainActivity.class);
             }
         }
     };
@@ -136,8 +126,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
-                                Log.d(TAG, "DocumentSnapshot data: " + document.getData().size());
-                                int ramdomtextsize = document.getData().size();
+                                int ramdomtextsize = Objects.requireNonNull(document.getData()).size();
                                 editor.putInt("ramdomtextsize", ramdomtextsize);
                                 editor.apply();
                             } else {
@@ -186,6 +175,12 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         tvranking = findViewById(R.id.tv_ranking);
         tvtotalranker = findViewById(R.id.tv_totalranker);
 
+        findViewById(R.id.iv_back).setOnClickListener(OnClickListener);
+
+        adBanner = findViewById(R.id.adView);
+        adBanner.setVisibility(View.GONE);
+        adBanner2 = findViewById(R.id.adView2);
+        adBanner2.setVisibility(View.GONE);
     }
 
     @Override
@@ -196,20 +191,31 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     }
     @Override
     protected void onResume() {
-
-        if(adview10){
-            AdRequest adRequest = new AdRequest.Builder().build();
-            adBanner.setVisibility(View.VISIBLE);
-            adBanner.loadAd(adRequest);
-        }
-        if(adview7){
-            AdRequest adRequest = new AdRequest.Builder().build();
-            adBanner2.setVisibility(View.VISIBLE);
-            adBanner2.loadAd(adRequest);
-        }
-
-
         super.onResume();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    private Drawable drawable;
+
+                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+                    @Override
+                    public void run() {
+                        if(adview10){
+                            AdRequest adRequest = new AdRequest.Builder().build();
+                            adBanner.setVisibility(View.VISIBLE);
+                            adBanner.loadAd(adRequest);
+                        }
+                        if(adview7){
+                            AdRequest adRequest = new AdRequest.Builder().build();
+                            adBanner2.setVisibility(View.VISIBLE);
+                            adBanner2.loadAd(adRequest);
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 //todo
     private void listenerDoc(){

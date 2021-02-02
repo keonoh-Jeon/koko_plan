@@ -315,12 +315,12 @@
                             android:nestedScrollingEnabled="false"
                             tools:ignore="ScrollViewSize,UnusedAttribute" />
 
-                        <!--<com.github.mmin18.widget.RealtimeBlurView
+                        <com.github.mmin18.widget.RealtimeBlurView
                             android:id="@+id/v_blur3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:realtimeBlurRadius="5dp"
-                            app:realtimeOverlayColor="#88FFFFFF"/>-->
+                            app:realtimeOverlayColor="#88FFFFFF"/>
 
                     </FrameLayout>
 

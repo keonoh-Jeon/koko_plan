@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -59,6 +60,7 @@ import static com.koko_plan.main.MainActivity.timegap;
 import static com.koko_plan.main.MainActivity.todaydate;
 import static com.koko_plan.main.MainActivity.totalprogress;
 import static com.koko_plan.main.MainActivity.trophy;
+import static com.koko_plan.main.MainActivity.vibrator;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements ItemTouchHelperListener {
 
@@ -73,6 +75,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         this.todoListItems  = todoListItems;
         this.mContext = context;
         this.todoListViewListener = listener;
+
     }
 //todo
     @Override
@@ -93,7 +96,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         like.setVisibility(View.GONE);
         trophy.setVisibility(View.GONE);
 
-
         return true;
     }
 
@@ -107,7 +109,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         private TextView tvTitle;
         private TextView tvProgress;
         private TextView tvCurTime, tvTime;
-        private ImageView ivPlus, ivMinus, ivPlay, ivPause, ivStop, ivbdelete;
+        private ImageView ivPlus, ivMinus, ivPlay, ivPause, ivStop, ivbdelete, ivmove;
 
         private Button mStartBtn, mStopBtn, mRecordBtn, mPauseBtn;
         private TextView mTimeTextView, mRecordTextView;
@@ -147,6 +149,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             ivStop.setOnClickListener(v -> editStop());
 
             progressBar = view.findViewById(R.id.progressBar);
+
+            ivmove = view.findViewById(R.id.iv_move);
+            ivmove.setVisibility(View.INVISIBLE);
+            ivmove.setAlpha(0.2f);
         }
 
         private void startTimerTask()
@@ -221,9 +227,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     ivStop.setVisibility(View.VISIBLE);
                     ivPlus.setVisibility(View.GONE);
                     ivMinus.setVisibility(View.GONE);
+                    ivmove.setVisibility(View.VISIBLE);
 
                     todaysetbtnclickable();
                 } else {
+                    ivmove.setVisibility(View.INVISIBLE);
                     isnottodaysetbtnvisibility();
                 }
 
@@ -243,6 +251,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     ivStop.setVisibility(View.GONE);
                     ivPause.setVisibility(View.GONE);
                     ivPlay.setVisibility(View.GONE);
+                    ivmove.setVisibility(View.VISIBLE);
                     todaysetbtnclickable();
 
                 } else {
@@ -252,7 +261,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
                 int count = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec() / (double)todoListItems.getCount()));
                 tvCurTime.setText(""+ count);
-                Log.e(TAG, "onBind: 버튼 변화" +  count );
             }
 
             int progress = (int) ((double)todoListItems.getCurtime() / ((double)todoListItems.getTotalsec()) *100.0);
@@ -275,6 +283,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void isnottodaysetbtnvisibility() {
             ivPlay.setVisibility(View.INVISIBLE);
+            ivmove.setVisibility(View.INVISIBLE);
             ivPause.setVisibility(View.INVISIBLE);
             ivStop.setVisibility(View.INVISIBLE);
             ivPlus.setVisibility(View.INVISIBLE);
@@ -680,13 +689,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 showPopupCountTime(v, holder.getAdapterPosition());
             }
         });
-        v.findViewById(R.id.tvTitle).setOnClickListener(new View.OnClickListener() {
+
+        v.findViewById(R.id.iv_move).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                /*MySoundPlayer.play(MySoundPlayer.CLICK);
-                makedialogtitle(v, holder.getAdapterPosition());*/
+            public boolean onLongClick(View view) {
+                vibrator.vibrate(100); // 1초간 진동
+                return false;
             }
         });
+
         return holder;
     }
 
@@ -708,45 +719,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void setItem(ArrayList<TodoList_Item> data) {
         todoListItems = data;
         notifyDataSetChanged();
-//        notifyDataSetChanged();
-    }
-
-
-
-    @SuppressLint("SetTextI18n")
-    private void makedialogtitle(View v, final int position){
-
-        final TextView tvTitle = (TextView) v. findViewById(R.id.tvTitle);
-
-        EditText edittext = new EditText(mContext);
-        edittext.setText(todoListItems.get(position).getHabbittitle());
-        edittext.setGravity(Gravity.CENTER);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("습관명 수정");
-        builder.setMessage("수정할 습관명을 기입해주세요.");
-        builder.setView(edittext);
-
-        builder.setPositiveButton("입력",
-                (dialog, which) -> {
-                    //제목 입력, DB추가
-                    tvTitle.setText(edittext.getText().toString());
-                    new Thread(() -> {
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("habbittitle", edittext.getText().toString());
-                        firebaseFirestore
-                                .collection("users")
-                                .document(firebaseUser.getUid())
-                                .collection("total")
-                                .document(edittext.getText().toString())
-                                .set(data, SetOptions.merge()); 
-                    }).start();
-                });
-        builder.setNegativeButton("취소",
-                (dialog, which) -> {
-                    //취소버튼 클릭
-                });
-        builder.show();
     }
 
     private void showPopupCountTime(View v, final int position){

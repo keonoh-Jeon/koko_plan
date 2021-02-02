@@ -79,6 +79,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         TextView tv1counttime = null;
         TextView tvcountsum = null;
         TextView tvcurtimesum = null;
+        ImageView ivleftright = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
@@ -90,6 +91,8 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
             tv1counttime = (TextView)view.findViewById(R.id.tv_1counttime);
             tvcountsum = (TextView)view.findViewById(R.id.tv_countsum);
             tvcurtimesum = (TextView)view.findViewById(R.id.tv_curtimesum);
+            ivleftright = (ImageView)view.findViewById(R.id.iv_leftright);
+            ivleftright.setAlpha(0.2f);
 
             view.setOnClickListener(new View.OnClickListener() {
 
@@ -98,9 +101,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                     int pos = getAdapterPosition();
                     Intent intent = new Intent(context, EditHabbit2.class);
                     intent.putExtra("habbittitle", totalHabbitsList_items.get(pos).getHabbittitle());
-
                     intent.putExtra("totalsec", totalHabbitsList_items.get(pos).getTotalsec());
-
 
                     if(totalHabbitsList_items.get(pos).getMonday()
                             && totalHabbitsList_items.get(pos).getTuesday()
@@ -181,6 +182,7 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
                             viewHolder.tvtitle.setText((String) Objects.requireNonNull(document.getData()).get("habbittitle"));
+                            viewHolder.ivleftright.setAlpha(0.2f);
 
                             if(Objects.equals(document.getData().get("habbitroutine"), "매일")) {
                                 viewHolder.tvroutine.setText((String) document.getData().get("habbitroutine"));
@@ -239,7 +241,4 @@ public class TotalHabbitsList_Adapter extends RecyclerView.Adapter<TotalHabbitsL
         // 외부에서 item을 추가시킬 함수입니다.
         totalHabbitsList_items.add(totalHabbitsList_item);
     }
-
-
-
 }

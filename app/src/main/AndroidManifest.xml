@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.koko_plan">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
@@ -98,6 +99,7 @@
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
         <receiver android:name=".sub.SetzeroProgressReceiver" />
+        <receiver android:name=".sub.SaveRankReceiver" />
 
         <service
             android:name=".sub.kat_OverdrawActivity"

@@ -26,16 +26,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp">
-
-                <TextView
-                    android:id="@+id/tv_totalhabbitlistTitle"
+                
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="목록"
-                    android:singleLine="true"
-                    android:textStyle="bold"
-                    android:textColor="#070952"
-                    tools:ignore="HardcodedText,NestedWeights" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_totalhabbitlistTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="목록"
+                        android:singleLine="true"
+                        android:textStyle="bold"
+                        android:textColor="#070952"
+                        tools:ignore="HardcodedText,NestedWeights" />
+
+                    <ImageView
+                        android:id="@+id/iv_leftright"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/leftright"/>
+
+                </FrameLayout>
+
+
 
 
             </LinearLayout>

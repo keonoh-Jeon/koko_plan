@@ -36,6 +36,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
@@ -183,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String todaydate;
     private SimpleDateFormat dateformat;
 
+    public static Vibrator vibrator;
+
     ItemTouchHelper helper, helper2;
     public static String selecteddata;
     private Date date, today, selected;
@@ -206,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CalendarView calendarView;
 
     private LineDataSet dataset;
+    private ProgressDialog pd;
 
     private float entries0;
     private FirebaseCrashlytics crashlytics;
@@ -218,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long Back_Key_Before_Time = 0;
     private LinearLayout veffectintro;
     private View vblur1, vblur2, vblur3;
-    private ProgressDialog pd;
 
     private AdView adBanner, adBanner2, adBanner3, adBanner4;
 
@@ -582,13 +585,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         tvTodayProgress.setText(today_progress+ "%" );
 
                                                         piechartmaker();
+
+                                                        if(pd!= null) pd.dismiss();
                                                     }
                                                 });
                                     }
                                 }
                             });
                         }
-
                     }).start();
 
                 } else {
@@ -597,6 +601,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     if(compare < 0)startToast("해당일에는 실행한 습관이 없습니다.");
                 }
+
             }
 
             @Override
@@ -703,66 +708,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void InitializeView() {
 
-            scrollview = findViewById(R.id.scrollview);
-            relativeview = findViewById(R.id.view_relativeview);
+        scrollview = findViewById(R.id.scrollview);
+        relativeview = findViewById(R.id.view_relativeview);
 
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            NavigationView navigationView = findViewById(R.id.nav_view);
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState();
-            navigationView.setNavigationItemSelectedListener(this);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
 
-            View nav_header_view = navigationView.getHeaderView(0);
-            nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
-            nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
-            nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
+        View nav_header_view = navigationView.getHeaderView(0);
+        nav_header_name_text = nav_header_view.findViewById(R.id.nhtv_name);
+        nav_header_photo_image = nav_header_view.findViewById(R.id.nhtv_image);
+        nav_header_mail_text = nav_header_view.findViewById(R.id.nhtv_mail);
 
-            ivgetcount = findViewById(R.id.iv_getcount);
-            ivTrophy = findViewById(R.id.iv_trophy);
-            ivdownarrow = findViewById(R.id.iv_downarrow);
-            ivuparrow = findViewById(R.id.iv_uparrow);
+        ivgetcount = findViewById(R.id.iv_getcount);
+        ivTrophy = findViewById(R.id.iv_trophy);
+        ivdownarrow = findViewById(R.id.iv_downarrow);
+        ivuparrow = findViewById(R.id.iv_uparrow);
 
-            veffectintro = findViewById(R.id.v_effectintro);
-            veffectintro.setVisibility(View.GONE);
+        veffectintro = findViewById(R.id.v_effectintro);
+        veffectintro.setVisibility(View.GONE);
 
-            vblur1= findViewById(R.id.v_blur1);
-            vblur1.setVisibility(View.GONE);
-            vblur2= findViewById(R.id.v_blur2);
-            vblur2.setVisibility(View.GONE);
-//            vblur3= findViewById(R.id.v_blur3);
-//            vblur3.setVisibility(View.GONE);
+        vblur1= findViewById(R.id.v_blur1);
+        vblur1.setVisibility(View.GONE);
+        vblur2= findViewById(R.id.v_blur2);
+        vblur2.setVisibility(View.GONE);
+        vblur3= findViewById(R.id.v_blur3);
+        vblur3.setVisibility(View.GONE);
 
-            tvmyrankscore = findViewById(R.id.tv_myrankscore);
-            tvrankereffect = findViewById(R.id.tv_rankereffect);
-            tveventeffect = findViewById(R.id.tv_eventeffect);
+        tvmyrankscore = findViewById(R.id.tv_myrankscore);
+        tvrankereffect = findViewById(R.id.tv_rankereffect);
+        tveventeffect = findViewById(R.id.tv_eventeffect);
 
-            tvgetcount= findViewById(R.id.tv_getcount);
-            tvtodayget= findViewById(R.id.tv_todayget);
+        tvgetcount= findViewById(R.id.tv_getcount);
+        tvtodayget= findViewById(R.id.tv_todayget);
 
-            pieChart = findViewById(R.id.piechart);
+        pieChart = findViewById(R.id.piechart);
 
-            btnPlus = findViewById(R.id.btnPlus);
-            btnsavelist = findViewById(R.id.btn_savelist);
-            like = findViewById(R.id.view_like);
-            trophy = findViewById(R.id.view_trophy);
+        btnPlus = findViewById(R.id.btnPlus);
+        btnsavelist = findViewById(R.id.btn_savelist);
+        like = findViewById(R.id.view_like);
+        trophy = findViewById(R.id.view_trophy);
 
-            tvTodayProgress = findViewById(R.id.tv_todayprogress);
+        tvTodayProgress = findViewById(R.id.tv_todayprogress);
 
-            //배너 광고 표기
-            adBanner = findViewById(R.id.ad_View1);
-            adBanner2 = findViewById(R.id.ad_View2);
-            adBanner3 = findViewById(R.id.ad_View3);
-            adBanner4 = findViewById(R.id.ad_View4);
-            recyclerView3 = findViewById(R.id.rv_msg);
+        //배너 광고 표기
+        adBanner = findViewById(R.id.ad_View1);
+        adBanner2 = findViewById(R.id.ad_View2);
+        adBanner3 = findViewById(R.id.ad_View3);
+        adBanner4 = findViewById(R.id.ad_View4);
+        recyclerView3 = findViewById(R.id.rv_msg);
 
-            goodtextsize = findViewById(R.id.tv_goodtextsize);
-            calendarView = findViewById(R.id.calendarView2);
+        goodtextsize = findViewById(R.id.tv_goodtextsize);
+        calendarView = findViewById(R.id.calendarView2);
 
-            //효과음 초기화
-            MySoundPlayer.initSounds(getApplicationContext());
-            setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //효과음 초기화
+        MySoundPlayer.initSounds(getApplicationContext());
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -1133,7 +1140,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             @Override
                                             public void onSuccess(Void aVoid) {
 
-                                                pd.dismiss();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -1141,6 +1147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             public void onFailure(@NonNull Exception e) {
                                             }
                                         });
+                                if(pd!= null) pd.dismiss();
                             }
                         });
             }
@@ -1265,8 +1272,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
             title.add("하루");
-
-            Log.e(TAG, "piechartmaker: "+ title +  dataSet);
 
             if(NoOfTotalsec.size() == title.size()) {
                 PieData data = new PieData(title, dataSet); // MPAndroidChart v3.X 오류 발생
@@ -1422,28 +1427,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
-        veffectintro.setVisibility(View.GONE);
+        //로딩 화면 만들기
+        pd = null;
+        pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
 
-            //로딩 화면 만들기
-            pd = null;
-            pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
-
-            //업데이트 가능 시, 연결해서 업데이트
-            appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
-                if (appUpdateInfo.updateAvailability()
-                        == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                    // If an in-app update is already running, resume the update.
-                    try {
-                        appUpdateManager.startUpdateFlowForResult(
-                                appUpdateInfo,
-                                IMMEDIATE,
-                                this,
-                                REQUEST_APP_UPDATE);
-                    } catch (IntentSender.SendIntentException e) {
-                        e.printStackTrace();
-                    }
+        //업데이트 가능 시, 연결해서 업데이트
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // If an in-app update is already running, resume the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            IMMEDIATE,
+                            this,
+                            REQUEST_APP_UPDATE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
                 }
-            });
+            }
+        });
+
+        veffectintro.setVisibility(View.GONE);
 
         // 파이어베이스 회원 정보 모으기
         getprofile();
@@ -1452,7 +1457,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // 현재 날짜 구하기
         gettodaydate();
-
         getdocforgetlike();
 
         todaysgoodtextsize = 0;
@@ -1473,8 +1477,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
-
-        showbannerblur();
     }
 
     @SuppressLint("SetTextI18n")
@@ -1488,7 +1490,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
                     @Override
                     public void run() {
-
                         fulladview = true;
                         adview1 = true;
                         adview2 = true;
@@ -1983,23 +1984,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             blurview3 = false;
                             blurview4 = false;
                         }
-                    }
-                });
-            }
-        }).start();
-    }
 
-    private void showbannerblur() {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    private Drawable drawable;
-
-                    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
-                    @Override
-                    public void run() {
                         adBanner.setVisibility(View.GONE);
                         adBanner2.setVisibility(View.GONE);
                         adBanner3.setVisibility(View.GONE);
@@ -2026,28 +2011,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             adBanner4.loadAd(adRequest4);
                         }
 
-                        if(blurview1){
-                            vblur1.setVisibility(View.VISIBLE);
-                        }
-
-                        if(blurview2){
-                            vblur2.setVisibility(View.VISIBLE);
-                        }
-
-                        /*if(blurview3){
-                            vblur3.setVisibility(View.VISIBLE);
-                        }*/
-
-
+                        if(blurview1) vblur1.setVisibility(View.VISIBLE);
+                        if(blurview2) vblur2.setVisibility(View.VISIBLE);
+                        if(blurview3) vblur3.setVisibility(View.VISIBLE);
                     }
-
                 });
             }
         }).start();
     }
 
     private void settrophyimage(float rankscore) {
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -2253,6 +2226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                startToast("이동 시작");
                 return false;
             }
 
@@ -2433,6 +2407,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+
+        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
     }
 
     //자정마다 실행 (리시버)
@@ -2473,6 +2452,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         setrankAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setrankCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, setrankSender);
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setResetTime = format.format(new Date(setrankCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+
+        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
     }
 
     @Override
