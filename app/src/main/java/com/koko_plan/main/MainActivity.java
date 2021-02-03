@@ -1049,6 +1049,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listenerDoc();
     }
 
+    //잠금 화면 해지시 첫화면
     public void getPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
             if (!Settings.canDrawOverlays(this)) {              // 체크
@@ -1333,6 +1334,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(() -> {
             editor.putInt("showcount", showcount);
             editor.putLong("stoptime", System.currentTimeMillis());
+            Log.e(TAG, "onPause: 확인" + System.currentTimeMillis());
             editor.putInt("todayitemsize", todayitemsize);
             editor.putString("yesterday", todaydate);
             editor.apply();
@@ -1353,6 +1355,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
+                    Log.e(TAG, "onPause: 확인" + now);
                     editor.apply();
                 }
             }
@@ -1462,12 +1465,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getdocforgetlike();
 
         todaysgoodtextsize = 0;
-
+        todayitemsize = pref.getInt("todayitemsize", 0);
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
 
-        todayitemsize = pref.getInt("todayitemsize", 0);
-        long stoptime = pref.getLong("stoptime", System.currentTimeMillis());
+
+        long stoptime = pref.getLong("stoptime", now);
+        Log.e(TAG, "onResume: 확인" + stoptime + "/  " + now);
         rank = pref.getString("rank", "");
         float rankscore = pref.getFloat("rankscore", 100);
         float eventscore = pref.getFloat("eventscore", 100);
@@ -1476,6 +1480,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
         timegap = (int)((now-stoptime)/1000);
+        Log.e(TAG, "onResume: 확인" + timegap);
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
@@ -2471,7 +2476,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else
         {
-            Toast.makeText(MainActivity.this, "뒤로가기 버튼을 한번 더 누르면 종료합니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "'뒤로'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
             Back_Key_Before_Time = System.currentTimeMillis();
         }
     }

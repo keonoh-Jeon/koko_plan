@@ -55,6 +55,4 @@ public class kat_OverdrawActivity extends Service {
         }
         super.onDestroy();
     }
-
-
 }

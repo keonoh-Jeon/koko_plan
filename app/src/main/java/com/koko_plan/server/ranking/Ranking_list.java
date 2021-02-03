@@ -189,6 +189,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         ranking_items.removeAll(ranking_items);
         System.gc();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
