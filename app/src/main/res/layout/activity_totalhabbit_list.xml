@@ -18,7 +18,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 tools:ignore="UseCompoundDrawables">
 
@@ -137,83 +137,85 @@
 
         </LinearLayout>
 
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView_totalhabbit2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/google_ads_banner_api_key">
+        </com.google.android.gms.ads.AdView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="InefficientWeight">
 
-            <com.google.android.gms.ads.AdView
-                xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adView_totalhabbit2"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/google_ads_banner_api_key">
-            </com.google.android.gms.ads.AdView>
+                android:layout_height="match_parent">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="10sp"
-                tools:ignore="ObsoleteLayoutParam">
-
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_margin="10sp"
+                    tools:ignore="ObsoleteLayoutParam">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_totlahabbitlist"
-                        android:layout_height="wrap_content"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        tools:ignore="UnusedAttribute">
-                    </androidx.recyclerview.widget.RecyclerView>
-
-                    <TextView
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="20sp"
-                        android:text="대기 중 습관"
-                        android:textStyle="italic"
-                        android:textColor="#7C7C7C"
-                        tools:ignore="HardcodedText,RtlHardcoded" />
+                        android:orientation="vertical"
+                        tools:ignore="ScrollViewSize">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_totlahabbitlistforready"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        tools:ignore="UnusedAttribute">
-                    </androidx.recyclerview.widget.RecyclerView>
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_totlahabbitlist"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:nestedScrollingEnabled="false"
+                                tools:ignore="UnusedAttribute">
+                            </androidx.recyclerview.widget.RecyclerView>
 
-                </LinearLayout>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginTop="20sp"
+                                android:text="대기 중 습관"
+                                android:textStyle="italic"
+                                android:textColor="#7C7C7C"
+                                tools:ignore="HardcodedText,RtlHardcoded" />
 
-            </ScrollView>
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_totlahabbitlistforready"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:nestedScrollingEnabled="false"
+                                android:layout_marginBottom="50dp"
+                                tools:ignore="UnusedAttribute">
+                            </androidx.recyclerview.widget.RecyclerView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:gravity="bottom">
+                    </LinearLayout>
+
+                </ScrollView>
 
                 <com.google.android.gms.ads.AdView
                     xmlns:ads="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/adView_totalhabbit"
+                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="bottom"
+                    android:layout_gravity="bottom"
                     ads:adSize="BANNER"
                     ads:adUnitId="@string/google_ads_banner_api_key">
                 </com.google.android.gms.ads.AdView>
 
-            </LinearLayout>
+            </FrameLayout>
+
 
         </LinearLayout>
+
 
     </LinearLayout>
 

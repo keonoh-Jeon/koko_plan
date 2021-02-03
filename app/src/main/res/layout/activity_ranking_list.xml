@@ -152,6 +152,7 @@
             android:id="@+id/adView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             ads:adSize="BANNER"
             ads:adUnitId="@string/google_ads_banner_api_key">
         </com.google.android.gms.ads.AdView>
@@ -221,18 +222,22 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_rankinglist"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        tools:ignore="UnusedAttribute">
-                    </androidx.recyclerview.widget.RecyclerView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_rankinglist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginBottom="100dp"
+                    tools:ignore="UnusedAttribute">
+                </androidx.recyclerview.widget.RecyclerView>
 
             </ScrollView>
 
@@ -268,9 +273,11 @@
 
             </LinearLayout>
 
-        </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
 
