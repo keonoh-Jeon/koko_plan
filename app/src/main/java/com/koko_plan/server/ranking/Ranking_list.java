@@ -57,6 +57,7 @@ import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.name;
+import static com.koko_plan.main.MainActivity.nickname;
 import static com.koko_plan.main.MainActivity.photourl;
 import static com.koko_plan.main.MainActivity.todaydate;
 
@@ -244,7 +245,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                     ranking_items.add(document.toObject(Ranking_Item.class));
 
-                                    if(Objects.equals(document.getData().get("name"), name)) {
+                                    if(Objects.equals(document.getData().get("id"), firebaseUser.getUid())) {
                                         tvmyrank.setText(ranking_items.size()+"위");
                                         myrank = ranking_items.size();
                                     }

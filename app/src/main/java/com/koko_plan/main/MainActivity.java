@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static View like, trophy;
 
-    public static String name, email;
+    public static String name, nickname, email;
     private String inputname;
     public static String photourl;
     public static Bitmap profile;
@@ -607,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onCalendarScroll(HorizontalCalendarView calendarView, int dx, int dy) {
-                timegap = 0;
+//                timegap = 0;
             }
 
             @Override

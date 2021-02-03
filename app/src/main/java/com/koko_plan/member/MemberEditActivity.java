@@ -47,10 +47,14 @@ import com.koko_plan.R;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.pref;
+import static com.koko_plan.main.MainActivity.todaydate;
 
 public class MemberEditActivity extends AppCompatActivity {
 
@@ -282,16 +286,19 @@ public class MemberEditActivity extends AppCompatActivity {
         if (name.length() > 0 && birthday.length() > 0) {
 
             if(firebaseUser != null) {
-                int getcount = 0;
-                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount);
+                Map<String, Object> profileset = new HashMap<>();
+                profileset.put("name", name);
+                profileset.put("birthday", birthday);
+                profileset.put("gender", gender);
+
                 firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid())
-                        .set(memberInfo, SetOptions.merge())
+                        .set(profileset, SetOptions.merge())
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                startToast("success member enregistrement");
+                                startToast("회원 정보가 저장되었습니다.");
                                 myStartActivity(MainActivity.class);
                             }
                         })

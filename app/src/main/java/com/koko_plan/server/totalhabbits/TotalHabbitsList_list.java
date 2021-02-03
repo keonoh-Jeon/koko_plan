@@ -474,7 +474,7 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                totalhabbitlist_items.add(0, document.toObject(TotalHabbitsList_Item.class));
+                                totalhabbitlist_items.add(document.toObject(TotalHabbitsList_Item.class));
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

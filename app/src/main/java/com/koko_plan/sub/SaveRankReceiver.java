@@ -83,7 +83,7 @@ public class SaveRankReceiver extends BroadcastReceiver {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         todoListItems.add(document.toObject(TodoList_Item.class));
-                                        if(Objects.equals(document.getData().get("name"), name)) {
+                                        if(Objects.equals(document.getData().get("nick"), name)) {
                                             myrank = todoListItems.size();
                                         }
                                     }
