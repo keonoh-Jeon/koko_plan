@@ -50,7 +50,7 @@
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
                         android:layout_gravity="center"
-                        android:text="골드 1 효과 발동중 "
+                        android:text="효과 발동 대기 중 "
                         tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry,SmallSp" />
 
                     <ImageView

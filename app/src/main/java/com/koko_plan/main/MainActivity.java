@@ -11,6 +11,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -100,6 +103,7 @@ import com.koko_plan.server.goodtext.RandomGoodText;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
+import com.koko_plan.sub.BackgroundSetzero;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -131,6 +135,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
@@ -286,8 +291,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(showcount >= 10) RequestReview.show(this);
 
         saveProgressAlarm(this);
-        setzeroProgressAlarm(this);
+//        setzeroProgressAlarm(this);
         setrankAlarm(this);
+
+        initWorkManager();
+    }
+
+    private void initWorkManager() {
+
+        WorkRequest uploadWorkRequest = new OneTimeWorkRequest
+                .Builder(BackgroundSetzero.class)
+                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)
+                .addTag("notify_day_by_day")
+                .build();
+        WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+    }
+
+    private long getTimeUsingInWorkRequest() {
+        Calendar currentDate = Calendar.getInstance();
+        currentDate.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar dueDate = Calendar.getInstance();
+        dueDate.setTimeInMillis(System.currentTimeMillis());
+        dueDate.set(Calendar.HOUR_OF_DAY, 0);
+        dueDate.set(Calendar.MINUTE, 0);
+        dueDate.set(Calendar.SECOND, 0);
+
+        if(dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24);
+        }
+
+        return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
 
     private void listenerhabbitlistDoc2() {
@@ -1334,7 +1368,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(() -> {
             editor.putInt("showcount", showcount);
             editor.putLong("stoptime", System.currentTimeMillis());
-            Log.e(TAG, "onPause: 확인" + System.currentTimeMillis());
             editor.putInt("todayitemsize", todayitemsize);
             editor.putString("yesterday", todaydate);
             editor.apply();
@@ -1355,7 +1388,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     //현재의 밀리세컨 구함
                     long now = System.currentTimeMillis();
                     editor.putLong("stoptime", now);
-                    Log.e(TAG, "onPause: 확인" + now);
                     editor.apply();
                 }
             }
@@ -1471,7 +1503,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         long stoptime = pref.getLong("stoptime", now);
-        Log.e(TAG, "onResume: 확인" + stoptime + "/  " + now);
         rank = pref.getString("rank", "");
         float rankscore = pref.getFloat("rankscore", 100);
         float eventscore = pref.getFloat("eventscore", 100);
@@ -1480,7 +1511,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
         timegap = (int)((now-stoptime)/1000);
-        Log.e(TAG, "onResume: 확인" + timegap);
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
@@ -2439,6 +2469,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, setzeroSender);
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setZeroTime = format.format(new Date(setzeroCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
+
+        Log.e(TAG, "setzeroAlarm: 확인" + setZeroTime);
     }
 
     //자정마다 실행 (리시버)

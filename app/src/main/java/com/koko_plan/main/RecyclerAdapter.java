@@ -157,7 +157,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         private void startTimerTask()
         {
-            Log.e(TAG, "startTimerTask: 확인" + timegap);
             stopTimerTask();
             Timer timer = new Timer();
             timerTask = new TimerTask()

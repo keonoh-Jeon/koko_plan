@@ -284,7 +284,6 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                     detailhabbitItems.add(document.toObject(Detailhabbit_Item.class));
                                     long total = (long) document.getData().get("totalsec");
                                     cursum += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
-                                    Log.e(TAG, "onComplete: 확인 "+  document.getData().get("totalsec"));
                                 }
                             } else {
                                 Log.d(TAG, "Error getting documents: ", task.getException());
