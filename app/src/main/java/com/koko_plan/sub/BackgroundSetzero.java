@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -31,19 +32,14 @@ public class BackgroundSetzero extends Worker {
             @NonNull Context context,
             @NonNull WorkerParameters params) {
         super(context, params);
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     @NonNull
     @Override
     public Result doWork() {
-
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        // Do the work here--in this case, upload the images.
-//        uploadImages();
-
-        Log.e(TAG, "doWork: "+ "확인" +  firebaseUser);
-        Log.e(TAG, "doWork: "+ firebaseUser );
 
         new Thread(() -> {
             if(firebaseUser != null){
@@ -92,8 +88,6 @@ public class BackgroundSetzero extends Worker {
                 Map<String, Object> getcount = new HashMap<>();
                 getcount.put("getcount", 0);
                 getcount.put("progress", 0);
-
-                Log.e(TAG, "onReceive: 확인" + "제로 실행" );
 
                 firebaseFirestore
                         .collection("users")

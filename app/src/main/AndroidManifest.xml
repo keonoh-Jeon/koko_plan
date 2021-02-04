@@ -98,8 +98,6 @@
 
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
-        <receiver android:name=".sub.SetzeroProgressReceiver" />
-        <receiver android:name=".sub.SaveRankReceiver" />
 
         <service
             android:name=".sub.kat_OverdrawActivity"

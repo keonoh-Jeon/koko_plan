@@ -78,7 +78,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.UpdateAvailability;
@@ -103,6 +102,7 @@ import com.koko_plan.server.goodtext.RandomGoodText;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
+import com.koko_plan.sub.BackgroundSaveRank;
 import com.koko_plan.sub.BackgroundSetzero;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
@@ -113,8 +113,6 @@ import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
-import com.koko_plan.sub.SaveRankReceiver;
-import com.koko_plan.sub.SetzeroProgressReceiver;
 import com.koko_plan.sub.Utils;
 import com.koko_plan.sub.kat_OverdrawActivity;
 import com.koko_plan.sub.subscribe;
@@ -292,34 +290,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         saveProgressAlarm(this);
 //        setzeroProgressAlarm(this);
-        setrankAlarm(this);
+//        setrankAlarm(this);
 
-        initWorkManager();
+        initWorkManagersetzero();
+        initWorkManagersaverank();
     }
 
-    private void initWorkManager() {
+    private void initWorkManagersetzero() {
 
         WorkRequest uploadWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSetzero.class)
-                .setInitialDelay(getTimeUsingInWorkRequest(), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(0, 0, 0), TimeUnit.MILLISECONDS)
                 .addTag("notify_day_by_day")
                 .build();
         WorkManager.getInstance(this).enqueue(uploadWorkRequest);
     }
 
-    private long getTimeUsingInWorkRequest() {
+    private void initWorkManagersaverank() {
+
+        WorkRequest uploadWorkRequest = new OneTimeWorkRequest
+                .Builder(BackgroundSaveRank.class)
+                .setInitialDelay(getTimeUsingInWorkRequest(0, 7, 0), TimeUnit.MILLISECONDS)
+                .addTag("notify_saverank")
+                .build();
+        WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+    }
+
+    private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
         Calendar currentDate = Calendar.getInstance();
         currentDate.setTimeInMillis(System.currentTimeMillis());
 
         Calendar dueDate = Calendar.getInstance();
         dueDate.setTimeInMillis(System.currentTimeMillis());
-        dueDate.set(Calendar.HOUR_OF_DAY, 0);
-        dueDate.set(Calendar.MINUTE, 0);
-        dueDate.set(Calendar.SECOND, 0);
+        dueDate.set(Calendar.HOUR_OF_DAY, i);
+        dueDate.set(Calendar.MINUTE, i1);
+        dueDate.set(Calendar.SECOND, i2);
 
         if(dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
         }
+
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
+        String setdudateTime = format.format(new Date(dueDate.getTimeInMillis()));
+
+        Log.e(TAG, "setrankAlarm: 확인" + setdudateTime);
 
         return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
@@ -2448,7 +2462,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
 
-        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
+//        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
     }
 
     //자정마다 실행 (리시버)
@@ -2456,8 +2470,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //알람 매니저 생성
         AlarmManager setzeroProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         //리시브 받을 클래스 연결
-        Intent setzeroProgressIntent = new Intent(context, SetzeroProgressReceiver.class);
-        PendingIntent setzeroSender = PendingIntent.getBroadcast(context, 0, setzeroProgressIntent, 0);
+//        Intent setzeroProgressIntent = new Intent(context, SetzeroProgressReceiver.class);
+//        PendingIntent setzeroSender = PendingIntent.getBroadcast(context, 0, setzeroProgressIntent, 0);
 
         //실행 시간
         Calendar setzeroCal = Calendar.getInstance();
@@ -2467,13 +2481,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setzeroCal.set(Calendar.SECOND, 0);
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
+        /*setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, setzeroSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setZeroTime = format.format(new Date(setzeroCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
 
-        Log.e(TAG, "setzeroAlarm: 확인" + setZeroTime);
+        Log.e(TAG, "setzeroAlarm: 확인" + setZeroTime);*/
     }
 
     //자정마다 실행 (리시버)
@@ -2481,8 +2495,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //알람 매니저 생성
         AlarmManager setrankAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         //리시브 받을 클래스 연결
-        Intent setrankProgressIntent = new Intent(context, SaveRankReceiver.class);
-        PendingIntent setrankSender = PendingIntent.getBroadcast(context, 0, setrankProgressIntent, 0);
+//        Intent setrankProgressIntent = new Intent(context, SaveRankReceiver.class);
+//        PendingIntent setrankSender = PendingIntent.getBroadcast(context, 0, setrankProgressIntent, 0);
 
         //실행 시간
         Calendar setrankCal = Calendar.getInstance();
@@ -2492,13 +2506,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setrankCal.set(Calendar.SECOND, 0);
 
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        setrankAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setrankCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
-                , AlarmManager.INTERVAL_DAY, setrankSender);
+//        setrankAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setrankCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
+//                , AlarmManager.INTERVAL_DAY, setrankSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setResetTime = format.format(new Date(setrankCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
-
-        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
     }
 
     @Override
