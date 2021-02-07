@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
@@ -321,23 +322,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("name", name1)
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank : 확인" + name1);
+        Log.e(TAG, "initWorkManagersaverank : 확인 " + name1);
 
         WorkRequest uploadWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(13-24, 54, 0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(20-24, 36,0), TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
-        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(13-24, 54, 0) );
+
+        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(20-24, 36, 0) );
         WorkManager.getInstance(this).enqueue(uploadWorkRequest);
 
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(uploadWorkRequest.getId())
-                .observe(this, info -> {
-                    if (info != null && info.getState().isFinished()) {
-                        float eventscore = info.getOutputData().getFloat("eventscore", 100);
+                .observe(this, workInfo -> {
+                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                        float eventscore = workInfo.getOutputData().getFloat("eventscore", 99.87f);
                         SetRank(eventscore);
-                        Log.e(TAG, "get 확인" + eventscore);
+                        Log.e(TAG, "get 확인 " + eventscore);
                     }
                 });
     }
@@ -360,9 +362,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String setdudateTime = format.format(new Date(dueDate.getTimeInMillis()));
 
         Log.e(TAG, "setAlarm: 확인" + setdudateTime);
-
-        Log.e(TAG, "get 확인" + dueDate.getTimeInMillis());
-        Log.e(TAG, "get 확인" + currentDate.getTimeInMillis());
 
         return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
