@@ -189,7 +189,6 @@ public class EditHabbit extends AppCompatActivity {
             todayprogresslist.put("start", todaydate);
             todayprogresslist.put("totalsec", totalsec);
             todayprogresslist.put("sumtotalsec", 0);
-            todayprogresslist.put("eventscore", 99.9);
             todayprogresslist.put("count", count);
             todayprogresslist.put("countsum", 0);
             todayprogresslist.put("habbittitle", habbittitle);

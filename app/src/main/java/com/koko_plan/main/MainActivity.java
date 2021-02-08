@@ -288,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListInit();
+        getdocforgetlike();
 
         GoodTextListmaker();
 
@@ -458,6 +459,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             if(!todaydate.equals(pref.getString("yesterday", null))) {
                 new Thread(() -> {
+
                     if(firebaseUser != null){
                         firebaseFirestore
                                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
@@ -501,26 +503,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                 });
 
-                        Map<String, Object> getcount = new HashMap<>();
-                        getcount.put("getcount", 0);
-                        getcount.put("progress", 0);
-                        getcount.put("eventscore", 100);
 
-                        firebaseFirestore
-                                .collection("users")
-                                .document(firebaseUser.getUid())
-                                .set(getcount, SetOptions.merge())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    }
-                                });
                     }
+
+                    Map<String, Object> getcount = new HashMap<>();
+                    getcount.put("getcount", 0);
+                    getcount.put("progress", 0);
+
+                    firebaseFirestore
+                            .collection("users")
+                            .document(firebaseUser.getUid())
+                            .set(getcount, SetOptions.merge())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
                 }).start();
             }
     }
@@ -1213,6 +1216,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 dairyInfo.put(todaydate, today_progress);
                                 dairyInfo.put("progress", today_progress);
                                 dairyInfo.put("todaytarget", today);
+                                dairyInfo.put("eventscore", 99.9);
+
 
                                 firebaseFirestore
                                         .collection("users")
@@ -1535,7 +1540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // 현재 날짜 구하기
         gettodaydate();
-        getdocforgetlike();
+
 
         todaysgoodtextsize = 0;
         todayitemsize = pref.getInt("todayitemsize", 0);
@@ -1545,7 +1550,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             pd = null;
             pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
 
-            if(todayitemsize>1) tvnewhabbits.setVisibility(View.GONE);
+            if(todayitemsize > 1) tvnewhabbits.setVisibility(View.GONE);
         }
 
         long now = System.currentTimeMillis();
