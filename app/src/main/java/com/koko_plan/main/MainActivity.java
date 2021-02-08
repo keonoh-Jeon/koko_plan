@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         WorkManager.getInstance(this).enqueue(uploadWorkRequest);
     }
 
+    @SuppressLint("SimpleDateFormat")
     private void initWorkManagersaverank() {
 
         String name1 = null;
@@ -319,18 +320,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
+        date = new Date();
+        dateformat = new SimpleDateFormat("yyyy-MM-dd");
+        todaydate = dateformat.format(date);
+
         Data myData = new Data.Builder()
                 .putString("name", name1)
+                .putString("todaydate", todaydate)
                 .build();
+
+        Log.e(TAG, "initWorkManagersaverank: " + todaydate);
 
         WorkRequest uploadWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(0, -1,0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(11-24, 51,0), TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(0, -1, 0) );
+        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(11-24, 51, 0) );
         WorkManager.getInstance(this).enqueue(uploadWorkRequest);
     }
 
@@ -1547,7 +1555,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @SuppressLint("SetTextI18n")
-    private void SetRank(double rankscore) {
+    private void SetRank(long rankscore) {
 
         new Thread(new Runnable() {
             @Override
@@ -2141,7 +2149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                 tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
 
-                                double eventscore =(double)document.getData().get("eventscore");
+                                long eventscore =(long)document.getData().get("eventscore");
                                 SetRank(eventscore);
                                 Log.e(TAG, "onComplete: 확인 eventscore " + eventscore);
                             }

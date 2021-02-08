@@ -14,8 +14,6 @@ import java.util.Map;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
 import static com.koko_plan.main.MainActivity.photourl;
-import static com.koko_plan.main.MainActivity.profile;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class SetMsgToUsers {
 

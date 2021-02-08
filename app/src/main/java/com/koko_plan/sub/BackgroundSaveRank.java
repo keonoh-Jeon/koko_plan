@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -55,6 +57,8 @@ public class BackgroundSaveRank extends Worker {
     public Result doWork() {
             if (firebaseUser != null) {
                 String name = getInputData().getString("name");
+                String todaydate = getInputData().getString("todaydate");
+                Log.e(TAG, "doWork: 받은 날짜 확인 " +  todaydate);
 
                 firebaseFirestore
                         .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
@@ -77,31 +81,58 @@ public class BackgroundSaveRank extends Worker {
                                         }
                                         eventscore = (float) ((float) myrank / (double) todoListItems.size() * 100.0);
 
-                                        Map<String, Object> seteventscore = new HashMap<>();
-                                        seteventscore.put("eventscore", eventscore);
-
-                                        firebaseFirestore
+                                        DocumentReference documentReference = firebaseFirestore
                                                 .collection("users")
-                                                .document(firebaseUser.getUid())
-                                                .set(seteventscore, SetOptions.merge())
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
+                                                .document(firebaseUser.getUid());
+
+                                        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @SuppressLint("SetTextI18n")
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document != null) {
+                                                        if (document.exists()) {
+                                                            if(0 < (long) document.getData().get(todaydate)) {
+
+                                                                Map<String, Object> seteventscore = new HashMap<>();
+                                                                seteventscore.put("eventscore", eventscore);
+
+                                                                Log.e(TAG, "onComplete: 확인 실행 eventscore" + eventscore);
+
+                                                                firebaseFirestore
+                                                                        .collection("users")
+                                                                        .document(firebaseUser.getUid())
+                                                                        .set(seteventscore, SetOptions.merge())
+
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                            }
+                                                                        });
+                                                            }
+                                                        } else {
+                                                            Log.d(TAG, "No such document");
+                                                        }
                                                     }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                    }
-                                                });
+                                                } else {
+                                                    Log.d(TAG, "get failed with ", task.getException());
+                                                }
+                                            }
+                                        });
                                     }
+
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
                             }
                         });
             }
-
             return Result.success();
     }
 }
