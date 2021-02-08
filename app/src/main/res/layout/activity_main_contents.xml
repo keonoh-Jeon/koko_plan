@@ -50,7 +50,7 @@
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
                         android:layout_gravity="center"
-                        android:text="효과 발동 대기 중 "
+                        android:text="보상 효과 대기 중 "
                         tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry,SmallSp" />
 
                     <ImageView
@@ -106,12 +106,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_view"
-                        android:layout_margin="10dp"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:ignore="ScrollViewSize" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_newhabbits"
+                            android:text="실천할 습관을 추가해 주세요."
+                            android:layout_margin="10dp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:ignore="HardcodedText" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_view"
+                            android:layout_margin="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:ignore="ScrollViewSize" />
+
+                    </LinearLayout>
+
+
 
                 </RelativeLayout>
 

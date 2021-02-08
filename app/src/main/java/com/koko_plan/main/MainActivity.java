@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean blurview2;
     public static boolean blurview3;
     public static boolean blurview4;
+    private TextView tvnewhabbits;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -334,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         WorkRequest uploadWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(11-24, 51,0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(0, 51,0), TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
 
@@ -503,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Map<String, Object> getcount = new HashMap<>();
                         getcount.put("getcount", 0);
                         getcount.put("progress", 0);
+                        getcount.put("eventscore", 100);
 
                         firebaseFirestore
                                 .collection("users")
@@ -561,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
 
+        tvnewhabbits = (TextView) findViewById(R.id.tv_newhabbits);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
 
         adapter = new RecyclerAdapter(todoListItems, this, this);
@@ -627,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     setdidlist();
                                     //달력추가
                                     EventCalendarMaker(date);
-                                    LineChartMaker();
+//                                    LineChartMaker();
                                 }
                                 private void setdidlist() {
                                     todoListItems.clear();
@@ -660,6 +663,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         tvTodayProgress.setText(today_progress+ "%" );
 
                                                         piechartmaker();
+                                                        LineChartMaker();
 
                                                         if(pd!= null) pd.dismiss();
                                                     }
@@ -1181,6 +1185,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .whereEqualTo(getdayofweek(), true) // 복합 쿼리 순서 주의! -- 색인에 가서 복합 색인 추가
                         .orderBy("num", Query.Direction.ASCENDING)
                         .get()
+
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @SuppressLint("SetTextI18n")
                             @Override
@@ -1196,6 +1201,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         today += total;
                                     }
                                     piechartmaker();
+                                    LineChartMaker();
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
@@ -1229,8 +1235,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         });
             }
         }).start();
-
-        LineChartMaker();
     }
 
     private void listenerDoc(){
@@ -1505,10 +1509,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
-        //로딩 화면 만들기
-        pd = null;
-        pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
-
         //업데이트 가능 시, 연결해서 업데이트
         appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
             if (appUpdateInfo.updateAvailability()
@@ -1539,6 +1539,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         todaysgoodtextsize = 0;
         todayitemsize = pref.getInt("todayitemsize", 0);
+
+        if(todayitemsize>0){
+            //로딩 화면 만들기
+            pd = null;
+            pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
+
+            if(todayitemsize>1) tvnewhabbits.setVisibility(View.GONE);
+        }
+
         long now = System.currentTimeMillis();
         // 현재시간을 date 변수에 저장한다.
 
@@ -1555,7 +1564,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @SuppressLint("SetTextI18n")
-    private void SetRank(long rankscore) {
+    private void SetRank(double rankscore) {
 
         new Thread(new Runnable() {
             @Override
@@ -1581,7 +1590,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         blurview3 = true;
                         blurview4 = true;
 
-                        if(99.94 < rankscore && rankscore <= 100) {
+                        if(99.94 < rankscore && rankscore <= 100.0) {
                             tvrankereffect.setText("Iron IV 보상 없슴");
                             tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
 
@@ -2133,6 +2142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getdocforgetlike() {
+
         new Thread(() -> {
             if (firebaseUser != null) {
                 DocumentReference documentReference = firebaseFirestore
@@ -2140,18 +2150,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .document(firebaseUser.getUid());
 
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
-                            if (document != null) {
-                                tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
-                                tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                            if (document.exists()) {
+                                    tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+                                    tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
 
-                                long eventscore =(long)document.getData().get("eventscore");
-                                SetRank(eventscore);
-                                Log.e(TAG, "onComplete: 확인 eventscore " + eventscore);
+                                    String eventscore = (String) String.valueOf(document.getData().get("eventscore"));
+                                    SetRank(Double.parseDouble(eventscore));
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
