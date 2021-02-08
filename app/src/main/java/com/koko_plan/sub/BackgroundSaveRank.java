@@ -12,14 +12,20 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.TodoList_Item;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -31,7 +37,6 @@ public class BackgroundSaveRank extends Worker {
     public static ArrayList<TodoList_Item> todoListItems = null;
     private int myrank = 0;
     private float eventscore;
-    private Data output;
 
     public BackgroundSaveRank(
             @NonNull Context context,
@@ -45,16 +50,6 @@ public class BackgroundSaveRank extends Worker {
         todoListItems.clear();
     }
 
-    // WorkManager를 호출한 액티비티로 데이터 반환
-    private Data createOutputData(float eventscore) {
-
-        Log.e(TAG, "createOutputData 확인" + eventscore);
-
-        return new Data.Builder()
-                .putFloat("eventscore", eventscore)
-                .build();
-    }
-
     @NonNull
     @Override
     public Result doWork() {
@@ -63,6 +58,9 @@ public class BackgroundSaveRank extends Worker {
 
                 firebaseFirestore
                         .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                        .orderBy("progress", Query.Direction.DESCENDING)
+                        .orderBy("getcount", Query.Direction.DESCENDING)
+                        .orderBy("todaytarget", Query.Direction.DESCENDING)
 
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -76,18 +74,34 @@ public class BackgroundSaveRank extends Worker {
                                         todoListItems.add(document.toObject(TodoList_Item.class));
                                         if (Objects.equals(document.getData().get("name"), name)) {
                                             myrank = todoListItems.size();
-                                            Log.e(TAG, "myrank 확인" + myrank);
                                         }
                                         eventscore = (float) ((float) myrank / (double) todoListItems.size() * 100.0);
+
+                                        Map<String, Object> seteventscore = new HashMap<>();
+                                        seteventscore.put("eventscore", eventscore);
+
+                                        firebaseFirestore
+                                                .collection("users")
+                                                .document(firebaseUser.getUid())
+                                                .set(seteventscore, SetOptions.merge())
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                    }
+                                                });
                                     }
-                                    createOutputData((long) eventscore);
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
                             }
                         });
             }
+
             return Result.success();
     }
 }
-

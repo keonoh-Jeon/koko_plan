@@ -12,6 +12,7 @@ public class GoodText_Item
     private String time;
     private String day;
     private int progress;
+    private int getcount;
     private int randomnum;
     private float average;
 
@@ -23,6 +24,15 @@ public class GoodText_Item
 
     public String getTime(){ return time; }
     public void setTime(String time){ this.time = time;  }
+
+    public void setGetcount(int getcount)
+    {
+        this.getcount = getcount;
+    }
+    public int getGetcount()
+    {
+        return getcount;
+    }
 
     public String getDay(){ return day; }
     public void setDay(String day){ this.day = day;  }

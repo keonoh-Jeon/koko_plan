@@ -56,10 +56,6 @@ import static com.koko_plan.main.MainActivity.adview7;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
-import static com.koko_plan.main.MainActivity.name;
-import static com.koko_plan.main.MainActivity.nickname;
-import static com.koko_plan.main.MainActivity.photourl;
-import static com.koko_plan.main.MainActivity.todaydate;
 
 public class Ranking_list extends AppCompatActivity implements Ranking_ViewListener, GoodText_ViewListener
 {

@@ -142,6 +142,7 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
+import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 
@@ -322,26 +323,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("name", name1)
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank : 확인 " + name1);
-
         WorkRequest uploadWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(20-24, 36,0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(0, -1,0), TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(20-24, 36, 0) );
+        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(0, -1, 0) );
         WorkManager.getInstance(this).enqueue(uploadWorkRequest);
-
-        WorkManager.getInstance(this).getWorkInfoByIdLiveData(uploadWorkRequest.getId())
-                .observe(this, workInfo -> {
-                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                        float eventscore = workInfo.getOutputData().getFloat("eventscore", 99.87f);
-                        SetRank(eventscore);
-                        Log.e(TAG, "get 확인 " + eventscore);
-                    }
-                });
     }
 
     private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
@@ -1557,7 +1547,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @SuppressLint("SetTextI18n")
-    private void SetRank(float rankscore) {
+    private void SetRank(double rankscore) {
 
         new Thread(new Runnable() {
             @Override
@@ -2150,6 +2140,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (document != null) {
                                 tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                 tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
+
+                                double eventscore =(double)document.getData().get("eventscore");
+                                SetRank(eventscore);
+                                Log.e(TAG, "onComplete: 확인 eventscore " + eventscore);
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
@@ -2369,6 +2363,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                         RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time);
                                         goodText_adapter.notifyItemChanged(position);
+
+                                        DocumentReference documentReference = firebaseFirestore
+                                                .collection("users")
+                                                .document(goodText_items.get(position).getFromid());
+
+                                        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @SuppressLint("SetTextI18n")
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document != null) {
+                                                        if (document.exists()) {
+                                                            long getcount = (long) document.get("getcount");
+
+                                                            Map<String, Object> data = new HashMap<>();
+                                                            data.put("getcount", getcount+1);
+                                                            firebaseFirestore
+                                                                    .collection("users")
+                                                                    .document(goodText_items.get(position).getFromid())
+                                                                    .set(data, SetOptions.merge());
+                                                        } else {
+                                                            Log.d(TAG, "No such document");
+                                                        }
+                                                    }
+                                                } else {
+                                                    Log.d(TAG, "get failed with ", task.getException());
+                                                }
+                                            }
+                                        });
                                     }
                                 });
                             }
