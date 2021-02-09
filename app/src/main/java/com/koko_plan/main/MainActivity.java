@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         LineData data = new LineData(labels, dataset);
         dataset.setColors(Collections.singletonList(Color.parseColor("#A4193D"))); //
-        /*dataset.setDrawCubic(true); //선 둥글게 만들기*/
+        dataset.setDrawCubic(true); //선 둥글게 만들기
         dataset.setDrawFilled(true); //그래프 밑부분 색칠
         dataset.setFillColor(Color.parseColor("#FFDFB9")); //아래 채워질 색상
         dataset.setCircleColor(Color.parseColor("#A4193D")); //포인트 색상

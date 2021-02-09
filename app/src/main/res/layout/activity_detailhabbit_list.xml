@@ -298,7 +298,9 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                tools:ignore="InefficientWeight">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -306,18 +308,15 @@
 
                     <ScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            tools:ignore="ScrollViewSize">
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_margin="10sp"
+                        tools:ignore="ObsoleteLayoutParam">
 
                             <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="100dp"
+                                android:layout_marginBottom="50dp"
                                 tools:ignore="UselessParent">
 
                                 <androidx.recyclerview.widget.RecyclerView
@@ -337,32 +336,17 @@
 
                             </FrameLayout>
 
-                        </LinearLayout>
-
                     </ScrollView>
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="bottom"
-                                android:gravity="bottom">
-
-                                <com.google.android.gms.ads.AdView
-                                    xmlns:ads="http://schemas.android.com/apk/res-auto"
-                                    android:id="@+id/adView"
-                                    android:layout_gravity="bottom"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    ads:adSize="BANNER"
-                                    ads:adUnitId="@string/google_ads_banner_api_key">
-                                </com.google.android.gms.ads.AdView>
-
-                            </LinearLayout>
-
-
-
-
-
+                    <com.google.android.gms.ads.AdView
+                        xmlns:ads="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/adView"
+                        android:layout_gravity="bottom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ads:adSize="BANNER"
+                        ads:adUnitId="@string/google_ads_banner_api_key">
+                    </com.google.android.gms.ads.AdView>
 
                 </FrameLayout>
 
