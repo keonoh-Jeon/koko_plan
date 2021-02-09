@@ -41,6 +41,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
@@ -251,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean blurview2;
     public static boolean blurview3;
     public static boolean blurview4;
-    private TextView tvnewhabbits, tvletscheer;
+    private TextView tvnewhabbits, tvletscheer, tvplus1;
     public static int adloadcount;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -847,6 +848,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adBanner3 = findViewById(R.id.ad_View3);
         adBanner4 = findViewById(R.id.ad_View4);
         recyclerView3 = findViewById(R.id.rv_msg);
+
+
+        tvplus1 = findViewById(R.id.tv_plus1);
+        tvplus1.setVisibility(View.GONE);
 
         goodtextsize = findViewById(R.id.tv_goodtextsize);
         calendarView = findViewById(R.id.calendarView2);
@@ -2222,27 +2227,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 @SuppressLint("SetTextI18n")
                                 @Override
                                 public void run() {
-                                    firebaseFirestore
-                                            .collection("users")
-                                            .document(firebaseUser.getUid())
-                                            .collection("total")
-                                            .document(todoListItems.get(position).getHabbittitle())
-                                            .delete()
+                                    if(firebaseUser != null) {
+                                        firebaseFirestore
+                                                .collection("users")
+                                                .document(firebaseUser.getUid())
+                                                .collection("total")
+                                                .document(todoListItems.get(position).getHabbittitle())
+                                                .delete()
 
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.e(TAG, "onSuccess: "  + todoListItems.get(position).getHabbittitle());
-                                                    todoListItems.remove(position);
-                                                    adapter.notifyItemRemoved(position);
-                                                }
-                                            })
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.e(TAG, "onSuccess: "  + todoListItems.get(position).getHabbittitle());
+                                                        todoListItems.remove(position);
+                                                        adapter.notifyItemRemoved(position);
+                                                    }
+                                                })
 
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                }
-                                            });
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                    }
+                                                });
+
+
+                                    }
+
                                 }
                             });
                         }
@@ -2374,6 +2384,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     goodText_items.remove(position);
                                                     goodtextsize.setText(goodText_items.size()+ "개");
                                                     goodText_adapter.notifyItemRemoved(position);
+
+                                                    DocumentReference documentReference = firebaseFirestore
+                                                            .collection("users")
+                                                            .document(firebaseUser.getUid());
+
+                                                    documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                        @SuppressLint("SetTextI18n")
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                DocumentSnapshot document = task.getResult();
+                                                                if (document != null) {
+                                                                    int getcount = Integer.parseInt(String.valueOf(Objects.requireNonNull(document.getData()).get("getcount")));
+                                                                    getcount =  getcount + 1;
+
+                                                                    tvgetcount.setText(getcount + "");
+                                                                    tvtodayget.setText(getcount + "");
+                                                                    tvplus1.setVisibility(View.VISIBLE);
+
+                                                                    Handler mHandler = new Handler();
+                                                                    mHandler.postDelayed(new Runnable() {
+                                                                        public void run() {
+                                                                            // 시간 지난 후 실행할 코딩
+                                                                            tvplus1.setVisibility(View.GONE);
+                                                                            }}, 500); // 0.5초후
+
+                                                                    Map<String, Object> count = new HashMap<>();
+                                                                    count.put("getcount", getcount);
+
+                                                                    firebaseFirestore
+                                                                            .collection("users")
+                                                                            .document(firebaseUser.getUid())
+
+                                                                            .set(count, SetOptions.merge())
+                                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+                                                                                }
+                                                                            })
+                                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                                @Override
+                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                }
+                                                                            });
+
+                                                                }
+                                                            } else {
+                                                                Log.d(TAG, "get failed with ", task.getException());
+                                                            }
+                                                        }
+                                                    });
+
                                                 }
                                             })
 

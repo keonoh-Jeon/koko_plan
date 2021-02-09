@@ -269,8 +269,11 @@
                     android:id="@+id/tv_letscheer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="힘이 되는 명언으로 서로를 응원해요.
-                            \n답장을 많이 받을수록 순위가 오릅니다. ('명언답장' → 오른쪽으로 '스와이프')"
+                    android:text="힘이 되는 명언으로 서로의 습관을 응원하세요.
+                            \n (명언을 많이 받을수록 순위가 오릅니다.)
+                            \n
+                            \n → 오른쪽으로 스와이프 : 명언 답장
+                            \n ← 왼쪽으로 스와이프 : 삭제 (명언 +1 포인트)"
                     tools:ignore="HardcodedText,RtlHardcoded,SmallSp"
                     android:textSize="10sp"
                     android:layout_margin="10dp"
@@ -331,6 +334,16 @@
                                 tools:ignore="HardcodedText,SmallSp" />
 
                         </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tv_plus1"
+                            android:textColor="#D8E7645A"
+                            android:layout_marginLeft="10dp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+1"
+                            tools:ignore="HardcodedText,RtlHardcoded" />
 
 
                     </LinearLayout>

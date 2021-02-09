@@ -123,15 +123,16 @@
                 </LinearLayout>
 
 
-
-
-
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/activity_main_contents" />
+    <include
+        android:id="@+id/include"
+        layout="@layout/activity_main_contents"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="center" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
