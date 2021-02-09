@@ -59,6 +59,7 @@ import com.github.mikephil.charting.components.Legend;
 import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -125,6 +126,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.MappedByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -162,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static View like, trophy;
 
-    public static String name, nickname, email;
+    public static String name, email;
+    public static InterstitialAd  mInterstitialAd;
     private String inputname;
     public static String photourl;
     public static Bitmap profile;
@@ -248,7 +251,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean blurview2;
     public static boolean blurview3;
     public static boolean blurview4;
-    private TextView tvnewhabbits;
+    private TextView tvnewhabbits, tvletscheer;
+    public static int adloadcount;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -298,18 +302,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        setzeroProgressAlarm(this);
 //        setrankAlarm(this);
 
-//        initWorkManagersetzero();
+        initWorkManagersetzero();
         initWorkManagersaverank();
+
+        //전면광고 로드
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-6976973682401259/7858524788");
     }
 
     private void initWorkManagersetzero() {
 
-        WorkRequest uploadWorkRequest = new OneTimeWorkRequest
+        WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSetzero.class)
                 .setInitialDelay(getTimeUsingInWorkRequest(0, 0, 0), TimeUnit.MILLISECONDS)
                 .addTag("notify_day_by_day")
                 .build();
-        WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+        WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -331,17 +339,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .putString("todaydate", todaydate)
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank: " + todaydate);
-
-        WorkRequest uploadWorkRequest = new OneTimeWorkRequest
+        WorkRequest saverankWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(0, 51,0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(getTimeUsingInWorkRequest(0, -1,0), TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
 
-        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(11-24, 51, 0) );
-        WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+//        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(11-24, 51, 0) );
+
+        WorkManager.getInstance(this).enqueue(saverankWorkRequest);
     }
 
     private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
@@ -460,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(!todaydate.equals(pref.getString("yesterday", null))) {
                 new Thread(() -> {
 
-                    if(firebaseUser != null){
+                    if(firebaseUser != null) {
                         firebaseFirestore
                                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                                 .document(firebaseUser.getUid())
@@ -503,27 +510,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                 });
 
+                        Map<String, Object> getcount = new HashMap<>();
+                        getcount.put("getcount", 0);
+                        getcount.put("progress", 0);
 
+                        firebaseFirestore
+                                .collection("users")
+                                .document(firebaseUser.getUid())
+                                .set(getcount, SetOptions.merge())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
                     }
-
-                    Map<String, Object> getcount = new HashMap<>();
-                    getcount.put("getcount", 0);
-                    getcount.put("progress", 0);
-
-                    firebaseFirestore
-                            .collection("users")
-                            .document(firebaseUser.getUid())
-                            .set(getcount, SetOptions.merge())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                }
-                            });
                 }).start();
             }
     }
@@ -666,7 +671,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         tvTodayProgress.setText(today_progress+ "%" );
 
                                                         piechartmaker();
-                                                        LineChartMaker();
 
                                                         if(pd!= null) pd.dismiss();
                                                     }
@@ -852,6 +856,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+
+        tvletscheer = findViewById(R.id.tv_letscheer);
+        tvletscheer.setSelected(true);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -1105,6 +1112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ivgetcount.setOnClickListener(v -> {
             MySoundPlayer.play(MySoundPlayer.POP);
             scrollview.smoothScrollTo(0, relativeview.getTop());
+            showfullad(this);
         });
 
         ivdownarrow.setOnClickListener(v ->  {
@@ -1128,6 +1136,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         listenerDoc();
+    }
+
+    public static void showfullad(Context context){
+        Log.e(TAG, "onStart: 전면" + pref.getInt("adloadcount", 1));
+        if (/*mInterstitialAd.isLoaded() && */!fulladview && pref.getInt("adloadcount", 0)%5==0) {
+            Toast.makeText(context,"전면 광고!", Toast.LENGTH_SHORT).show();
+            mInterstitialAd.show();
+            adloadcount ++;
+            editor.putInt("adloadcount" , adloadcount);
+            editor.apply();
+        }else{
+            adloadcount ++;
+            editor.putInt("adloadcount" , adloadcount);
+            editor.apply();
+        }
     }
 
     //잠금 화면 해지시 첫화면
@@ -1204,7 +1227,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         today += total;
                                     }
                                     piechartmaker();
-                                    LineChartMaker();
                                 } else {
                                     Log.d(TAG, "Error getting documents: ", task.getException());
                                 }
@@ -1216,8 +1238,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 dairyInfo.put(todaydate, today_progress);
                                 dairyInfo.put("progress", today_progress);
                                 dairyInfo.put("todaytarget", today);
-                                dairyInfo.put("eventscore", 99.9);
-
 
                                 firebaseFirestore
                                         .collection("users")
@@ -1478,7 +1498,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     DocumentSnapshot document = task.getResult();
                                     if (document != null) {
                                         if (document.exists()) {
-                                            Log.e(TAG, "LineChartMaker: document" + document.get("percentage"));
                                             double percent = (double) document.get("percentage");
                                             editor.putFloat("entries" + finalI, (float) percent);
                                             editor.apply();
@@ -1514,6 +1533,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
         //업데이트 가능 시, 연결해서 업데이트
         appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
             if (appUpdateInfo.updateAvailability()
@@ -1541,7 +1562,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 현재 날짜 구하기
         gettodaydate();
 
-
         todaysgoodtextsize = 0;
         todayitemsize = pref.getInt("todayitemsize", 0);
 
@@ -1551,6 +1571,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
 
             if(todayitemsize > 1) tvnewhabbits.setVisibility(View.GONE);
+
+            LineChartMaker();
         }
 
         long now = System.currentTimeMillis();

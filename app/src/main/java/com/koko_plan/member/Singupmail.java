@@ -2,9 +2,13 @@ package com.koko_plan.member;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +28,9 @@ import com.koko_plan.sub.MySoundPlayer;
 public class Singupmail extends AppCompatActivity {
 
     private FirebaseAuth mAuth = null;
+    private EditText etemail;
+    private TextView tvemail;
+    private static final String TAG = "Signupmail";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +39,11 @@ public class Singupmail extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         findViewById(R.id.signUpButton).setOnClickListener(btnClickListener);
-
+        tvemail = (TextView) findViewById(R.id.tv_email);
+        etemail = (EditText) findViewById(R.id.et_email);
     }
 
-    private Button.OnClickListener btnClickListener = new View.OnClickListener() {
+    private final Button.OnClickListener btnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch(v.getId()) {
@@ -57,20 +65,10 @@ public class Singupmail extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
-    }
-
-    private void updateUI(FirebaseUser currentUser) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-        if(account != null){
-            String personalName = account.getDisplayName();
-            String personGivenName = account.getGivenName();
-        }
     }
 
     private void signUp() {
-        String email = ((EditText) findViewById(R.id.emailEditText)).getText().toString();
+        String email = etemail.getText().toString();
         String password = ((EditText) findViewById(R.id.passwordEditText)).getText().toString();
         String passwordCheck = ((EditText) findViewById(R.id.passwordCheckEditText)).getText().toString();
 
@@ -85,7 +83,6 @@ public class Singupmail extends AppCompatActivity {
                                     startToast("Welcome! to be a member");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     myStartActivity(MainActivity.class);
-                                    updateUI(user);
                                 } else {
                                     if (task.getException() != null) {
                                         startToast(task.getException().toString());
@@ -100,9 +97,6 @@ public class Singupmail extends AppCompatActivity {
         }}else{
             startToast("write E-mail or password!");
         }
-    }
-
-    private void updateUI(GoogleSignInAccount account) {
     }
 
     private void startToast(String msg){

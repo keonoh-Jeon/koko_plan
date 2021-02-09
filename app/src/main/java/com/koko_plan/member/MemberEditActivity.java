@@ -290,6 +290,7 @@ public class MemberEditActivity extends AppCompatActivity {
                 profileset.put("name", name);
                 profileset.put("birthday", birthday);
                 profileset.put("gender", gender);
+                profileset.put("eventscore", 99.9);
 
                 firebaseFirestore
                         .collection("users")

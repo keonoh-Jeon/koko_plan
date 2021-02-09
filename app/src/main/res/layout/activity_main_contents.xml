@@ -149,11 +149,14 @@
 
                 <TextView
                     android:text="하루 중, 습관 비중 추이"
+                    android:padding="5sp"
                     android:textSize="15sp"
                     android:fontFamily="@font/elandchoice"
                     android:textColor="#FF9800"
+                    android:gravity="center"
+                    android:background="#FFF2DF"
                     android:textStyle="bold"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     tools:ignore="HardcodedText" />
@@ -211,10 +214,13 @@
                 <TextView
                     android:text="월간 성취율"
                     android:textSize="15sp"
+                    android:gravity="center"
                     android:fontFamily="@font/elandchoice"
                     android:textColor="#3162C7"
+                    android:background="#DAE5FE"
                     android:textStyle="bold"
-                    android:layout_width="wrap_content"
+                    android:padding="5sp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     tools:ignore="HardcodedText" />
@@ -258,10 +264,25 @@
                     android:layout_height="30dp"
                     tools:ignore="UselessLeaf" />
 
+                <TextView
+                    android:alpha="0.5"
+                    android:id="@+id/tv_letscheer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="힘이 되는 명언으로 서로를 응원해요.
+                            \n답장을 많이 받을수록 순위가 오릅니다. ('명언답장' → 오른쪽으로 '스와이프')"
+                    tools:ignore="HardcodedText,RtlHardcoded,SmallSp"
+                    android:textSize="10sp"
+                    android:layout_margin="10dp"
+                    android:textColor="#2C5F2D"
+                    android:background="#FFE77A"/>
+
                 <RelativeLayout
                     android:id="@+id/view_relativeview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
+
 
                     <LinearLayout
                         android:layout_width="wrap_content"

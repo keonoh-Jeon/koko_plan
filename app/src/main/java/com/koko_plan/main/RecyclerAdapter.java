@@ -49,13 +49,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
+import static com.koko_plan.main.MainActivity.adloadcount;
 import static com.koko_plan.main.MainActivity.btnsavelist;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.fulladview;
 import static com.koko_plan.main.MainActivity.lastsec;
 import static com.koko_plan.main.MainActivity.like;
+import static com.koko_plan.main.MainActivity.mInterstitialAd;
 import static com.koko_plan.main.MainActivity.selecteddata;
+import static com.koko_plan.main.MainActivity.showfullad;
 import static com.koko_plan.main.MainActivity.timegap;
 import static com.koko_plan.main.MainActivity.todaydate;
 import static com.koko_plan.main.MainActivity.totalprogress;
@@ -340,6 +344,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }).start();
             }
             alramset(false);
+            showfullad(mContext);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
@@ -404,6 +409,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .set(data5, SetOptions.merge());
                 }
             }).start();
+            showfullad(mContext);
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -541,6 +547,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
                         .set(data, SetOptions.merge());
             }).start();
+
+            showfullad(mContext);
         }
 
         @SuppressLint("SetTextI18n")
@@ -601,6 +609,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         .set(data, SetOptions.merge());
 
             }).start();
+            showfullad(mContext);
         }
 
         @SuppressLint("SetTextI18n")
@@ -621,7 +630,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             int finalCurcount = curcount;
             int finalCurtimesum = curtimesum;
             new Thread(() -> {
-
                 for(int i=0; i<index; i++){
                     if(todoListItems.get(i).getIsrunning()) {
                         todoListItems.get(i).setCurtime(lastsec - 1);
@@ -662,6 +670,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 datasettofirebase("curcount", finalCurcount, index ,"total");
 
             }).start();
+
+            showfullad(mContext);
         }
     }
 
@@ -925,5 +935,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
         popup.show();
     }*/
-
 }

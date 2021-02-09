@@ -24,24 +24,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="회원 가입"
-            android:textColor="#F5A734"
+            android:textColor="#DDA94B"
             android:layout_marginTop="100dp"
             android:layout_marginBottom="50dp"
             tools:ignore="HardcodedText" />
 
+
         <EditText
-            android:hint="E-mail"
-            android:textColorHint="#000000"
-            android:id="@+id/emailEditText"
+            android:hint="e-mail"
+            android:textColorHint="#C3C3C3"
+            android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textEmailAddress"
             tools:ignore="HardcodedText" />
 
+
+
+
         <EditText
             android:hint="password"
-            android:textColorHint="#000000"
+            android:textColorHint="#C3C3C3"
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,8 +54,8 @@
             tools:ignore="HardcodedText" />
 
         <EditText
-            android:hint="password"
-            android:textColorHint="#000000"
+            android:hint="password 확인"
+            android:textColorHint="#C3C3C3"
             android:id="@+id/passwordCheckEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,8 +69,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#69F0AE"
+            android:background="#DDA94B"
             android:textSize="20sp"
+            android:textColor="#1E4174"
             android:text="가입"
             tools:ignore="HardcodedText" />
 
