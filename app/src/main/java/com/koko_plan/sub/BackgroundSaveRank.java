@@ -58,6 +58,7 @@ public class BackgroundSaveRank extends Worker {
             if (firebaseUser != null) {
                 String name = getInputData().getString("name");
                 String todaydate = getInputData().getString("todaydate");
+                long interval = getInputData().getLong("interval", 0);
                 Log.e(TAG, "doWork: 받은 날짜 확인 " +  todaydate);
 
                 firebaseFirestore
@@ -93,7 +94,7 @@ public class BackgroundSaveRank extends Worker {
                                                     DocumentSnapshot document = task.getResult();
                                                     if (document != null) {
                                                         if (document.exists()) {
-                                                            if(0 < (long) document.getData().get(todaydate)) {
+                                                            if(0 < (long) document.getData().get(todaydate) && interval > 0) {
 
                                                                 Map<String, Object> seteventscore = new HashMap<>();
                                                                 seteventscore.put("eventscore", eventscore);

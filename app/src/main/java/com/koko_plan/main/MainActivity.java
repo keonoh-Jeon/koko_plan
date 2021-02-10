@@ -304,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        setrankAlarm(this);
 
         initWorkManagersetzero();
-        initWorkManagersaverank();
 
         //전면광고 로드
         mInterstitialAd = new InterstitialAd(this);
@@ -334,20 +333,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         date = new Date();
         dateformat = new SimpleDateFormat("yyyy-MM-dd");
         todaydate = dateformat.format(date);
+        long interval = getTimeUsingInWorkRequest(0, -1,0);
 
         Data myData = new Data.Builder()
                 .putString("name", name1)
                 .putString("todaydate", todaydate)
+                .putLong("interval", interval)
                 .build();
 
         WorkRequest saverankWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSaveRank.class)
                 .setInputData(myData)
-                .setInitialDelay(getTimeUsingInWorkRequest(0, -1,0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(interval, TimeUnit.MILLISECONDS)
                 .addTag("notify_saverank")
                 .build();
 
-//        Log.e(TAG, "initWorkManagersaverank: 확인 "+ getTimeUsingInWorkRequest(11-24, 51, 0) );
+        Log.e(TAG, "initWorkManagersaverank: 확인 "+ interval);
 
         WorkManager.getInstance(this).enqueue(saverankWorkRequest);
     }
@@ -466,7 +467,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             horizontalCalendar.selectDate(calendar, true);
 
             if(!todaydate.equals(pref.getString("yesterday", null))) {
+
+                Log.e(TAG, "gettodaydate: 확인" +  pref.getString("yesterday", null));
                 new Thread(() -> {
+                    initWorkManagersaverank();
 
                     if(firebaseUser != null) {
                         firebaseFirestore
