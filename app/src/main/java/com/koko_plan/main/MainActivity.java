@@ -191,8 +191,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String time, day;
 
-    private int total;
-
     public static String todaydate;
     private SimpleDateFormat dateformat;
 
@@ -220,23 +218,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<EventDay> events;
     private CalendarView calendarView;
 
-    private LineDataSet dataset;
     private ProgressDialog pd;
 
-    private float entries0;
-    private FirebaseCrashlytics crashlytics;
-    private int todaysgoodtextsize;
     private int showcount = 0;
-    private TextView tvmyrankscore, tveffectintro;
+    private TextView tvmyrankscore;
+    @SuppressLint("StaticFieldLeak")
     public static TextView tvrankereffect;
+    @SuppressLint("StaticFieldLeak")
     public static TextView tveventeffect;
-    private String rank;
     private long Back_Key_Before_Time = 0;
     private LinearLayout veffectintro;
     private View vblur1, vblur2, vblur3;
 
     private AdView adBanner, adBanner2, adBanner3, adBanner4;
 
+    public static boolean subscribing = false;
     public static boolean fulladview;
     public static boolean adview1;
     public static boolean adview2;
@@ -252,8 +248,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean blurview2;
     public static boolean blurview3;
     public static boolean blurview4;
-    private TextView tvnewhabbits, tvletscheer, tvplus1;
+    private TextView tvnewhabbits;
+    private TextView tvplus1;
     public static int adloadcount;
+    public static boolean setrankavailable = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -304,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        setrankAlarm(this);
 
         initWorkManagersetzero();
+//        initWorkManagersaverank();
 
         //전면광고 로드
         mInterstitialAd = new InterstitialAd(this);
@@ -312,45 +311,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initWorkManagersetzero() {
 
+        long zero = getTimeUsingInWorkRequest(0, 0,0);
+
         WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
                 .Builder(BackgroundSetzero.class)
-                .setInitialDelay(getTimeUsingInWorkRequest(0, 0, 0), TimeUnit.MILLISECONDS)
+                .setInitialDelay(zero, TimeUnit.MILLISECONDS)
                 .addTag("notify_day_by_day")
                 .build();
         WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
+
     }
 
     @SuppressLint("SimpleDateFormat")
     private void initWorkManagersaverank() {
 
-        String name1 = null;
-        if (firebaseUser != null) {
-            for (UserInfo profile : firebaseUser.getProviderData()) {
-                name1 = profile.getDisplayName();
-            }
+        if(setrankavailable){
+            Log.e(TAG, "initWorkManagersaverank: 확인 " + inputname );
+
+            date = new Date();
+            dateformat = new SimpleDateFormat("yyyy-MM-dd"/*, Locale.KOREA*/);
+            todaydate = dateformat.format(date);
+            long interval = getTimeUsingInWorkRequest(0,-2,0);
+            Log.e(TAG, "initWorkManagersaverank: 확인 interval " + interval);
+
+            Data myData = new Data.Builder()
+                    .putString("name", inputname)
+                    .putString("todaydate", todaydate)
+                    .putLong("interval", interval)
+                    .build();
+
+            WorkRequest saverankWorkRequest = new OneTimeWorkRequest
+                    .Builder(BackgroundSaveRank.class)
+                    .setInputData(myData)
+                    .setInitialDelay((interval), TimeUnit.MILLISECONDS)
+                    .addTag("notify_saverank")
+                    .build();
+
+            WorkManager.getInstance(this).enqueue(saverankWorkRequest);
         }
 
-        date = new Date();
-        dateformat = new SimpleDateFormat("yyyy-MM-dd");
-        todaydate = dateformat.format(date);
-        long interval = getTimeUsingInWorkRequest(0, -1,0);
 
-        Data myData = new Data.Builder()
-                .putString("name", name1)
-                .putString("todaydate", todaydate)
-                .putLong("interval", interval)
-                .build();
-
-        WorkRequest saverankWorkRequest = new OneTimeWorkRequest
-                .Builder(BackgroundSaveRank.class)
-                .setInputData(myData)
-                .setInitialDelay(interval, TimeUnit.MILLISECONDS)
-                .addTag("notify_saverank")
-                .build();
-
-        Log.e(TAG, "initWorkManagersaverank: 확인 "+ interval);
-
-        WorkManager.getInstance(this).enqueue(saverankWorkRequest);
     }
 
     private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             entries.add(new Entry(pref.getFloat("entries"+i, 0), i));
         }
 
-        dataset = new LineDataSet(entries, "하루 중, 습관 비중 추이");
+        LineDataSet dataset = new LineDataSet(entries, "하루 중, 습관 비중 추이");
 
         ArrayList<String> labels = new ArrayList<String>();
         for(int i=0 ; i < 10; i++){
@@ -454,25 +454,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("SimpleDateFormat")
     private void gettodaydate() {
-            date = new Date();
-            calendar = Calendar.getInstance();
-            calendar.setTime(date);
 
-            //날짜 표시 형식 지정
-            dateformat = new SimpleDateFormat("yyyy-MM-dd");
-            todaydate = dateformat.format(date);
-            selecteddata = todaydate;
+        date = new Date();
+        calendar = Calendar.getInstance();
+        calendar.setTime(date);
 
-            //가로 달력 시작시, 선택날짜와 이동
-            horizontalCalendar.selectDate(calendar, true);
+        //날짜 표시 형식 지정
+        dateformat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+        todaydate = dateformat.format(date);
+        selecteddata = todaydate;
 
-            if(!todaydate.equals(pref.getString("yesterday", null))) {
+        //가로 달력 시작시, 선택날짜와 이동
+        horizontalCalendar.selectDate(calendar, true);
 
-                Log.e(TAG, "gettodaydate: 확인" +  pref.getString("yesterday", null));
+        Date yester = new Date();
+        yester = new Date(yester.getTime()+(1000*60*60*24*-1));
+        String yesterday = dateformat.format(yester);
+
+        //날짜 바뀌면 실행
+        if(!todaydate.equals(pref.getString("yesterday", yesterday))) {
+            Log.e(TAG, "gettodaydate: 확인 날 바뀜" + yesterday);
+
                 new Thread(() -> {
-                    initWorkManagersaverank();
-
                     if(firebaseUser != null) {
+                        initWorkManagersaverank();
                         firebaseFirestore
                                 .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                                 .document(firebaseUser.getUid())
@@ -618,7 +623,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .defaultSelectedDate(calendar)
                 .datesNumberOnScreen(7)
                 .build();
-        //todo
+
         //가로 달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -768,6 +773,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .document(firebaseUser.getUid());
 
                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -780,6 +787,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     assert profileItem != null;
                                     inputname = profileItem.getName();
                                     nav_header_name_text.setText(inputname+"");
+                                    probitmap();
                                 } else {
                                     Log.d(TAG, "No such document");
                                     myStartActivity2(MemberActivity.class);
@@ -853,7 +861,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adBanner4 = findViewById(R.id.ad_View4);
         recyclerView3 = findViewById(R.id.rv_msg);
 
-
         tvplus1 = findViewById(R.id.tv_plus1);
         tvplus1.setVisibility(View.GONE);
 
@@ -866,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
-        tvletscheer = findViewById(R.id.tv_letscheer);
+        TextView tvletscheer = findViewById(R.id.tv_letscheer);
         tvletscheer.setSelected(true);
     }
 
@@ -882,8 +889,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             nav_header_photo_image.setImageBitmap(profile);
                             nav_header_photo_image.setBackground(new ShapeDrawable(new OvalShape()));
                             nav_header_photo_image.setClipToOutline(true);
-                            nav_header_name_text.setText(name + " ");
+                            nav_header_name_text.setText(inputname + " ");
                             nav_header_mail_text.setText(email + " ");
+                            initWorkManagersaverank();
+                            setrankavailable = false;
                     }
                 });
             }
@@ -1193,7 +1202,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             if (!Settings.canDrawOverlays(this)) {
-                // TODO 동의를 얻지 못했을 경우의 처리
                 finish();
             } else {
                 startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
@@ -1299,7 +1307,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                     goodText_items.add(document.toObject(GoodText_Item.class));
                                                     goodtextsize.setText(goodText_items.size() + "개");
                                                     if(Objects.equals(document.getData().get("day"), todaydate)) {
-                                                        todaysgoodtextsize ++;
                                                     }
                                                 }
                                             } else {
@@ -1329,7 +1336,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void resetId() {
-
         if(todoListItems.size() > 0) {
             new Thread(() -> {
                 for(int i=0; i < adapter.getItems().size() ; i++){
@@ -1348,7 +1354,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     firebaseFirestore
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
                             .set(data, SetOptions.merge());
-
                 }
             }).start();
         }
@@ -1364,14 +1369,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(adapter.getItemCount() > 0) {
 
             ArrayList NoOfTotalsec = new ArrayList();
-            total = 0;
+            int total = 0;
             for (int i = 0; i < todoListItems.size(); i++) {
                 if(todoListItems.get(i).getTotalsec()!=0){
                     NoOfTotalsec.add(new Entry(todoListItems.get(i).getTotalsec(), 0));
                 }
                 total += todoListItems.get(i).getTotalsec();
             }
-            double percentage = total/(24*3600.0)*100;
+            double percentage = total /(24*3600.0)*100;
 
             //하루 24 남은 시간
             NoOfTotalsec.add(new Entry(24 * 3600 - total, 0));
@@ -1542,6 +1547,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
+        Log.e(TAG, "onResume: 확인 setrankavailable " + setrankavailable);
+
+        scrollview.smoothScrollTo(0, 0);
+
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         //업데이트 가능 시, 연결해서 업데이트
@@ -1566,12 +1575,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 파이어베이스 회원 정보 모으기
         getprofile();
 
-        probitmap();
-
         // 현재 날짜 구하기
         gettodaydate();
 
-        todaysgoodtextsize = 0;
         todayitemsize = pref.getInt("todayitemsize", 0);
 
         if(todayitemsize>0){
@@ -1588,9 +1594,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 현재시간을 date 변수에 저장한다.
 
         long stoptime = pref.getLong("stoptime", now);
-        rank = pref.getString("rank", "");
+        String rank = pref.getString("rank", "");
         float rankscore = pref.getFloat("rankscore", 100);
-        tvmyrankscore.setText(rank+"");
+        tvmyrankscore.setText(rank +"");
         settrophyimage(rankscore);
         showcount = pref.getInt("showcount", 0);
         timegap = (int)((now-stoptime)/1000);
@@ -1601,30 +1607,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("SetTextI18n")
     private void SetRank(double rankscore) {
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
-
                     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
                     @Override
                     public void run() {
-                        fulladview = true;
-                        adview1 = true;
-                        adview2 = true;
-                        adview3 = true;
-                        adview4 = true;
-                        adview5 = true;
-                        adview6 = true;
-                        adview7 = true;
-                        adview8 = true;
-                        adview9 = true;
-                        adview10 = true;
-                        blurview1 = true;
-                        blurview2 = true;
-                        blurview3 = true;
-                        blurview4 = true;
+                        if(subscribing = true) {
+                            fulladview = false;
+                            adview1 = false;
+                            adview2 = false;
+                            adview3 = false;
+                            adview4 = false;
+                            adview5 = false;
+                            adview6 = false;
+                            adview7 = false;
+                            adview8 = false;
+                            adview9 = false;
+                            adview10 = false;
+                            blurview1 = false;
+                            blurview2 = false;
+                            blurview3 = false;
+                            blurview4 = false;
+                        } else {
+                            fulladview = true;
+                            adview1 = true;
+                            adview2 = true;
+                            adview3 = true;
+                            adview4 = true;
+                            adview5 = true;
+                            adview6 = true;
+                            adview7 = true;
+                            adview8 = true;
+                            adview9 = true;
+                            adview10 = true;
+                            blurview1 = true;
+                            blurview2 = true;
+                            blurview3 = true;
+                            blurview4 = true;
+                        }
 
                         if(99.94 < rankscore && rankscore <= 100.0) {
                             tvrankereffect.setText("Iron IV 보상 없슴");
@@ -2195,7 +2217,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (document.exists()) {
                                     tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                     tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
-
                                     String eventscore = (String) String.valueOf(document.getData().get("eventscore"));
                                     SetRank(Double.parseDouble(eventscore));
                             }
@@ -2468,7 +2489,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         date = new Date();
                                         //날짜 표시 형식 지정
                                         timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                        dayformat = new SimpleDateFormat("yyyy-MM-dd");
+                                        dayformat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
                                         time = timeformat.format(date);
                                         day = dayformat.format(date);
 

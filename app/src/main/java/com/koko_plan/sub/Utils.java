@@ -12,14 +12,11 @@ import com.koko_plan.R;
 
 public class Utils {
 
-    int standardSize_X, standardSize_Y;
-    float density;
-
     public enum StatusBarColorType {
-//        BLACK_STATUS_BAR(R.color.statue),
+
         GREEN_STATUS_BAR(R.color.statusbargreen );
 
-        private int backgroundColorId;
+        private final int backgroundColorId;
 
         StatusBarColorType(int backgroundColorId){
             this.backgroundColorId = backgroundColorId;

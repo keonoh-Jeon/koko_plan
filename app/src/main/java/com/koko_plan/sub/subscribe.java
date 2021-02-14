@@ -37,7 +37,7 @@ import static com.koko_plan.main.MainActivity.pref;
 public class subscribe extends AppCompatActivity implements PurchasesUpdatedListener {
 
     private static final String TAG = "subscribe";
-    private int ballcount, additionball;
+    private int ballcount;
 
     private BillingClient billingClient;
 
@@ -51,8 +51,7 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscribe_popup);
 
-        findViewById(R.id.iv_basket300).setOnClickListener(OnClickListener);
-//        findViewById(R.id.iv_basket500).setOnClickListener(OnClickListener);
+        findViewById(R.id.tv_subscribe).setOnClickListener(OnClickListener);
 
         MySoundPlayer.initSounds(getApplicationContext());
 
@@ -114,7 +113,7 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
             Log.d(TAG, "결제에 성공했으며, 아래에 구매한 상품들이 나열됨");
             for (Purchase purchase : purchases) {
                 handlePurchase(purchase);
-                addball(additionball);
+                subscribing();
             }
             // 사용자가 결제를 취소한 경우
         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
@@ -167,16 +166,15 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
     }
 
 
-    private View.OnClickListener OnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener OnClickListener = new View.OnClickListener() {
 
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-        @SuppressLint({"DefaultLocale", "SetTextI18n"})
+        @SuppressLint({"DefaultLocale", "SetTextI18n", "NonConstantResourceId"})
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.iv_basket300:
+                case R.id.tv_subscribe:
                     doBillingFlow(skuDetails300);
-                    additionball = 300;
                     break;
                 /*case R.id.iv_basket500:
                     doBillingFlow(skuDetails500);
@@ -186,10 +184,9 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         }
     };
 
-    private void addball(int i) {
-        ballcount = ballcount + i;
-        editor.putInt("ballcount", ballcount);
-        editor.apply();
+    //구독 버튼 눌렀을때,
+    private void subscribing() {
+        MainActivity.subscribing = true;
     }
 
 

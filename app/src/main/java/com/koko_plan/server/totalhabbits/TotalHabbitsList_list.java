@@ -152,7 +152,6 @@ public class TotalHabbitsList_list extends AppCompatActivity implements TotalHab
         //리스트 스와이프 기능 초기화
         initSwipe();
 
-
         totalHabbitsListReady_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(this);

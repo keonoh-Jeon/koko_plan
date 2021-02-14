@@ -208,7 +208,8 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
         detailhabbitItems = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
+        layoutManager.setStackFromEnd(false);
+//        layoutManager.scrollToPositionWithOffset(0, 0);
 
         RecyclerView recyclerView = findViewById(R.id.rv_detailhabbit);
         recyclerView.setLayoutManager(layoutManager);
@@ -285,10 +286,13 @@ public class DetailHabbit extends AppCompatActivity implements Detailhabbit_View
                                     long total = (long) document.getData().get("totalsec");
                                     cursum += (long) ((long) document.getData().get("curtime") / (double) total * 100.0);
                                 }
+
+                                detailhabbitAdapter.notifyDataSetChanged();
+
                             } else {
                                 Log.d(TAG, "Error getting documents: ", task.getException());
                             }
-                            detailhabbitAdapter.notifyDataSetChanged();
+
 
                             long dayprogress = 0;
                             if(detailhabbitItems.size()>0)dayprogress = (long) (cursum/detailhabbitItems.size());

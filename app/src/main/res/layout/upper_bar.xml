@@ -26,7 +26,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:text="오늘의 실행   "
+                    android:text="TODAY   "
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textSize="20sp"

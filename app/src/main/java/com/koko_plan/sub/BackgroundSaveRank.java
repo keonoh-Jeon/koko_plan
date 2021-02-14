@@ -23,6 +23,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.koko_plan.main.MainActivity;
 import com.koko_plan.main.TodoList_Item;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import static com.koko_plan.main.MainActivity.firebaseUser;
 public class BackgroundSaveRank extends Worker {
 
     private static final String TAG = "BackgroundSaveRank";
-    public static ArrayList<TodoList_Item> todoListItems = null;
+    public static ArrayList<TodoList_Item> todoListItems;
     private int myrank = 0;
     private float eventscore;
 
@@ -48,8 +49,7 @@ public class BackgroundSaveRank extends Worker {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
-        todoListItems = new ArrayList<>();
-        todoListItems.clear();
+        //        todoListItems.removeAll(todoListItems);
     }
 
     @NonNull
@@ -59,7 +59,9 @@ public class BackgroundSaveRank extends Worker {
                 String name = getInputData().getString("name");
                 String todaydate = getInputData().getString("todaydate");
                 long interval = getInputData().getLong("interval", 0);
-                Log.e(TAG, "doWork: 받은 날짜 확인 " +  todaydate);
+                Log.e(TAG, "doWork: 확인 todaydate -" +  todaydate);
+                Log.e(TAG, "doWork: 확인 name -" +  name);
+                todoListItems = new ArrayList<>();
 
                 firebaseFirestore
                         .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
@@ -75,12 +77,16 @@ public class BackgroundSaveRank extends Worker {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
+                                    todoListItems.clear();
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         todoListItems.add(document.toObject(TodoList_Item.class));
                                         if (Objects.equals(document.getData().get("name"), name)) {
                                             myrank = todoListItems.size();
+                                            Log.e(TAG, "doWork: 확인 myrank -" + myrank);
                                         }
                                         eventscore = (float) ((float) myrank / (double) todoListItems.size() * 100.0);
+                                        Log.e(TAG, "doWork: 확인 size -" + todoListItems.size());
+                                        Log.e(TAG, "doWork: 확인 eventscore -" + eventscore);
 
                                         DocumentReference documentReference = firebaseFirestore
                                                 .collection("users")
@@ -90,36 +96,36 @@ public class BackgroundSaveRank extends Worker {
                                             @SuppressLint("SetTextI18n")
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot document = task.getResult();
-                                                    if (document != null) {
-                                                        if (document.exists()) {
-                                                            if(0 < (long) document.getData().get(todaydate) && interval > 0) {
+                                                    Log.e(TAG, "doWork : 확인 todaydate -" + document.getData().get(todaydate));
+                                                    Log.e(TAG, "doWork: 확인 interval -" + interval);
 
-                                                                Map<String, Object> seteventscore = new HashMap<>();
-                                                                seteventscore.put("eventscore", eventscore);
+                                                    if (document.exists()) {
+                                                        if(0 < (long) document.getData().get(todaydate) && interval > 0) {
 
-                                                                Log.e(TAG, "onComplete: 확인 실행 eventscore" + eventscore);
+                                                            Map<String, Object> seteventscore = new HashMap<>();
+                                                            seteventscore.put("eventscore", eventscore);
 
-                                                                firebaseFirestore
-                                                                        .collection("users")
-                                                                        .document(firebaseUser.getUid())
-                                                                        .set(seteventscore, SetOptions.merge())
+                                                            firebaseFirestore
+                                                                    .collection("users")
+                                                                    .document(firebaseUser.getUid())
+                                                                    .set(seteventscore, SetOptions.merge())
 
-                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                            @Override
-                                                                            public void onSuccess(Void aVoid) {
-                                                                            }
-                                                                        })
-                                                                        .addOnFailureListener(new OnFailureListener() {
-                                                                            @Override
-                                                                            public void onFailure(@NonNull Exception e) {
-                                                                            }
-                                                                        });
-                                                            }
-                                                        } else {
-                                                            Log.d(TAG, "No such document");
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                        }
+                                                                    });
                                                         }
+                                                    } else {
+                                                        Log.d(TAG, "No such document");
                                                     }
                                                 } else {
                                                     Log.d(TAG, "get failed with ", task.getException());
@@ -133,6 +139,7 @@ public class BackgroundSaveRank extends Worker {
                                 }
                             }
                         });
+                MainActivity.setrankavailable = true;
             }
             return Result.success();
     }

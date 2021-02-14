@@ -159,7 +159,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         ranking_items = new ArrayList<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
+        layoutManager.setStackFromEnd(false);
 
         RecyclerView recyclerView = findViewById(R.id.rv_rankinglist);
         recyclerView.setLayoutManager(layoutManager);
@@ -183,7 +183,8 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
     @Override
     protected void onPause() {
         super.onPause();
-        ranking_items.removeAll(ranking_items);
+
+        ranking_items.clear();
         System.gc();
     }
 

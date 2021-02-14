@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -258,7 +259,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             date = new Date();
                             //날짜 표시 형식 지정
                             timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            dayformat = new SimpleDateFormat("yyyy-MM-dd");
+                            dayformat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
                             time = timeformat.format(date);
                             day = dayformat.format(date);
 
