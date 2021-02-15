@@ -7,6 +7,7 @@ public class GoodText_Item
     @PrimaryKey(autoGenerate = true)
     private String id;
     private String text;
+    private String namefrom;
     private String from;
     private String fromid;
     private String time;
@@ -62,6 +63,15 @@ public class GoodText_Item
     public void setText(String text)
     {
         this.text = text;
+    }
+
+    public String getNamefrom()
+    {
+        return namefrom;
+    }
+    public void setNamefrom(String namefrom)
+    {
+        this.namefrom = namefrom;
     }
 
     public float getAverage()

@@ -263,7 +263,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             time = timeformat.format(date);
                             day = dayformat.format(date);
 
-                            RandomGoodText.make(context, filterList.get(pos).getId(), day, time);
+                            RandomGoodText.make(context, filterList.get(pos).getId(), day, time, name);
                             filterList.get(pos).setGetcount(filterList.get(pos).getGetcount()+1);
 
                             Map<String, Object> data = new HashMap<>();

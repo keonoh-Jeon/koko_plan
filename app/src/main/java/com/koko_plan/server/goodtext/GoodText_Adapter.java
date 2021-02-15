@@ -84,9 +84,8 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
         View backgraound = null;
         ImageView profileview = null;
         TextView textview = null;
+        TextView tvnamefrom = null;
         TextView timeview = null;
-        TextView clubaver = null;
-        TextView clubdist = null;
 
         // 뷰홀더의 텍스트 및 이미지 연결 : xml 연결
         ViewHolder(View view) {
@@ -95,6 +94,7 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
             backgraound = view.findViewById(R.id.view_goodtexts);
             profileview = (ImageView)view.findViewById(R.id.iv_profileimager);
             textview = (TextView)view.findViewById(R.id.tv_text);
+            tvnamefrom = (TextView)view.findViewById(R.id.tv_namefrom);
             timeview = (TextView)view.findViewById(R.id.tv_time);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -108,11 +108,6 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                         if(goodText_viewListener != null) {
                             goodText_viewListener.onItemClick(v, pos);
                         }
-
-                        /*itemclub = rankingItems.get(pos).getClub();
-                        itemloft = rankingItems.get(pos).getLoft();
-                        itemdist = rankingItems.get(pos).getSet();*/
-
                     }
                 }
             });
@@ -160,7 +155,8 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
                 .override(100,100)
                 .into(viewHolder.profileview);
 
-            viewHolder.timeview.setText(filterList.get(i).getTime());
+        viewHolder.timeview.setText(filterList.get(i).getTime());
+        viewHolder.tvnamefrom.setText(filterList.get(i).getNamefrom());
 
             String randomnum = String.valueOf(filterList.get(i).getRandomnum());
             DocumentReference documentReference = firebaseFirestore
@@ -188,7 +184,8 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
             });
 
             if(Objects.equals(filterList.get(i).getDay(), todaydate)) {
-                viewHolder.timeview.setTextColor(Color.parseColor("#000000"));
+                viewHolder.tvnamefrom.setTextColor(Color.parseColor("#FF8D8D8D"));
+                viewHolder.timeview.setTextColor(Color.parseColor("#FF8D8D8D"));
                 viewHolder.textview.setTextColor(Color.parseColor("#000000"));
                 viewHolder.profileview.setAlpha((float) 2.55);
             }

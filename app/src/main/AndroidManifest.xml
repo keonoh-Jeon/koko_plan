@@ -113,6 +113,14 @@
         <activity
             android:name="com.koko_plan.sub.subscribe"
             android:theme="@style/Theme.AppCompat.Light.Dialog"/>
+
+        <!--<provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            android:exported="false"
+            tools:node="remove"
+            android:enabled="false"/>-->
+
     </application>
 
 </manifest>

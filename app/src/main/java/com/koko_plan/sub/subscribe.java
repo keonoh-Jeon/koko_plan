@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -174,7 +175,8 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.tv_subscribe:
-                    doBillingFlow(skuDetails300);
+                    startToast("서비스 준비 중");
+//                    doBillingFlow(skuDetails300);
                     break;
                 /*case R.id.iv_basket500:
                     doBillingFlow(skuDetails500);
@@ -183,6 +185,10 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
             }
         }
     };
+
+    private void startToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 
     //구독 버튼 눌렀을때,
     private void subscribing() {

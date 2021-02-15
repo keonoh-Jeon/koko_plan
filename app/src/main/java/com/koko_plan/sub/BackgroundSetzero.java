@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.koko_plan.main.MainActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,6 +106,8 @@ public class BackgroundSetzero extends Worker {
                         });
             }
         }).start();
+
+        MainActivity.setzeroavailable = true;
 
         // Indicate whether the work finished successfully with the Result
         return Result.success();

@@ -17,7 +17,7 @@ import static com.koko_plan.main.MainActivity.photourl;
 
 public class SetMsgToUsers {
 
-    public static void send(String day, String time, String text, String touser) {
+    public static void send(String day, String time, String text, String touser, String namefrom) {
 
         int randomnum = RandomGoodText.getTextnum();
 
@@ -29,6 +29,7 @@ public class SetMsgToUsers {
             GoodTextList.put("randomnum", randomnum);
             GoodTextList.put("from", photourl);
             GoodTextList.put("fromid", firebaseUser.getUid());
+            GoodTextList.put("namefrom", namefrom);
 
             if (firebaseUser != null) {
                 firebaseFirestore

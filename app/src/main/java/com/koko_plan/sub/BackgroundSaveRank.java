@@ -125,7 +125,24 @@ public class BackgroundSaveRank extends Worker {
                                                                     });
                                                         }
                                                     } else {
-                                                        Log.d(TAG, "No such document");
+                                                        Map<String, Object> seteventscore = new HashMap<>();
+                                                        seteventscore.put("eventscore", 100.0);
+
+                                                        firebaseFirestore
+                                                                .collection("users")
+                                                                .document(firebaseUser.getUid())
+                                                                .set(seteventscore, SetOptions.merge())
+
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                    }
+                                                                })
+                                                                .addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                    }
+                                                                });
                                                     }
                                                 } else {
                                                     Log.d(TAG, "get failed with ", task.getException());

@@ -22,7 +22,7 @@ public class RandomGoodText {
     private static String text;
     private static int randomNum;
 
-    public static void make(Context context, String userid, String day, String time){
+    public static void make(Context context, String userid, String day, String time, String namefrom){
 
         int ramdomtextsize = pref.getInt("ramdomtextsize",0);
         randomNum = (int)(Math.random() * ramdomtextsize);
@@ -45,7 +45,7 @@ public class RandomGoodText {
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                             text = (String) document.get(randomnum);
                             CustomToastMaker.show(context, text);
-                            SetMsgToUsers.send(day, time, text, userid);
+                            SetMsgToUsers.send(day, time, text, userid, namefrom);
                         } else {
                             Log.d(TAG, "No such document");
                         }

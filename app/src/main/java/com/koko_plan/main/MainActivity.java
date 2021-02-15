@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Configuration;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
@@ -62,6 +63,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
@@ -148,6 +150,7 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
 
@@ -252,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView tvplus1;
     public static int adloadcount;
     public static boolean setrankavailable = true;
+    public static boolean setzeroavailable = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -274,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         editor = pref.edit();
 
         //파이어베이스 초기화
+        FirebaseApp.initializeApp(this);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
@@ -311,21 +316,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initWorkManagersetzero() {
 
-        long zero = getTimeUsingInWorkRequest(0, 0,0);
+        if(setzeroavailable){
+            /*if(getContext() != null) {
+                Configuration config = new Configuration.Builder().build();
+                WorkManager.initialize(getApplicationContext(), config);
+            }*/
 
-        WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
-                .Builder(BackgroundSetzero.class)
-                .setInitialDelay(zero, TimeUnit.MILLISECONDS)
-                .addTag("notify_day_by_day")
-                .build();
-        WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
+            long zero = getTimeUsingInWorkRequest(0, 0,0);
 
+            WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
+                    .Builder(BackgroundSetzero.class)
+                    .setInitialDelay(zero, TimeUnit.MILLISECONDS)
+                    .addTag("notify_day_by_day")
+                    .build();
+            WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
+        }
+        setzeroavailable = false;
     }
 
     @SuppressLint("SimpleDateFormat")
     private void initWorkManagersaverank() {
 
         if(setrankavailable){
+
+            /*if(getContext() != null) {
+                Configuration config = new Configuration.Builder().build();
+                WorkManager.initialize(getApplicationContext(), config);
+            }*/
+
             Log.e(TAG, "initWorkManagersaverank: 확인 " + inputname );
 
             date = new Date();
@@ -1547,8 +1565,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
-        Log.e(TAG, "onResume: 확인 setrankavailable " + setrankavailable);
-
         scrollview.smoothScrollTo(0, 0);
 
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
@@ -1614,7 +1630,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
                     @Override
                     public void run() {
-                        if(subscribing = true) {
+                        if(subscribing) {
                             fulladview = false;
                             adview1 = false;
                             adview2 = false;
@@ -1630,6 +1646,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             blurview2 = false;
                             blurview3 = false;
                             blurview4 = false;
+
+                            tvrankereffect.setText("구매 쿠폰 사용 중");
+                            tveventeffect.setText(" - 모든 흐림 효과, 광고 제거");
+
+                            adBanner.setVisibility(View.GONE);
+                            adBanner2.setVisibility(View.GONE);
+                            adBanner3.setVisibility(View.GONE);
+                            adBanner4.setVisibility(View.GONE);
+
                         } else {
                             fulladview = true;
                             adview1 = true;
@@ -1646,516 +1671,516 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             blurview2 = true;
                             blurview3 = true;
                             blurview4 = true;
+
+                            if (99.94 < rankscore && rankscore <= 100.0) {
+                                tvrankereffect.setText("Iron IV 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                            } else if (99.64 < rankscore && rankscore <= 99.94) {
+                                tvrankereffect.setText("Iron III 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                            } else if (98.94 < rankscore && rankscore <= 99.64) {
+                                tvrankereffect.setText("Iron II 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                            } else if (97.93 < rankscore && rankscore <= 98.94) {
+                                tvrankereffect.setText("Iron I 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
+
+                            } else if (95.53 < rankscore && rankscore <= 97.93) {
+                                tvrankereffect.setText("Bronze IV 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                            } else if (92.78 < rankscore && rankscore <= 95.53) {
+                                tvrankereffect.setText("Bronze III 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                            } else if (88.73 < rankscore && rankscore <= 92.78) {
+                                tvrankereffect.setText("Bronze II 보상 없슴");
+                                tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                            } else if (82.76 < rankscore && rankscore <= 88.73) {
+                                tvrankereffect.setText("Bronze I 보상 발동 중");
+                                tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
+
+                            } else if (73.61 < rankscore && rankscore <= 82.76) {
+                                tvrankereffect.setText("Silver IV 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = true;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (66.31 < rankscore && rankscore <= 73.61) {
+                                tvrankereffect.setText("Silver III 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = true;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (57.53 < rankscore && rankscore <= 66.31) {
+                                tvrankereffect.setText("Silver II 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = true;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (50.21 < rankscore && rankscore <= 57.53) {
+                                tvrankereffect.setText("Silver I 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = true;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (36.76 < rankscore && rankscore <= 50.21) {
+                                tvrankereffect.setText("Gold IV 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관상세] 상단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = false;
+                                adview9 = true;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (29.14 < rankscore && rankscore <= 36.76) {
+                                tvrankereffect.setText("Gold III 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = true;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (22.53 < rankscore && rankscore <= 29.14) {
+                                tvrankereffect.setText("Gold II 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = true;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+
+                            } else if (18.36 < rankscore && rankscore <= 22.53) {
+                                tvrankereffect.setText("Gold I 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = true;
+                                adview4 = false;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (10.58 < rankscore && rankscore <= 18.36) {
+                                tvrankereffect.setText("Platinum IV 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = true;
+                                adview6 = true;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (7.58 < rankscore && rankscore <= 10.58) {
+                                tvrankereffect.setText("Platinum III 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = true;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (5.59 < rankscore && rankscore <= 7.58) {
+                                tvrankereffect.setText("Platinum II 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거+" +
+                                        "\n - [전체 습관] 하단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (3.67 < rankscore && rankscore <= 5.59) {
+                                tvrankereffect.setText("Platinum I 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (1.45 < rankscore && rankscore <= 3.67) {
+                                tvrankereffect.setText("Diamond IV 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = true;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (0.68 < rankscore && rankscore <= 1.45) {
+                                tvrankereffect.setText("Diamond III 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거");
+                                fulladview = true;
+                                adview1 = true;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (0.31 < rankscore && rankscore <= 0.68) {
+                                tvrankereffect.setText("Diamond II 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거" +
+                                        "\n - [오늘의 습관] 배너광고 제거");
+                                fulladview = true;
+                                adview1 = false;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = true;
+                            } else if (0.11 < rankscore && rankscore <= 0.31) {
+                                tvrankereffect.setText("Diamond I 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거" +
+                                        "\n - [오늘의 습관] 배너광고 제거" +
+                                        "\n - [상세 습관] 보이기");
+                                fulladview = true;
+                                adview1 = false;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = true;
+                                blurview2 = true;
+                                blurview3 = false;
+                                blurview4 = false;
+                            } else if (0.06 < rankscore && rankscore <= 0.11) {
+                                tvrankereffect.setText("Master 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거" +
+                                        "\n - [오늘의 습관] 배너광고 제거" +
+                                        "\n - [상세 습관] 보이기" +
+                                        "\n - [월간 성취율] 보이기");
+                                fulladview = true;
+                                adview1 = false;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = true;
+                                blurview2 = false;
+                                blurview3 = false;
+                                blurview4 = false;
+                            } else if (0.02 < rankscore && rankscore <= 0.06) {
+                                tvrankereffect.setText("G_Master 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거" +
+                                        "\n - [오늘의 습관] 배너광고 제거" +
+                                        "\n - [상세 습관] 보이기" +
+                                        "\n - [월간 성취율] 보이기" +
+                                        "\n - [습관 비중] 보이기");
+                                fulladview = true;
+                                adview1 = false;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = false;
+                                blurview2 = false;
+                                blurview3 = false;
+                                blurview4 = false;
+                            } else if (0 < rankscore && rankscore <= 0.02) {
+                                tvrankereffect.setText("Challenger 보상 발동 중");
+                                tveventeffect.setText(" - [선물받은 명언] 보이기" +
+                                        "\n - [습관 상세] 상단 배너광고 제거" +
+                                        "\n - [전체 습관] 상단 배너광고 제거" +
+                                        "\n - [달성 순위] 상단 배너광고 제거" +
+                                        "\n - [선물받은 명언] 배너광고 제거" +
+                                        "\n - [월간 성취율] 배너광고 제거" +
+                                        "\n - [상세 습관] 하단 배너광고 제거" +
+                                        "\n - [전체 습관] 하단 배너광고 제거" +
+                                        "\n - [달성 순위] 하단 배너광고 제거" +
+                                        "\n - [습관 비중] 배너광고 제거" +
+                                        "\n - [오늘의 습관] 배너광고 제거" +
+                                        "\n - [상세 습관] 보이기" +
+                                        "\n - [월간 성취율] 보이기" +
+                                        "\n - [습관 비중] 보이기" +
+                                        "\n - 전면 광고 제거");
+                                fulladview = false;
+                                adview1 = false;
+                                adview2 = false;
+                                adview3 = false;
+                                adview4 = false;
+                                adview5 = false;
+                                adview6 = false;
+                                adview7 = false;
+                                adview8 = false;
+                                adview9 = false;
+                                adview10 = false;
+                                blurview1 = false;
+                                blurview2 = false;
+                                blurview3 = false;
+                                blurview4 = false;
+                            }
+
+                            adBanner.setVisibility(View.GONE);
+                            adBanner2.setVisibility(View.GONE);
+                            adBanner3.setVisibility(View.GONE);
+                            adBanner4.setVisibility(View.GONE);
+
+                            if (adview1) {
+                                AdRequest adRequest = new AdRequest.Builder().build();
+                                adBanner.setVisibility(View.VISIBLE);
+                                adBanner.loadAd(adRequest);
+                            }
+                            if (adview2) {
+                                AdRequest adRequest2 = new AdRequest.Builder().build();
+                                adBanner2.setVisibility(View.VISIBLE);
+                                adBanner2.loadAd(adRequest2);
+                            }
+                            if (adview3) {
+                                AdRequest adRequest3 = new AdRequest.Builder().build();
+                                adBanner3.setVisibility(View.VISIBLE);
+                                adBanner3.loadAd(adRequest3);
+                            }
+                            if (adview4) {
+                                AdRequest adRequest4 = new AdRequest.Builder().build();
+                                adBanner4.setVisibility(View.VISIBLE);
+                                adBanner4.loadAd(adRequest4);
+                            }
+
+                            if (blurview1) vblur1.setVisibility(View.VISIBLE);
+                            if (blurview2) vblur2.setVisibility(View.VISIBLE);
+                            if (blurview3) vblur3.setVisibility(View.VISIBLE);
                         }
-
-                        if(99.94 < rankscore && rankscore <= 100.0) {
-                            tvrankereffect.setText("Iron IV 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
-
-                        } else if(99.64 < rankscore && rankscore <= 99.94) {
-                            tvrankereffect.setText("Iron III 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
-
-                        } else if (98.94 < rankscore && rankscore <= 99.64) {
-                            tvrankereffect.setText("Iron II 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
-
-                        } else if (97.93 < rankscore && rankscore <= 98.94) {
-                            tvrankereffect.setText("Iron I 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(습관을 실천하세요)");
-
-                        } else if (95.53 < rankscore && rankscore <= 97.93) {
-                            tvrankereffect.setText("Bronze IV 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
-
-                        } else if (92.78 < rankscore && rankscore <= 95.53) {
-                            tvrankereffect.setText("Bronze III 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
-
-                        } else if (88.73 < rankscore && rankscore <= 92.78) {
-                            tvrankereffect.setText("Bronze II 보상 없슴");
-                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
-
-                        } else if (82.76 < rankscore && rankscore <= 88.73) {
-                            tvrankereffect.setText("Bronze I 보상 발동 중");
-                            tveventeffect.setText(" - 해당 보상 없슴(조금 더 노력하세요)");
-
-                        } else if (73.61 < rankscore && rankscore <= 82.76) {
-                            tvrankereffect.setText("Silver IV 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = true;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (66.31 < rankscore && rankscore <= 73.61) {
-                            tvrankereffect.setText("Silver III 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = true;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (57.53 < rankscore && rankscore <= 66.31) {
-                            tvrankereffect.setText("Silver II 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = true;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (50.21 < rankscore && rankscore <= 57.53) {
-                            tvrankereffect.setText("Silver I 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = true;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (36.76 < rankscore && rankscore <= 50.21) {
-                            tvrankereffect.setText("Gold IV 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관상세] 상단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = false;
-                            adview9 = true;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (29.14 < rankscore && rankscore <= 36.76) {
-                            tvrankereffect.setText("Gold III 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = true;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (22.53 < rankscore && rankscore <= 29.14) {
-                            tvrankereffect.setText("Gold II 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = true;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-
-                        } else if (18.36 < rankscore && rankscore <= 22.53) {
-                            tvrankereffect.setText("Gold I 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = true;
-                            adview4 = false;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (10.58 < rankscore && rankscore <= 18.36) {
-                            tvrankereffect.setText("Platinum IV 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = true;
-                            adview6 = true;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (7.58 < rankscore && rankscore <= 10.58) {
-                            tvrankereffect.setText("Platinum III 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = true;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (5.59 < rankscore && rankscore <= 7.58) {
-                            tvrankereffect.setText("Platinum II 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거+" +
-                                    "\n - [전체 습관] 하단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (3.67 < rankscore && rankscore <= 5.59) {
-                            tvrankereffect.setText("Platinum I 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (1.45 < rankscore && rankscore <= 3.67) {
-                            tvrankereffect.setText("Diamond IV 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = true;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (0.68 < rankscore && rankscore <= 1.45) {
-                            tvrankereffect.setText("Diamond III 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거");
-                            fulladview = true;
-                            adview1 = true;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (0.31 < rankscore && rankscore <= 0.68) {
-                            tvrankereffect.setText("Diamond II 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거"+
-                                    "\n - [오늘의 습관] 배너광고 제거");
-                            fulladview = true;
-                            adview1 = false;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = true;
-                        } else if (0.11 < rankscore && rankscore <= 0.31) {
-                            tvrankereffect.setText("Diamond I 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거"+
-                                    "\n - [오늘의 습관] 배너광고 제거"+
-                                    "\n - [상세 습관] 보이기");
-                            fulladview = true;
-                            adview1 = false;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = true;
-                            blurview2 = true;
-                            blurview3 = false;
-                            blurview4 = false;
-                        } else if (0.06 < rankscore && rankscore <= 0.11) {
-                            tvrankereffect.setText("Master 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거"+
-                                    "\n - [오늘의 습관] 배너광고 제거"+
-                                    "\n - [상세 습관] 보이기"+
-                                    "\n - [월간 성취율] 보이기");
-                            fulladview = true;
-                            adview1 = false;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = true;
-                            blurview2 = false;
-                            blurview3 = false;
-                            blurview4 = false;
-                        } else if (0.02 < rankscore && rankscore <= 0.06) {
-                            tvrankereffect.setText("G_Master 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거"+
-                                    "\n - [오늘의 습관] 배너광고 제거"+
-                                    "\n - [상세 습관] 보이기"+
-                                    "\n - [월간 성취율] 보이기"+
-                                    "\n - [습관 비중] 보이기");
-                            fulladview = true;
-                            adview1 = false;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = false;
-                            blurview2 = false;
-                            blurview3 = false;
-                            blurview4 = false;
-                        } else if (0 < rankscore && rankscore <= 0.02) {
-                            tvrankereffect.setText("Challenger 보상 발동 중");
-                            tveventeffect.setText(" - [선물받은 명언] 보이기"+
-                                    "\n - [습관 상세] 상단 배너광고 제거"+
-                                    "\n - [전체 습관] 상단 배너광고 제거"+
-                                    "\n - [달성 순위] 상단 배너광고 제거"+
-                                    "\n - [선물받은 명언] 배너광고 제거"+
-                                    "\n - [월간 성취율] 배너광고 제거"+
-                                    "\n - [상세 습관] 하단 배너광고 제거"+
-                                    "\n - [전체 습관] 하단 배너광고 제거"+
-                                    "\n - [달성 순위] 하단 배너광고 제거"+
-                                    "\n - [습관 비중] 배너광고 제거"+
-                                    "\n - [오늘의 습관] 배너광고 제거"+
-                                    "\n - [상세 습관] 보이기"+
-                                    "\n - [월간 성취율] 보이기"+
-                                    "\n - [습관 비중] 보이기"+
-                                    "\n - 전면 광고 제거");
-                            fulladview = false;
-                            adview1 = false;
-                            adview2 = false;
-                            adview3 = false;
-                            adview4 = false;
-                            adview5 = false;
-                            adview6 = false;
-                            adview7 = false;
-                            adview8 = false;
-                            adview9 = false;
-                            adview10 = false;
-                            blurview1 = false;
-                            blurview2 = false;
-                            blurview3 = false;
-                            blurview4 = false;
-                        }
-
-                        adBanner.setVisibility(View.GONE);
-                        adBanner2.setVisibility(View.GONE);
-                        adBanner3.setVisibility(View.GONE);
-                        adBanner4.setVisibility(View.GONE);
-
-                        if(adview1){
-                            AdRequest adRequest = new AdRequest.Builder().build();
-                            adBanner.setVisibility(View.VISIBLE);
-                            adBanner.loadAd(adRequest);
-                        }
-                        if(adview2){
-                            AdRequest adRequest2 = new AdRequest.Builder().build();
-                            adBanner2.setVisibility(View.VISIBLE);
-                            adBanner2.loadAd(adRequest2);
-                        }
-                        if(adview3){
-                            AdRequest adRequest3 = new AdRequest.Builder().build();
-                            adBanner3.setVisibility(View.VISIBLE);
-                            adBanner3.loadAd(adRequest3);
-                        }
-                        if(adview4){
-                            AdRequest adRequest4 = new AdRequest.Builder().build();
-                            adBanner4.setVisibility(View.VISIBLE);
-                            adBanner4.loadAd(adRequest4);
-                        }
-
-                        if(blurview1) vblur1.setVisibility(View.VISIBLE);
-                        if(blurview2) vblur2.setVisibility(View.VISIBLE);
-                        if(blurview3) vblur3.setVisibility(View.VISIBLE);
                     }
                 });
             }
@@ -2493,7 +2518,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         time = timeformat.format(date);
                                         day = dayformat.format(date);
 
-                                        RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time);
+                                        RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time, name);
                                         goodText_adapter.notifyItemChanged(position);
 
                                         DocumentReference documentReference = firebaseFirestore
