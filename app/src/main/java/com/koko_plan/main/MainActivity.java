@@ -11,10 +11,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.Configuration;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
@@ -43,7 +41,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
@@ -59,7 +56,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.components.Legend;
-import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -122,7 +118,6 @@ import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
 import com.koko_plan.sub.SaveProgressReceiver;
 import com.koko_plan.sub.Utils;
-import com.koko_plan.sub.kat_OverdrawActivity;
 import com.koko_plan.sub.subscribe;
 
 import java.io.IOException;
@@ -130,7 +125,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.MappedByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -148,11 +142,8 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
-import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
-import static com.google.common.collect.ComparisonChain.start;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, TodoList_ViewListener, GoodText_ViewListener, HabbitList_ViewListener {
 
@@ -1065,7 +1056,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Objects.requireNonNull(map.get("calendar" + i)).setTime(date);
 
                 if (firebaseUser != null) {
-
                     DocumentReference documentReference = firebaseFirestore
                             .collection("users")
                             .document(firebaseUser.getUid());
@@ -1099,7 +1089,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                                         pnt2.setAntiAlias(true);
                                                         pnt2.setColor(Color.RED);
                                                         pnt2.setTextSize(canvas.getWidth()*1/3);
-                                                        canvas.drawText(st, canvas.getWidth()*1/4, canvas.getHeight() - 10, pnt2);
+                                                        canvas.drawText(st, canvas.getWidth()*1/6, canvas.getHeight() - 10, pnt2);
                                                     }
 
                                                     @Override
@@ -1210,7 +1200,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //잠금 화면 해지시 첫화면
-    public void getPermission(){
+    /*public void getPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
             if (!Settings.canDrawOverlays(this)) {              // 체크
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -1230,7 +1220,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             startService(new Intent(this, kat_OverdrawActivity.class));
         }
-    }
+    }*/
 
 
 
@@ -1238,15 +1228,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
-            if (!Settings.canDrawOverlays(this)) {
-                finish();
-            } else {
-                startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
-            }
-
-        }
-
         //습관 입력창 복귀 : EditHabbit에서 돌아와서 처리
         if (requestCode == 2) {
             if (resultCode == RESULT_OK) {

@@ -99,12 +99,6 @@
         <receiver android:name=".sub.AlarmReceiver" />
         <receiver android:name=".sub.SaveProgressReceiver" />
 
-        <service
-            android:name=".sub.kat_OverdrawActivity"
-            android:enabled="true"
-            android:permission="android.permission.SYSTEM_ALERT_WINDOW">
-        </service>
-
         <activity
             android:name="com.koko_plan.server.totalhabbits.TotalHabbitsList_list"
             android:screenOrientation="portrait"

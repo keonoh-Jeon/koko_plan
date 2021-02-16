@@ -74,7 +74,6 @@ dependencies {
     // 일반 달력
     implementation 'com.applandeo:material-calendar-view:1.7.0'
 
-
     //파이어베이스 관련
     implementation 'com.google.firebase:firebase-analytics:18.0.2'
     implementation 'com.google.firebase:firebase-messaging:21.0.1'
