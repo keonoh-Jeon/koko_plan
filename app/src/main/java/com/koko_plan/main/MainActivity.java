@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
@@ -149,6 +150,7 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 
 import static android.content.ContentValues.TAG;
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
+import static com.google.common.collect.ComparisonChain.start;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
 import static java.security.AccessController.getContext;
 
@@ -1175,10 +1177,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void showfullad(Context context){
+
         Log.e(TAG, "onStart: 전면" + pref.getInt("adloadcount", 1));
-        if (/*mInterstitialAd.isLoaded() && */!fulladview && pref.getInt("adloadcount", 0)%5==0) {
-            Toast.makeText(context,"전면 광고!", Toast.LENGTH_SHORT).show();
-            mInterstitialAd.show();
+        Log.e(TAG, "onStart: 전면" + fulladview);
+
+        if (/*mInterstitialAd.isLoaded() && */fulladview && pref.getInt("adloadcount", 0)%5==0) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    ((MainActivity)context).runOnUiThread(new Runnable(){
+                        @Override
+                        public void run() {
+                            Handler mHandler = new Handler();
+                            mHandler.postDelayed(new Runnable() {
+                                public void run() {
+                                    // 시간 지난 후 실행할 코딩
+                                    mInterstitialAd.show();
+                                }}, 500); // 0.5초후
+                        }
+                    });
+                }
+            }).start();
             adloadcount ++;
             editor.putInt("adloadcount" , adloadcount);
             editor.apply();

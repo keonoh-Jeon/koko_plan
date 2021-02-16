@@ -341,16 +341,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     firebaseFirestore
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
                             .set(data, SetOptions.merge());
+                    showfullad(mContext);
                 }).start();
             }
             alramset(false);
-            showfullad(mContext);
+
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editPlay() {
             MySoundPlayer.play(MySoundPlayer.PLAY);
+            showfullad(mContext);
             timegap = 0;
             if(isRunning = false){
                 ivPause.setVisibility(View.VISIBLE);
@@ -409,7 +411,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .set(data5, SetOptions.merge());
                 }
             }).start();
-            showfullad(mContext);
+
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -546,9 +548,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
                         .set(data, SetOptions.merge());
+                showfullad(mContext);
             }).start();
 
-            showfullad(mContext);
+
         }
 
         @SuppressLint("SetTextI18n")
@@ -607,9 +610,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 firebaseFirestore
                         .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(index).getHabbittitle())
                         .set(data, SetOptions.merge());
-
+                showfullad(mContext);
             }).start();
-            showfullad(mContext);
+
         }
 
         @SuppressLint("SetTextI18n")
@@ -668,10 +671,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         .set(data, SetOptions.merge());
 
                 datasettofirebase("curcount", finalCurcount, index ,"total");
-
+                showfullad(mContext);
             }).start();
-
-            showfullad(mContext);
         }
     }
 
