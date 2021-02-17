@@ -110,14 +110,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvTitle;
-        private TextView tvProgress;
-        private TextView tvCurTime, tvTime;
-        private ImageView ivPlus, ivMinus, ivPlay, ivPause, ivStop, ivbdelete, ivmove;
+        private final TextView tvTitle;
+        private final TextView tvProgress;
+        private final TextView tvCurTime;
+        private final TextView tvTime;
+        private final ImageView ivPlus;
+        private final ImageView ivMinus;
+        private final ImageView ivPlay;
+        private final ImageView ivPause;
+        private final ImageView ivStop;
+        private final ImageView ivmove;
 
-        private Button mStartBtn, mStopBtn, mRecordBtn, mPauseBtn;
-        private TextView mTimeTextView, mRecordTextView;
-        private Thread timeThread = null;
         private Boolean isRunning = true;
 
         private int index;
@@ -303,6 +306,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         public void editStop() {
+            MySoundPlayer.play(MySoundPlayer.PAUSE);
             timegap = 0;
             dailyNotify = false;
             if(isRunning = true) {
@@ -471,7 +475,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             } else {
 
                 dailyNotify = false;
-                Toast.makeText(mContext,"알람 해제!", Toast.LENGTH_SHORT).show();
 
                 Calendar calendar = Calendar.getInstance();
                 diaryNotification(calendar);

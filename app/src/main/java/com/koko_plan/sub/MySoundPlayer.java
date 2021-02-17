@@ -16,7 +16,6 @@ public class MySoundPlayer {
     public static final int PAGE = R.raw.page;
     public static final int PLAY = R.raw.playbutton;
     public static final int CLICK = R.raw.sound_click;
-    public static final int BEEP = R.raw.beep;
     public static final int PAUSE = R.raw.pausebutton;
     public static final int POP2 = R.raw.pop2;
 
@@ -43,9 +42,8 @@ public class MySoundPlayer {
         soundPoolMap.put(PAGE, soundPool.load(context, PAGE, 3));
         soundPoolMap.put(PLAY, soundPool.load(context, PLAY, 4));
         soundPoolMap.put(CLICK, soundPool.load(context, CLICK, 5));
-        soundPoolMap.put(BEEP, soundPool.load(context, BEEP, 6));
-        soundPoolMap.put(PAUSE, soundPool.load(context, PAUSE, 7));
-        soundPoolMap.put(POP2, soundPool.load(context, POP2, 8));
+        soundPoolMap.put(PAUSE, soundPool.load(context, PAUSE, 6));
+        soundPoolMap.put(POP2, soundPool.load(context, POP2, 7));
     }
 
     public static void play(int raw_id){

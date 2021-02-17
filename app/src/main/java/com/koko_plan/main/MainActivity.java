@@ -296,11 +296,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(showcount >= 10) RequestReview.show(this);
 
         saveProgressAlarm(this);
-//        setzeroProgressAlarm(this);
-//        setrankAlarm(this);
 
         initWorkManagersetzero();
-//        initWorkManagersaverank();
 
         //전면광고 로드
         mInterstitialAd = new InterstitialAd(this);
@@ -310,10 +307,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initWorkManagersetzero() {
 
         if(setzeroavailable){
-            /*if(getContext() != null) {
-                Configuration config = new Configuration.Builder().build();
-                WorkManager.initialize(getApplicationContext(), config);
-            }*/
 
             long zero = getTimeUsingInWorkRequest(0, 0,0);
 
@@ -331,19 +324,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initWorkManagersaverank() {
 
         if(setrankavailable){
-
-            /*if(getContext() != null) {
-                Configuration config = new Configuration.Builder().build();
-                WorkManager.initialize(getApplicationContext(), config);
-            }*/
-
-            Log.e(TAG, "initWorkManagersaverank: 확인 " + inputname );
-
             date = new Date();
             dateformat = new SimpleDateFormat("yyyy-MM-dd"/*, Locale.KOREA*/);
             todaydate = dateformat.format(date);
             long interval = getTimeUsingInWorkRequest(0,-2,0);
-            Log.e(TAG, "initWorkManagersaverank: 확인 interval " + interval);
 
             Data myData = new Data.Builder()
                     .putString("name", inputname)
@@ -378,11 +362,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
         }
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setdudateTime = format.format(new Date(dueDate.getTimeInMillis()));
-
-        Log.e(TAG, "setAlarm: 확인" + setdudateTime);
-
         return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
 
@@ -410,11 +389,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 switch (dc.getType()) {
                                     case ADDED:
                                         Log.w("ADDED","Data: " + dc.getDocument().getData());
-//                                        todoListItems.add(0, dc.getDocument().toObject(TodoList_Item.class));
                                         break;
                                     case MODIFIED:
                                         Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-//                                    rankingAdapter.notifyDataSetChanged();
                                         adapter.notifyDataSetChanged();
                                         break;
                                     case REMOVED:
@@ -431,15 +408,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void LineChartMaker() {
 
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
-
         ArrayList<Entry> entries = new ArrayList<>();
-
         for(int i=0 ; i < 10; i++){
             entries.add(new Entry(pref.getFloat("entries"+i, 0), i));
         }
 
         LineDataSet dataset = new LineDataSet(entries, "하루 중, 습관 비중 추이");
-
         ArrayList<String> labels = new ArrayList<String>();
         for(int i=0 ; i < 10; i++){
             Calendar cal = Calendar.getInstance();
@@ -456,11 +430,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Legend legend = lineChart.getLegend(); //레전드 설정 (차트 밑에 색과 라벨을 나타내는 설정)
         legend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);//하단 왼쪽에 설정
-//        legend.setTextColor(ContextCompat.getColor(getContext(), R.color.textColor)); // 레전드 컬러 설정
 
         lineChart.setData(data);
         lineChart.setDescription("");
-//        lineChart.animateY(3000);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -484,7 +456,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //날짜 바뀌면 실행
         if(!todaydate.equals(pref.getString("yesterday", yesterday))) {
-            Log.e(TAG, "gettodaydate: 확인 날 바뀜" + yesterday);
 
                 new Thread(() -> {
                     if(firebaseUser != null) {
@@ -628,14 +599,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Calendar endDate = Calendar.getInstance();
         endDate.add(Calendar.MONTH, 12);
 
-        //가로 달력 구현
         horizontalCalendar = new HorizontalCalendar.Builder(this, R.id.calendarView)
                 .range(startDate, endDate)
                 .defaultSelectedDate(calendar)
                 .datesNumberOnScreen(7)
                 .build();
 
-        //가로 달력 구동시 리스너
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -659,7 +628,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     setdidlist();
                                     //달력추가
                                     EventCalendarMaker(date);
-//                                    LineChartMaker();
                                 }
                                 private void setdidlist() {
                                     todoListItems.clear();
@@ -739,11 +707,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.recommend) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
-
             Intent msg = new Intent(Intent.ACTION_SEND);
             msg.addCategory(Intent.CATEGORY_DEFAULT);
             msg.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=KOKO_HABBIT");
-            msg.putExtra(Intent.EXTRA_TITLE, "코코 습관 추천하기");
+            msg.putExtra(Intent.EXTRA_TITLE, "코빗(습관 형성 어플) 추천하기");
             msg.setType("text/plain");
             startActivity(Intent.createChooser(msg, "앱을 선택해 주세요"));
 
@@ -756,18 +723,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.ranker) {
         MySoundPlayer.play(MySoundPlayer.CLICK);
         myStartActivity(Ranking_list.class);
-
-        }/*else if (id == R.id.nav_history) {
-            MySoundPlayer.play(MySoundPlayer.CLICK);
-            myStartActivity(History_list.class);
-
-        } else if (id == R.id.nav_clublist) {
-            MySoundPlayer.play(MySoundPlayer.CLICK);
-            myStartActivity(Club_list.class);
-
-        } else if (id == R.id.nav_help) {
-            MySoundPlayer.play(MySoundPlayer.CLICK);
-            myStartActivity(Help.class);*/
+        }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -991,7 +947,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void EventCalendarMaker(Calendar calendar){
 
             // https://github.com/Applandeo/Material-Calendar-View
-
             try {
                 calendarView.setDate(calendar);
             } catch (OutOfDateRangeException e) {
@@ -999,11 +954,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             CalendarEvents(calendar);
-//or
-        /*events.add(new EventDay(calendar2, new Drawable()));
-//or if you want to specify event label color
-        events.add(new EventDay(calendar2, R.drawable.sample_icon, Color.parseColor("#228B22")));*/
-
 
             //달력클릭
             calendarView.setOnDayClickListener(new OnDayClickListener() {
@@ -1168,10 +1118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static void showfullad(Context context){
 
-        Log.e(TAG, "onStart: 전면" + pref.getInt("adloadcount", 1));
-        Log.e(TAG, "onStart: 전면" + fulladview);
-
-        if (/*mInterstitialAd.isLoaded() && */fulladview && pref.getInt("adloadcount", 0)%5==0) {
+        if (fulladview && pref.getInt("adloadcount", 0)%5==0) {
             new Thread(new Runnable() {
 
                 @Override
@@ -1198,31 +1145,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             editor.apply();
         }
     }
-
-    //잠금 화면 해지시 첫화면
-    /*public void getPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
-            if (!Settings.canDrawOverlays(this)) {              // 체크
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
-            } else {
-                startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
-            }
-        } else {
-            startService(new Intent(MainActivity.this, kat_OverdrawActivity.class));
-        }
-    }
-
-    void startMain(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(new Intent(this, kat_OverdrawActivity.class));
-        } else {
-            startService(new Intent(this, kat_OverdrawActivity.class));
-        }
-    }*/
-
-
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -1501,8 +1423,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         savehabbitportion();
         System.gc();
-
-//        getPermission();
     }
 
     private void savehabbitportion() {
@@ -2661,64 +2581,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         resetCal.set(Calendar.MINUTE, -1);
         resetCal.set(Calendar.SECOND, 0);
 
-//        long reserve = resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY ;
-
         //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
         saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
                 , AlarmManager.INTERVAL_DAY, resetSender);
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
         String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
-
-//        Log.e(TAG, "setrankAlarm: 확인" + setResetTime);
-    }
-
-    //자정마다 실행 (리시버)
-    void setzeroProgressAlarm(Context context){
-        //알람 매니저 생성
-        AlarmManager setzeroProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        //리시브 받을 클래스 연결
-//        Intent setzeroProgressIntent = new Intent(context, SetzeroProgressReceiver.class);
-//        PendingIntent setzeroSender = PendingIntent.getBroadcast(context, 0, setzeroProgressIntent, 0);
-
-        //실행 시간
-        Calendar setzeroCal = Calendar.getInstance();
-        setzeroCal.setTimeInMillis(System.currentTimeMillis());
-        setzeroCal.set(Calendar.HOUR_OF_DAY, 0);
-        setzeroCal.set(Calendar.MINUTE, 1);
-        setzeroCal.set(Calendar.SECOND, 0);
-
-        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        /*setzeroProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setzeroCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
-                , AlarmManager.INTERVAL_DAY, setzeroSender);
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setZeroTime = format.format(new Date(setzeroCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
-
-        Log.e(TAG, "setzeroAlarm: 확인" + setZeroTime);*/
-    }
-
-    //자정마다 실행 (리시버)
-    void setrankAlarm(Context context){
-        //알람 매니저 생성
-        AlarmManager setrankAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        //리시브 받을 클래스 연결
-//        Intent setrankProgressIntent = new Intent(context, SaveRankReceiver.class);
-//        PendingIntent setrankSender = PendingIntent.getBroadcast(context, 0, setrankProgressIntent, 0);
-
-        //실행 시간
-        Calendar setrankCal = Calendar.getInstance();
-        setrankCal.setTimeInMillis(System.currentTimeMillis());
-        setrankCal.set(Calendar.HOUR_OF_DAY, 0);
-        setrankCal.set(Calendar.MINUTE, 0);
-        setrankCal.set(Calendar.SECOND, 0);
-
-        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-//        setrankAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setrankCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
-//                , AlarmManager.INTERVAL_DAY, setrankSender);
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(setrankCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
     }
 
     @Override

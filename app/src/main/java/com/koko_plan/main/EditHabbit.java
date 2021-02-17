@@ -111,7 +111,7 @@ public class EditHabbit extends AppCompatActivity {
     }
 
     /** 이모티콘이 있을경우 "" 리턴, 그렇지 않을 경우 null 리턴 **/
-    private InputFilter specialCharacterFilter = new InputFilter() {
+    private final InputFilter specialCharacterFilter = new InputFilter() {
 
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -130,7 +130,7 @@ public class EditHabbit extends AppCompatActivity {
     private void SetListener() {
         View.OnClickListener Listener = new View.OnClickListener() {
 
-            @SuppressLint("SetTextI18n")
+            @SuppressLint({"SetTextI18n", "NonConstantResourceId"})
             @Override
             public void onClick(View view) {
                 switch (view.getId()) {

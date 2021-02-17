@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
-// Apply the Crashlytics Gradle plugin
 
 android {
     compileSdkVersion 30
@@ -20,7 +19,7 @@ android {
 
         //구글플레이 업데이트 시
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

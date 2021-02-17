@@ -127,7 +127,7 @@ public class EditHabbit2 extends AppCompatActivity {
     private void SetListener() {
         View.OnClickListener Listener = new View.OnClickListener() {
 
-            @SuppressLint("SetTextI18n")
+            @SuppressLint({"SetTextI18n", "NonConstantResourceId"})
             @Override
             public void onClick(View view) {
                 switch (view.getId()) {
