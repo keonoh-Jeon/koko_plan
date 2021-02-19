@@ -24,26 +24,28 @@ public class MySoundPlayer {
 
     // sound media initialize
     public static void initSounds(Context context) {
-        AudioAttributes attributes = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            attributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_GAME)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            soundPool = new SoundPool.Builder()
-                    .setAudioAttributes(attributes)
-                    .build();
-        }
-        soundPoolMap = new HashMap<Integer, Integer>(8);
-        soundPoolMap.put(TEAR, soundPool.load(context, TEAR, 1));
-        soundPoolMap.put(POP, soundPool.load(context, POP, 2));
-        soundPoolMap.put(PAGE, soundPool.load(context, PAGE, 3));
-        soundPoolMap.put(PLAY, soundPool.load(context, PLAY, 4));
-        soundPoolMap.put(CLICK, soundPool.load(context, CLICK, 5));
-        soundPoolMap.put(PAUSE, soundPool.load(context, PAUSE, 6));
-        soundPoolMap.put(POP2, soundPool.load(context, POP2, 7));
+        new Thread(() -> {
+            AudioAttributes attributes = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                attributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_GAME)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                soundPool = new SoundPool.Builder()
+                        .setAudioAttributes(attributes)
+                        .build();
+            }
+            soundPoolMap = new HashMap<Integer, Integer>(8);
+            soundPoolMap.put(TEAR, soundPool.load(context, TEAR, 1));
+            soundPoolMap.put(POP, soundPool.load(context, POP, 2));
+            soundPoolMap.put(PAGE, soundPool.load(context, PAGE, 3));
+            soundPoolMap.put(PLAY, soundPool.load(context, PLAY, 4));
+            soundPoolMap.put(CLICK, soundPool.load(context, CLICK, 5));
+            soundPoolMap.put(PAUSE, soundPool.load(context, PAUSE, 6));
+            soundPoolMap.put(POP2, soundPool.load(context, POP2, 7));
+        }).start();
     }
 
     public static void play(int raw_id){
