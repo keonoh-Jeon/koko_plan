@@ -30,13 +30,13 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-6976973682401259~7383739182" />
         <meta-data
             android:name="com.google.android.gms.ads.banner.API_KEY"
             android:value="@string/google_ads_banner_api_key"/>
         <meta-data
             android:name="com.google.android.gms.ads.reward.API_KEY"
-            android:value="@string/google_ads_reward_api_key"/>
+            android:value="@string/google_ads_fullscreen_api_key"/>
 
         <activity android:name=".main.MainActivity"
             android:screenOrientation="portrait">

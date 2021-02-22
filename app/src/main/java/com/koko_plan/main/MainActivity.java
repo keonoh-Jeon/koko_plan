@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static String name, email;
     public static InterstitialAd  mInterstitialAd;
-    private String inputname;
+    public static String inputname;
     public static String photourl;
     public static Bitmap profile;
 
@@ -279,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseApp.initializeApp(this);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
         crashlytics.log("my message");
         crashlytics.log("E/TAG: my message");
@@ -306,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //전면광고 로드
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-6976973682401259/7858524788");
+        mInterstitialAd.setAdUnitId("ca-app-pub-6976973682401259/5609646607");
 
         getAppKeyHash();
     }
@@ -716,7 +717,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MySoundPlayer.play(MySoundPlayer.CLICK);
             Intent msg = new Intent(Intent.ACTION_SEND);
             msg.addCategory(Intent.CATEGORY_DEFAULT);
-            msg.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=KOKO_HABBIT");
+            msg.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.koko_plan");
             msg.putExtra(Intent.EXTRA_TITLE, "코빗(습관 형성 어플) 추천하기");
             msg.setType("text/plain");
             startActivity(Intent.createChooser(msg, "앱을 선택해 주세요"));
@@ -2171,6 +2172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                     tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                     String eventscore = (String) String.valueOf(document.getData().get("eventscore"));
+                                    Log.e(TAG, "onComplete: eventscore 확인 " + eventscore );
                                     SetRank(Double.parseDouble(eventscore));
                             }
                         } else {
@@ -2446,7 +2448,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         time = timeformat.format(date);
                                         day = dayformat.format(date);
 
-                                        RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time, name);
+                                        RandomGoodText.make(getApplicationContext(), goodText_items.get(position).getFromid(), day, time, inputname);
                                         goodText_adapter.notifyItemChanged(position);
 
                                         DocumentReference documentReference = firebaseFirestore

@@ -7,13 +7,14 @@ public class MemberInfo {
     private String gender;
     private String id;
     private int getcount;
+    private float eventscore;
 
-
-    public MemberInfo(String name, String birthday, String gender, String id, int getcount){
+    public MemberInfo(String name, String birthday, String gender, String id, int getcount, float eventscore){
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
         this.id = id;
+        this.eventscore = eventscore;
     }
     public String getId(){
         return this.id;
@@ -48,6 +49,13 @@ public class MemberInfo {
     }
     public void setGetcount(int getcount){
         this.getcount = getcount;
+    }
+
+    public float getEventscore(){
+        return this.eventscore;
+    }
+    public void setEventscore(float eventscore){
+        this.eventscore = eventscore;
     }
 
 }

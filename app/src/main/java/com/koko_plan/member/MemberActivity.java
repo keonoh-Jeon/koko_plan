@@ -137,8 +137,8 @@ public class MemberActivity extends AppCompatActivity {
         if (gender == null) gender = "male";
     }
 
-    private View.OnClickListener OnClickListener = new View.OnClickListener() {
-        @SuppressLint("SetTextI18n")
+    private final View.OnClickListener OnClickListener = new View.OnClickListener() {
+        @SuppressLint({"SetTextI18n", "NonConstantResourceId"})
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -181,8 +181,6 @@ public class MemberActivity extends AppCompatActivity {
 
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-                    private boolean duplication;
-
                     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -191,7 +189,7 @@ public class MemberActivity extends AppCompatActivity {
                             Log.w("listen:error", e);
                             return;                        }
 
-                        duplication = false;
+                        boolean duplication = false;
                         String nickname = "이름 기입";
 
                         assert snapshots != null;
@@ -270,7 +268,8 @@ public class MemberActivity extends AppCompatActivity {
         if (!name.equals("name")  && !birthday.equals("birthday")) {
             if(firebaseUser != null) {
                 int getcount = 0;
-                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount);
+                float eventscore = (float)99.9;
+                MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount, eventscore);
                 firebaseFirestore
                         .collection("users")
                         .document(firebaseUser.getUid())

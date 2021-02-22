@@ -8,6 +8,7 @@ public class GoodText_Item
     private String id;
     private String text;
     private String namefrom;
+    private String name;
     private String from;
     private String fromid;
     private String time;
@@ -72,6 +73,15 @@ public class GoodText_Item
     public void setNamefrom(String namefrom)
     {
         this.namefrom = namefrom;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public float getAverage()

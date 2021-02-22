@@ -42,6 +42,7 @@ import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
+import static com.koko_plan.main.MainActivity.inputname;
 import static com.koko_plan.main.MainActivity.lastsec;
 import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.todaydate;
@@ -263,7 +264,7 @@ public class Ranking_Adapter extends RecyclerView.Adapter<Ranking_Adapter.ViewHo
                             time = timeformat.format(date);
                             day = dayformat.format(date);
 
-                            RandomGoodText.make(context, filterList.get(pos).getId(), day, time, name);
+                            RandomGoodText.make(context, filterList.get(pos).getId(), day, time, inputname);
                             filterList.get(pos).setGetcount(filterList.get(pos).getGetcount()+1);
 
                             Map<String, Object> data = new HashMap<>();

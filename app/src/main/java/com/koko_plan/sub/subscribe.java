@@ -38,12 +38,11 @@ import static com.koko_plan.main.MainActivity.pref;
 public class subscribe extends AppCompatActivity implements PurchasesUpdatedListener {
 
     private static final String TAG = "subscribe";
-    private int ballcount;
 
     private BillingClient billingClient;
 
-    private SkuDetails skuDetails300, skuDetails500, skuDetails1000, skuDetails2500, skuDetails5000, skuDetails10000;
-    private String skuID300 = "ballbasket_300", skuID500 = "ballbasket_500", skuID1000, skuID2500, skuID5000, skuID10000;
+    private SkuDetails skuDetails_subscribe;
+    private final String skuID = "subsribe";
 
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -69,12 +68,11 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                     // The BillingClient is ready. You can query purchases here.
                     // 구글 상품 정보들의 ID를 만들어 줌
                     List<String> skuList = new ArrayList<> ();
-                    skuList.add(skuID300);
-                    skuList.add(skuID500);
+                    skuList.add(skuID);
 
                     // SkuDetailsList 객체를 만듬
                     SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-                    params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+                    params.setSkusList(skuList).setType(BillingClient.SkuType.SUBS);
 
                     // 비동기 상태로 앱의 정보를 가지고 옴
                     billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
@@ -84,16 +82,19 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
                                         for (SkuDetails skuDetails : skuDetailsList) {
                                             String sku = skuDetails.getSku();
                                             String price = skuDetails.getPrice();
-                                            if(skuID300.equals(sku)) {
-                                                skuDetails300 = skuDetails;
-                                            } else if(skuID500.equals(sku)) {
-                                                skuDetails500 = skuDetails;
+
+                                            if(skuID.equals(sku)) {
+                                                skuDetails_subscribe = skuDetails;
+
+                                                Log.e(TAG, "onSkuDetailsResponse: 확인 skuDetails_subscribe " + skuDetails_subscribe);
                                             }
                                         }
                                     }
                                 }});
                 } else {
                     billingClient.startConnection(this);
+
+                    Log.e(TAG, "onBillingSetupFinished: 확인 skuID"+ skuID);
                 }
             }
 
@@ -114,11 +115,12 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
             Log.d(TAG, "결제에 성공했으며, 아래에 구매한 상품들이 나열됨");
             for (Purchase purchase : purchases) {
                 handlePurchase(purchase);
-                subscribing();
+                subscribing(true);
             }
             // 사용자가 결제를 취소한 경우
         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
             Log.d(TAG, "사용자에 의해 결제취소");
+            subscribing(false);
         } else {
             // 그 외에 다른 결제 실패 이유
             Log.d(TAG, "결제가 취소 되었습니다. 종료코드: " + billingResult.getResponseCode());
@@ -134,7 +136,8 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         BillingFlowParams flowParams = BillingFlowParams.newBuilder()
                 .setSkuDetails(skuDetails)
                 .build();
-        billingClient.launchBillingFlow(subscribe.this, flowParams);
+
+        billingClient.launchBillingFlow(this, flowParams);
         /*if(responseCode == BillingClient.BillingResponse.ITEM_ALREADY_OWNED) {
             Purchase.PurchasesResult purchasesResult = BillingClient.queryPurchases(BillingClient.SkuType.INAPP);
             onPurchasesUpdated(BillingClient.BillingResponse.OK, purchasesResult.getPurchasesList());
@@ -175,13 +178,8 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.tv_subscribe:
-                    startToast("서비스 준비 중");
-//                    doBillingFlow(skuDetails300);
+                    doBillingFlow(skuDetails_subscribe);
                     break;
-                /*case R.id.iv_basket500:
-                    doBillingFlow(skuDetails500);
-                    additionball = 500;
-                    break;*/
             }
         }
     };
@@ -191,22 +189,14 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
     }
 
     //구독 버튼 눌렀을때,
-    private void subscribing() {
-        MainActivity.subscribing = true;
-    }
-
-
-    @SuppressLint({"DefaultLocale", "SetTextI18n"})
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void loaddata() {
-        ballcount = pref.getInt("ballcount", 0);
+    private void subscribing(boolean bool) {
+        MainActivity.subscribing = bool;
     }
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     protected void onResume() {
         super.onResume();
-        loaddata();
     }
 
     @Override
@@ -232,5 +222,4 @@ public class subscribe extends AppCompatActivity implements PurchasesUpdatedList
         startActivity(intent);
         finish();
     }
-
 }
