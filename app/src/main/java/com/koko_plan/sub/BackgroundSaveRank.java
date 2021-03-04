@@ -59,8 +59,6 @@ public class BackgroundSaveRank extends Worker {
                 String name = getInputData().getString("name");
                 String todaydate = getInputData().getString("todaydate");
                 long interval = getInputData().getLong("interval", 0);
-                Log.e(TAG, "doWork: 확인 todaydate -" +  todaydate);
-                Log.e(TAG, "doWork: 확인 name -" +  name);
                 todoListItems = new ArrayList<>();
 
                 firebaseFirestore
@@ -82,11 +80,8 @@ public class BackgroundSaveRank extends Worker {
                                         todoListItems.add(document.toObject(TodoList_Item.class));
                                         if (Objects.equals(document.getData().get("name"), name)) {
                                             myrank = todoListItems.size();
-                                            Log.e(TAG, "doWork: 확인 myrank -" + myrank);
                                         }
                                         eventscore = (float) ((float) myrank / (double) todoListItems.size() * 100.0);
-                                        Log.e(TAG, "doWork: 확인 size -" + todoListItems.size());
-                                        Log.e(TAG, "doWork: 확인 eventscore -" + eventscore);
 
                                         DocumentReference documentReference = firebaseFirestore
                                                 .collection("users")
@@ -99,8 +94,6 @@ public class BackgroundSaveRank extends Worker {
 
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot document = task.getResult();
-                                                    Log.e(TAG, "doWork : 확인 todaydate -" + document.getData().get(todaydate));
-                                                    Log.e(TAG, "doWork: 확인 interval -" + interval);
 
                                                     if (document.exists()) {
                                                         if(0 < (long) document.getData().get(todaydate) && interval > 0) {

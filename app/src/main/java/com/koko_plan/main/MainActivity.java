@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -19,8 +20,11 @@ import androidx.work.WorkRequest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -111,8 +115,11 @@ import com.koko_plan.server.goodtext.RandomGoodText;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
+import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.BackgroundSaveRank;
 import com.koko_plan.sub.BackgroundSetzero;
+import com.koko_plan.sub.DeviceBootReceiver;
+import com.koko_plan.sub.GoodtextAlarmReceiver;
 import com.koko_plan.sub.ItemTouchHelperCallback;
 import com.koko_plan.R;
 import com.koko_plan.member.MemberActivity;
@@ -423,8 +430,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
-                    .collection("total")
-                    .orderBy("num", Query.Direction.ASCENDING)
+                    .collection("messages")
 
                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
 
@@ -435,22 +441,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Log.w("listen:error", e);
                                 return;                        }
 
-                            assert snapshots != null;
-                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
 
+                            assert snapshots != null;
+                            String namefrom = "좋은사람";
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
                                 switch (dc.getType()) {
                                     case ADDED:
                                         Log.w("ADDED","Data: " + dc.getDocument().getData());
+                                        namefrom = (String) dc.getDocument().getData().get("namefrom");
                                         break;
                                     case MODIFIED:
                                         Log.w("MODIFIED","Data: " + dc.getDocument().getData());
-                                        adapter.notifyDataSetChanged();
                                         break;
                                     case REMOVED:
                                         Log.w("REMOVED", "Data: " + dc.getDocument().getData());
                                         break;
                                 }
                             }
+                            if(namefrom != null) createNotification(namefrom);
+                        }
+
+                        private void createNotification(String namefrom) {
+                            PackageManager pm = getApplicationContext().getPackageManager();
+                            ComponentName receiver = new ComponentName(getApplicationContext(), DeviceBootReceiver.class);
+                            //리시버 클래스 지정
+                            Intent alarmIntent = new Intent(getApplicationContext(), GoodtextAlarmReceiver.class);
+                            alarmIntent.putExtra("namefrom", namefrom);
+                            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+                            //알람 매니저
+                            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+                            // 사용자가 매일 알람을 허용했다면
+                                if (alarmManager != null) {
+                                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+                                }
+                                // 부팅 후 실행되는 리시버 사용가능하게 설정
+                                pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
                         }
                     });
         }
@@ -2222,7 +2248,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     tvgetcount.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                     tvtodayget.setText(Objects.requireNonNull(document.getData()).get("getcount")+ "");
                                     String eventscore = (String) String.valueOf(document.getData().get("eventscore"));
-                                    Log.e(TAG, "onComplete: eventscore 확인 " + eventscore );
                                     SetRank(Double.parseDouble(eventscore));
                             }
                         } else {

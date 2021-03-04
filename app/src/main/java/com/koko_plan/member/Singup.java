@@ -8,11 +8,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,6 +27,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.kakao.sdk.auth.AuthCodeClient;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.common.KakaoSdk;
 import com.kakao.sdk.user.UserApiClient;
@@ -83,7 +86,7 @@ public class Singup extends AppCompatActivity {
 
 //                    Glide.with(profileImage).load(user.getKakaoAccount().getProfile().getThumbnailImageUrl()).circleCrop().into(profileImaget);
 
-                    myStartActivity(MainActivity.class);
+//                    myStartActivity(MainActivity.class);
 
                 } else {
                     Log.e(TAG, "invoke: 카카오 유저정보 없슴");
@@ -120,25 +123,7 @@ public class Singup extends AppCompatActivity {
                     break;
                 case R.id.btn_sign_in_kakao:
                     MySoundPlayer.play(MySoundPlayer.CLICK);
-                    Function2<OAuthToken, Throwable, Unit> callback = new Function2<OAuthToken, Throwable, Unit>() {
-                        @Override
-                        public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
-                            Log.e(TAG, "invoke: 카카오 토큰" + oAuthToken + throwable);
-                            if(oAuthToken != null){
-                                updateKakaoLoginUi();
-                            }
-                            if(throwable != null){
-
-                            }
-                            return null;
-                        }
-                    };
-
-                    if(UserApiClient.getInstance().isKakaoTalkLoginAvailable(Singup.this)){
-                        UserApiClient.getInstance().loginWithKakaoTalk(Singup.this, callback);
-                    } else {
-                        UserApiClient.getInstance().loginWithKakaoAccount(Singup.this, callback);
-                    }
+                    signInwithkakao();
                     break;
             }
         }
@@ -147,10 +132,31 @@ public class Singup extends AppCompatActivity {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
+
+        private void signInwithkakao() {
+            Function2<OAuthToken, Throwable, Unit> callback = new Function2<OAuthToken, Throwable, Unit>() {
+                @Override
+                public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
+                    Log.e(TAG, "invoke: 카카오 토큰" + oAuthToken.getAccessToken());
+                    if(oAuthToken != null){
+                        oAuthToken.getAccessToken();
+//                        updateKakaoLoginUi();
+                        firebaseAuthWithKakao(oAuthToken.getAccessToken());
+                    }
+                    if(throwable != null){
+
+                    }
+                    return null;
+                }
+            };
+
+            if(UserApiClient.getInstance().isKakaoTalkLoginAvailable(Singup.this)){
+                UserApiClient.getInstance().loginWithKakaoTalk(Singup.this, callback);
+            } else {
+                UserApiClient.getInstance().loginWithKakaoAccount(Singup.this, callback);
+            }
+        }
     };
-
-
-
 
     @Override
     public void onStart() {
@@ -190,6 +196,28 @@ public class Singup extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            updateUI(null);
+                        }
+                    }
+                });
+    }
+
+    private void firebaseAuthWithKakao(String accessToken) {
+        Log.e(TAG, "firebaseAuthWithKakao: 카카오 " + accessToken  );
+        mAuth.signInWithCustomToken(accessToken)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCustomToken:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            myStartActivity(MainActivity.class);
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCustomToken:failure", task.getException());
+                            Toast.makeText(Singup.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                     }

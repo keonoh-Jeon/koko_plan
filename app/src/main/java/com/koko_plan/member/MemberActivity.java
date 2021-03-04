@@ -268,7 +268,7 @@ public class MemberActivity extends AppCompatActivity {
         if (!name.equals("name")  && !birthday.equals("birthday")) {
             if(firebaseUser != null) {
                 int getcount = 0;
-                float eventscore = (float)99.9;
+                float eventscore = (float)0.01;
                 MemberInfo memberInfo = new MemberInfo(name, birthday, gender, firebaseUser.getUid(), getcount, eventscore);
                 firebaseFirestore
                         .collection("users")

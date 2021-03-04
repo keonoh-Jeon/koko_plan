@@ -8,9 +8,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,19 +24,26 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static android.content.ContentValues.TAG;
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
-import static com.koko_plan.main.MainActivity.editor;
 import static com.koko_plan.main.MainActivity.pref;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class GoodtextAlarmReceiver extends BroadcastReceiver {
 
   /*  //메니페스트 등록
     <receiver android:name=".sub.AlarmReceiver" />*/
 
+    private Date newdate;
+    private Calendar calendar;
+    private SimpleDateFormat dateformat;
+    private String newtoday;
+    private PowerManager.WakeLock sCpuWakeLock;
+
     @SuppressLint({"WakelockTimeout", "InvalidWakeLockTag"})
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        String namefrom = "좋은사람";
+        Bundle bundle = intent.getExtras();
+        namefrom = bundle.getString("namefrom");
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //연결되는 액티비티(돌아갈 액티비티)
@@ -66,7 +74,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             channel.enableVibration(true); // 진동 무음
             channel.enableLights(true);
             channel.setLightColor(Color.BLUE);
-            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             if (notificationManager != null) {
                 // 노티피케이션 채널을 시스템에 등록
@@ -79,8 +86,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("{Time to watch some cool stuff!}")
-                .setContentTitle("습관 할당 시간 100% 도달!")
-                .setContentText("'"+ pref.getString("alarmtitle", null) + "목표 시간을 달성하였습니다.")
+                .setContentTitle("오늘 하루도 좋은 습관으로 채우고 계신가요?")
+                .setContentText(namefrom + "님으로부터 힘이 되는 응원메시지가 도착했어요.")
                 .setContentInfo("INFO")
                 .setOngoing(true) // 사용자가 직접 못지우게 계속 실행하기.
                 .setContentIntent(pendingI) //눌렀을때 액티비티 이동
@@ -89,7 +96,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (notificationManager != null) {
 
             // 노티피케이션 동작시킴
-            notificationManager.notify(1234, builder.build());
+            notificationManager.notify(1, builder.build());
             /*Calendar nextNotifyTime = Calendar.getInstance();
 
             // 내일 같은 시간으로 알람시간 결정
