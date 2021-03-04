@@ -102,6 +102,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.kakao.sdk.user.UserApiClient;
 import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
@@ -146,6 +147,8 @@ import java.util.concurrent.TimeUnit;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
@@ -292,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         horizontalCalendarmaker(calendar);
 
         listenerhabbitlistDoc2();
+        listenergoodtextlistDoc();
 
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListInit();
@@ -309,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-6976973682401259/5609646607");
 
+        //해시 키 확인
         getAppKeyHash();
     }
 
@@ -352,14 +357,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             WorkManager.getInstance(this).enqueue(saverankWorkRequest);
         }
-
-
     }
 
     private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
+
+        //현재 시간을 밀리세컨으로 받음
         Calendar currentDate = Calendar.getInstance();
         currentDate.setTimeInMillis(System.currentTimeMillis());
 
+        //현재 시간, 분, 초로 표기시 사용
         Calendar dueDate = Calendar.getInstance();
         dueDate.setTimeInMillis(System.currentTimeMillis());
         dueDate.set(Calendar.HOUR_OF_DAY, i);
@@ -376,6 +382,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void listenerhabbitlistDoc2() {
         if(firebaseUser!=null){
 
+            firebaseFirestore
+                    .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
+                    .document(firebaseUser.getUid())
+                    .collection("total")
+                    .orderBy("num", Query.Direction.ASCENDING)
+
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot snapshots,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("listen:error", e);
+                                return;                        }
+
+                            assert snapshots != null;
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.w("ADDED","Data: " + dc.getDocument().getData());
+                                        break;
+                                    case MODIFIED:
+                                        Log.w("MODIFIED","Data: " + dc.getDocument().getData());
+                                        adapter.notifyDataSetChanged();
+                                        break;
+                                    case REMOVED:
+                                        Log.w("REMOVED", "Data: " + dc.getDocument().getData());
+                                        break;
+                                }
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void listenergoodtextlistDoc() {
+        if(firebaseUser!=null){
             firebaseFirestore
                     .collection("users") // 목록화할 항목을 포함하는 컬렉션까지 표기
                     .document(firebaseUser.getUid())
@@ -707,6 +751,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.logoutButton) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
             FirebaseAuth.getInstance().signOut();
+            UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
+                @Override
+                public Unit invoke(Throwable throwable) {
+                    return null;
+                }
+            });
             myStartActivity(Singup.class);
 
         } else if (id == R.id.profile) {
@@ -741,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initprofile() {
         new Thread(() -> {
             if (firebaseUser == null) {
-                myStartActivity(Singup.class);
+//                myStartActivity(Singup.class);
             } else {
                 DocumentReference documentReference = firebaseFirestore
                         .collection("users")

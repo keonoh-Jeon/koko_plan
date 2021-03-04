@@ -153,6 +153,7 @@ public class GoodText_Adapter extends RecyclerView.Adapter<GoodText_Adapter.View
         Glide.with(context)
                 .load(imageUrl)
                 .override(100,100)
+                .circleCrop()
                 .into(viewHolder.profileview);
 
         viewHolder.timeview.setText(filterList.get(i).getTime());

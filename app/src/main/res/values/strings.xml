@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Kobbit</string>
+
+    <string name="kakao_app_key">855eeff4baf07de4edf721315792ee8b</string>
+
     <string name="title_activity_maker">Maker</string>
     <string name="title_activity_field">Field</string>
     <string name="title_activity_marker">Marker</string>
