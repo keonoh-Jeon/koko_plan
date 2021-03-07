@@ -14,6 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.datatransport.cct.internal.LogEvent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -24,20 +31,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.kakao.sdk.auth.AuthCodeClient;
-import com.kakao.sdk.auth.model.OAuthToken;
-import com.kakao.sdk.common.KakaoSdk;
-import com.kakao.sdk.user.UserApiClient;
-import com.kakao.sdk.user.model.User;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.R;
 import com.koko_plan.sub.MySoundPlayer;
 
-import kotlin.Unit;
-import kotlin.jvm.functions.Function2;
+import java.util.Arrays;
 
 public class Singup extends AppCompatActivity {
 
@@ -46,6 +48,10 @@ public class Singup extends AppCompatActivity {
     private FirebaseAuth mAuth = null;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
+    private CallbackManager callbackManager;
+    private LoginButton buttonFacebook;
+    private CallbackManager mCallbackManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +62,28 @@ public class Singup extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        updateKakaoLoginUi();
+        // Initialize Facebook Login button
+        mCallbackManager = CallbackManager.Factory.create();
+        LoginButton loginButton = findViewById(R.id.btn_sign_in_facebook);
+        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "facebook:onCancel");
+                // ...
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "facebook:onError", error);
+                // ...
+            }
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -69,32 +96,8 @@ public class Singup extends AppCompatActivity {
         findViewById(R.id.gotoLogin).setOnClickListener(btnClickListener);
         findViewById(R.id.btn_sign_in_goolgle).setOnClickListener(btnClickListener);
 
-        findViewById(R.id.btn_sign_in_kakao).setOnClickListener(btnClickListener);
-
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-    }
-
-    private void updateKakaoLoginUi() {
-        UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
-            @Override
-            public Unit invoke(User user, Throwable throwable) {
-                if(user!=null){
-                    Log.d(TAG, "invoke: 카카오 id " + user.getId());
-                    Log.d(TAG, "invoke: 카카오 nickname " + user.getKakaoAccount().getProfile().getNickname());
-                    Log.d(TAG, "invoke: 카카오 id " + user.getKakaoAccount().getProfile().getProfileImageUrl());
-
-//                    Glide.with(profileImage).load(user.getKakaoAccount().getProfile().getThumbnailImageUrl()).circleCrop().into(profileImaget);
-
-//                    myStartActivity(MainActivity.class);
-
-                } else {
-                    Log.e(TAG, "invoke: 카카오 유저정보 없슴");
-
-                }
-                return null;
-            }
-        });
     }
 
     protected void onPause() {
@@ -121,10 +124,6 @@ public class Singup extends AppCompatActivity {
                     mGoogleSignInClient.signOut();}
                     signIn();
                     break;
-                case R.id.btn_sign_in_kakao:
-                    MySoundPlayer.play(MySoundPlayer.CLICK);
-                    signInwithkakao();
-                    break;
             }
         }
 
@@ -132,41 +131,20 @@ public class Singup extends AppCompatActivity {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
-
-        private void signInwithkakao() {
-            Function2<OAuthToken, Throwable, Unit> callback = new Function2<OAuthToken, Throwable, Unit>() {
-                @Override
-                public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
-                    Log.e(TAG, "invoke: 카카오 토큰" + oAuthToken.getAccessToken());
-                    if(oAuthToken != null){
-                        oAuthToken.getAccessToken();
-//                        updateKakaoLoginUi();
-                        firebaseAuthWithKakao(oAuthToken.getAccessToken());
-                    }
-                    if(throwable != null){
-
-                    }
-                    return null;
-                }
-            };
-
-            if(UserApiClient.getInstance().isKakaoTalkLoginAvailable(Singup.this)){
-                UserApiClient.getInstance().loginWithKakaoTalk(Singup.this, callback);
-            } else {
-                UserApiClient.getInstance().loginWithKakaoAccount(Singup.this, callback);
-            }
-        }
     };
 
     @Override
     public void onStart() {
         super.onStart();
-        updateUI(user);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
@@ -190,41 +168,43 @@ public class Singup extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:success");
                             myStartActivity(MainActivity.class);
                             updateUI(user);
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                             updateUI(null);
                         }
                     }
                 });
     }
 
-    private void firebaseAuthWithKakao(String accessToken) {
-        Log.e(TAG, "firebaseAuthWithKakao: 카카오 " + accessToken  );
-        mAuth.signInWithCustomToken(accessToken)
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCustomToken:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            myStartActivity(MainActivity.class);
                             updateUI(user);
+                            Log.d(TAG, "페이스 북 " + user.getPhotoUrl());
+                            myStartActivity(MainActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCustomToken:failure", task.getException());
-                            Toast.makeText(Singup.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Toast.makeText(Singup.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                     }
                 });
     }
 
+
     private void updateUI(FirebaseUser user) {
+
     }
 
     private void myStartActivity(Class c){

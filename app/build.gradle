@@ -49,7 +49,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.firebase:firebase-ads:19.7.0'
     implementation 'com.google.android.gms:play-services-ads:19.7.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
 
     //구글플레이 업데이트 관련
-    implementation 'com.google.android.play:core:1.9.1'
+    implementation 'com.google.android.play:core:1.10.0'
     //구글 로그인 버튼
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
 
@@ -105,9 +105,5 @@ dependencies {
 
     implementation "android.arch.work:work-runtime:1.0.1"
 
-    implementation "com.kakao.sdk:v2-user:2.4.0" // 카카오 로그인
-    implementation "com.kakao.sdk:v2-talk:2.4.0" // 친구, 메시지(카카오톡)
-    implementation "com.kakao.sdk:v2-story:2.4.0" // 카카오스토리
-    implementation "com.kakao.sdk:v2-link:2.4.0" // 메시지(카카오링크)
-    implementation "com.kakao.sdk:v2-navi:2.4.0" // 카카오내비
+    implementation 'com.facebook.android:facebook-android-sdk:8.2.0'
 }

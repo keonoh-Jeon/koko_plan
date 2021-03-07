@@ -63,6 +63,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
 import com.github.mikephil.charting.components.Legend;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -106,7 +107,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.kakao.sdk.user.UserApiClient;
 import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
@@ -154,8 +154,6 @@ import java.util.concurrent.TimeUnit;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 import static com.koko_plan.main.RecyclerAdapter.timerTask;
@@ -231,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ProgressDialog pd;
 
-    private int showcount = 0;
+    private int ShowCount = 0;
     private TextView tvmyrankscore;
     @SuppressLint("StaticFieldLeak")
     public static TextView tvrankereffect;
@@ -310,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         GoodTextListmaker();
 
-        if(showcount >= 10) RequestReview.show(this);
+        if(ShowCount >= 10) RequestReview.show(this);
 
         saveProgressAlarm(this);
 
@@ -777,12 +775,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.logoutButton) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
             FirebaseAuth.getInstance().signOut();
-            UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
-                @Override
-                public Unit invoke(Throwable throwable) {
-                    return null;
-                }
-            });
             myStartActivity(Singup.class);
 
         } else if (id == R.id.profile) {
@@ -817,7 +809,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initprofile() {
         new Thread(() -> {
             if (firebaseUser == null) {
-//                myStartActivity(Singup.class);
+                myStartActivity(Singup.class);
             } else {
                 DocumentReference documentReference = firebaseFirestore
                         .collection("users")
@@ -1468,13 +1460,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         timegap = 0;
-        showcount++;
+        ShowCount++;
 
         todayitemsize = todoListItems.size();
 
         //오늘 날짜의 플레이중인 항목의 진행 상황과 스톱 시간을 저장
         new Thread(() -> {
-            editor.putInt("showcount", showcount);
+            editor.putInt("showcount", ShowCount);
             editor.putLong("stoptime", System.currentTimeMillis());
             editor.putInt("todayitemsize", todayitemsize);
             editor.putString("yesterday", todaydate);
@@ -1619,7 +1611,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         float rankscore = pref.getFloat("rankscore", 100);
         tvmyrankscore.setText(rank +"");
         settrophyimage(rankscore);
-        showcount = pref.getInt("showcount", 0);
+        ShowCount = pref.getInt("showcount", 0);
         timegap = (int)((now-stoptime)/1000);
 
         //하단 프로세스 달력추가

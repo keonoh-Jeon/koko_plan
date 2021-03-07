@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Kobbit</string>
 
-    <string name="kakao_app_key">855eeff4baf07de4edf721315792ee8b</string>
+    <string name="facebook_app_id">859740174574752</string>
+    <string name="fb_login_protocol_scheme">fb859740174574752</string>
 
     <string name="title_activity_maker">Maker</string>
     <string name="title_activity_field">Field</string>
@@ -22,4 +23,5 @@
     <string name="name">name</string>
     <string name="birthday">생년월일</string>
     <string name="app_review">어플 평가</string>
+
 </resources>
