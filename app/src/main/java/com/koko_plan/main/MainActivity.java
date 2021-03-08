@@ -64,6 +64,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
+import com.facebook.login.LoginManager;
 import com.github.mikephil.charting.components.Legend;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("StaticFieldLeak")
     public static TextView tveventeffect;
     private long Back_Key_Before_Time = 0;
-    private LinearLayout veffectintro;
+    private LinearLayout veffectintro, veffectstandby, vhabbitportion;
     private View vblur1, vblur2, vblur3;
 
     private AdView adBanner, adBanner2, adBanner3, adBanner4;
@@ -262,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int adloadcount;
     public static boolean setrankavailable = true;
     public static boolean setzeroavailable = true;
+    private boolean goodTextReceiver;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
@@ -300,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         horizontalCalendarmaker(calendar);
 
         listenerhabbitlistDoc2();
-        listenergoodtextlistDoc();
 
         // 할일 목록 만들기(리사이클러뷰)
         HabbitTodayListInit();
@@ -325,9 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initWorkManagersetzero() {
 
         if(setzeroavailable){
-
             long zero = getTimeUsingInWorkRequest(0, 0,0);
-
             WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
                     .Builder(BackgroundSetzero.class)
                     .setInitialDelay(zero, TimeUnit.MILLISECONDS)
@@ -456,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         break;
                                 }
                             }
-                            if(namefrom != null) createNotification(namefrom);
+                            if(namefrom != null && goodTextReceiver) createNotification(namefrom);
                         }
 
                         private void createNotification(String namefrom) {
@@ -640,6 +639,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         layoutManager.setStackFromEnd(true);
 
         tvnewhabbits = (TextView) findViewById(R.id.tv_newhabbits);
+        vhabbitportion = (LinearLayout) findViewById(R.id.view_habbitportion);
+        vhabbitportion.setVisibility(View.GONE);
         recyclerView = (RecyclerView) findViewById(R.id.rv_view);
 
         adapter = new RecyclerAdapter(todoListItems, this, this);
@@ -775,6 +776,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.logoutButton) {
             MySoundPlayer.play(MySoundPlayer.CLICK);
             FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
             myStartActivity(Singup.class);
 
         } else if (id == R.id.profile) {
@@ -873,6 +875,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         veffectintro = findViewById(R.id.v_effectintro);
         veffectintro.setVisibility(View.GONE);
+        veffectstandby = findViewById(R.id.v_effectstanby);
+        veffectstandby.setVisibility(View.GONE);
 
         vblur1= findViewById(R.id.v_blur1);
         vblur1.setVisibility(View.GONE);
@@ -1554,6 +1558,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
+
+        goodTextReceiver = true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -1597,8 +1603,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //로딩 화면 만들기
             pd = null;
             pd = ProgressDialog.show(this, "리스트 불러 오는 중......", "잠시만 기다려 주세요.");
+            vhabbitportion.setVisibility(View.VISIBLE);
+            veffectstandby.setVisibility(View.VISIBLE);
 
-            if(todayitemsize > 1) tvnewhabbits.setVisibility(View.GONE);
+            if(todayitemsize > 1) {
+                tvnewhabbits.setVisibility(View.GONE);
+            }
 
             LineChartMaker();
         }
@@ -1616,6 +1626,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //하단 프로세스 달력추가
         EventCalendarMaker(calendar);
+
+        goodTextReceiver = false;
+        listenergoodtextlistDoc();
     }
 
     @SuppressLint("SetTextI18n")
@@ -1643,6 +1656,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             blurview2 = false;
                             blurview3 = false;
                             blurview4 = false;
+
+                            veffectintro.setVisibility(View.GONE);
+                            veffectstandby.setVisibility(View.GONE);
 
                             tvrankereffect.setText("구매 쿠폰 사용 중");
                             tveventeffect.setText(" - 모든 흐림 효과, 광고 제거");

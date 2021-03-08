@@ -13,13 +13,13 @@ android {
 
     defaultConfig {
         applicationId "com.koko_plan"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 30
         multiDexEnabled true
 
         //구글플레이 업데이트 시
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 7
+        versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

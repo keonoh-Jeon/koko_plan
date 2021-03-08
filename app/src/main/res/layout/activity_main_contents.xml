@@ -39,6 +39,7 @@
                 </RelativeLayout>
 
                 <LinearLayout
+                    android:id="@+id/v_effectstanby"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -113,7 +114,7 @@
 
                         <TextView
                             android:id="@+id/tv_newhabbits"
-                            android:text="아래 '더하기'버튼을 눌러, 실천할 습관을 추가해 주세요."
+                            android:text="아래의 '+' 버튼을 눌러, 실천할 습관을 추가해 주세요."
                             android:layout_margin="10dp"
                             android:textStyle="bold"
                             android:layout_width="wrap_content"
@@ -147,54 +148,62 @@
                     android:layout_height="30sp"
                     tools:ignore="UselessLeaf" />
 
-                <TextView
-                    android:text="하루 중, 습관 비중 추이"
-                    android:padding="5sp"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/elandchoice"
-                    android:textColor="#FF9800"
-                    android:gravity="center"
-                    android:background="#FFF2DF"
-                    android:textStyle="bold"
+                <LinearLayout
+                    android:id="@+id/view_habbitportion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    tools:ignore="HardcodedText" />
+                    android:orientation="vertical">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp">
-
-                    <FrameLayout
+                    <TextView
+                        android:text="하루 중, 습관 비중 추이"
+                        android:padding="5sp"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/elandchoice"
+                        android:textColor="#FF9800"
+                        android:gravity="center"
+                        android:background="#FFF2DF"
+                        android:textStyle="bold"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        tools:ignore="UselessParent">
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        tools:ignore="HardcodedText" />
 
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/chart"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp">
+
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="300dp"
+                            tools:ignore="UselessParent">
 
-                            <com.github.mikephil.charting.charts.PieChart
-                                android:id="@+id/piechart"
+                            <com.github.mikephil.charting.charts.LineChart
+                                android:id="@+id/chart"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <com.github.mikephil.charting.charts.PieChart
+                                    android:id="@+id/piechart"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="10dp"
+                                    tools:ignore="ScrollViewSize" />
+                            </com.github.mikephil.charting.charts.LineChart>
+
+                            <com.github.mmin18.widget.RealtimeBlurView
+                                android:id="@+id/v_blur1"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_margin="10dp"
-                                tools:ignore="ScrollViewSize" />
-                        </com.github.mikephil.charting.charts.LineChart>
+                                app:realtimeBlurRadius="7dp"
+                                app:realtimeOverlayColor="#88FFFFFF"/>
 
-                        <com.github.mmin18.widget.RealtimeBlurView
-                            android:id="@+id/v_blur1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:realtimeBlurRadius="7dp"
-                            app:realtimeOverlayColor="#88FFFFFF"/>
+                        </FrameLayout>
 
-                    </FrameLayout>
+                    </RelativeLayout>
 
-                </RelativeLayout>
+                </LinearLayout>
 
                 <com.google.android.gms.ads.AdView
                     xmlns:ads="http://schemas.android.com/apk/res-auto"

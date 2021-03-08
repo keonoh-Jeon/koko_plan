@@ -44,27 +44,29 @@
         <Button
             android:id="@+id/btn_sign_in_goolgle"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="15dp"
             android:background="@drawable/loginbtn_style_forgoogle"
             android:drawableStart="@mipmap/googlesymbol_foreground"
-            android:drawableLeft="@mipmap/googlesymbol_round"
             android:text="구글 로그인"
             tools:ignore="HardcodedText" />
 
-        <com.facebook.login.widget.LoginButton
+        <Button
             android:id="@+id/btn_sign_in_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginBottom="15dp"
             android:background="@drawable/loginbtn_style_facebook"
             android:drawableStart="@mipmap/facebooksymbol_foreground"
-            android:drawableLeft="@mipmap/kakaosymbol_foreground"
             android:text="페이스북 로그인"
-            tools:ignore="HardcodedText"
-            />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
+
+       <!-- <com.facebook.login.widget.LoginButton
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="페이스북 로그인"
+            tools:ignore="HardcodedText" />-->
 
 
     </LinearLayout>

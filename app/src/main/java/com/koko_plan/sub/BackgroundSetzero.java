@@ -41,7 +41,6 @@ public class BackgroundSetzero extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-
         new Thread(() -> {
             if(firebaseUser != null){
                 firebaseFirestore
@@ -108,7 +107,6 @@ public class BackgroundSetzero extends Worker {
         }).start();
 
         MainActivity.setzeroavailable = true;
-
         // Indicate whether the work finished successfully with the Result
         return Result.success();
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -45,11 +46,9 @@ public class Singup extends AppCompatActivity {
 
     private static final String TAG = "SignUpActivity";
     private static final int RC_SIGN_IN = 9001;
-    private FirebaseAuth mAuth = null;
+    public static FirebaseAuth mAuth = null;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
-    private CallbackManager callbackManager;
-    private LoginButton buttonFacebook;
     private CallbackManager mCallbackManager;
 
 
@@ -64,26 +63,25 @@ public class Singup extends AppCompatActivity {
 
         // Initialize Facebook Login button
         mCallbackManager = CallbackManager.Factory.create();
-        LoginButton loginButton = findViewById(R.id.btn_sign_in_facebook);
-        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "facebook:onSuccess:" + loginResult);
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
 
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "facebook:onCancel");
-                // ...
-            }
+        LoginManager.getInstance().registerCallback(mCallbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.d("Success", "Login");
+                        handleFacebookAccessToken(loginResult.getAccessToken());
+                    }
 
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "facebook:onError", error);
-                // ...
-            }
-        });
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(Singup.this, "Login Cancel", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        Toast.makeText(Singup.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -95,6 +93,7 @@ public class Singup extends AppCompatActivity {
         findViewById(R.id.emailsignup).setOnClickListener(btnClickListener);
         findViewById(R.id.gotoLogin).setOnClickListener(btnClickListener);
         findViewById(R.id.btn_sign_in_goolgle).setOnClickListener(btnClickListener);
+        findViewById(R.id.btn_sign_in_facebook).setOnClickListener(btnClickListener);
 
         MySoundPlayer.initSounds(getApplicationContext());
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -123,6 +122,10 @@ public class Singup extends AppCompatActivity {
                     if(mGoogleSignInClient != null) {
                     mGoogleSignInClient.signOut();}
                     signIn();
+                    break;
+                case R.id.btn_sign_in_facebook:
+                    MySoundPlayer.play(MySoundPlayer.CLICK);
+                    LoginManager.getInstance().logInWithReadPermissions(Singup.this, Arrays.asList("email", "public_profile"));
                     break;
             }
         }
@@ -189,7 +192,6 @@ public class Singup extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
-                            Log.d(TAG, "페이스 북 " + user.getPhotoUrl());
                             myStartActivity(MainActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.

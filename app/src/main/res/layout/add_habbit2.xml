@@ -339,7 +339,7 @@
                                 android:layout_height="wrap_content"/>
 
                             <TextView
-                                android:text="회당 시간"
+                                android:text="1 회당 시간"
                                 android:layout_width="0dp"
                                 android:gravity="center"
                                 android:layout_gravity="bottom"
@@ -362,14 +362,16 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="#9BE0FF">
+                                android:background="#679BE0FF">
 
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"
                                     android:background="#FFFFFF"
-                                    android:orientation="vertical">
+                                    android:layout_marginRight="20dp"
+                                    android:orientation="vertical"
+                                    tools:ignore="RtlHardcoded">
 
                                     <TextView
                                         android:layout_gravity="center"
@@ -387,6 +389,16 @@
                                     </NumberPicker>
 
 
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="0.1"
+                                    android:layout_height="wrap_content"
+                                    android:background="#FFFFFF"
+                                    android:orientation="vertical"
+                                    tools:ignore="RtlHardcoded">
 
                                 </LinearLayout>
 

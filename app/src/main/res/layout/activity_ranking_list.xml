@@ -226,52 +226,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_rankinglist"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_rankinglist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginBottom="150dp"
+                        tools:ignore="UnusedAttribute">
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                </ScrollView>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:layout_marginBottom="100dp"
-                    tools:ignore="UnusedAttribute">
-                </androidx.recyclerview.widget.RecyclerView>
-
-            </ScrollView>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#50586C"
-                    android:layout_margin="10dp"
-                    android:gravity="center|left"
                     android:layout_gravity="bottom"
-                    android:textSize="10sp"
-                    android:text="'좋아요' 버튼을 눌러 서로의 습관 실천을 응원(명언선물)하세요.
+                    android:gravity="bottom"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#50586C"
+                        android:layout_margin="10dp"
+                        android:gravity="center|left"
+                        android:layout_gravity="bottom"
+                        android:textSize="10sp"
+                        android:text="'좋아요' 버튼을 눌러 서로의 습관 실천을 응원(명언선물)하세요.
                             \n
                             \n'달성율 > 받은 명언 > 할당시간'로 순위가 정해집니다.
                             \n상위 순위권자는, 어플의 모든 기능을 사용할 수 있는 혜택(광고제거)이 주어집니다."
-                    tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
+                        tools:ignore="HardcodedText,RtlHardcoded,SmallSp" />
 
-                <com.google.android.gms.ads.AdView
-                    xmlns:ads="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/adView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    ads:adSize="BANNER"
-                    ads:adUnitId="@string/google_ads_banner_api_key">
-                </com.google.android.gms.ads.AdView>
+                    <com.google.android.gms.ads.AdView
+                        xmlns:ads="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/adView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ads:adSize="BANNER"
+                        ads:adUnitId="@string/google_ads_banner_api_key">
+                    </com.google.android.gms.ads.AdView>
 
-            </LinearLayout>
+                </LinearLayout>
 
             </FrameLayout>
 
@@ -280,7 +280,3 @@
     </LinearLayout>
 
 </LinearLayout>
-
-
-
-
