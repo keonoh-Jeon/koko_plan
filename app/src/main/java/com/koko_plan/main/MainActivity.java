@@ -446,6 +446,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     case ADDED:
                                         Log.w("ADDED","Data: " + dc.getDocument().getData());
                                         namefrom = (String) dc.getDocument().getData().get("namefrom");
+                                        if(namefrom != null && goodTextReceiver) createNotification(namefrom);
                                         break;
                                     case MODIFIED:
                                         Log.w("MODIFIED","Data: " + dc.getDocument().getData());
@@ -455,7 +456,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         break;
                                 }
                             }
-                            if(namefrom != null && goodTextReceiver) createNotification(namefrom);
                         }
 
                         private void createNotification(String namefrom) {
@@ -1000,7 +1000,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void Appupdatemanager() {
         new Thread(() -> {
             //어플 업데이트 관리
-            appUpdateManager = AppUpdateManagerFactory.create(getApplicationContext());
+            appUpdateManager = AppUpdateManagerFactory.create(this);
             appUpdateManager.getAppUpdateInfo().addOnSuccessListener(
                     appUpdateInfo -> {
                         // Checks that the platform will allow the specified type of update.
