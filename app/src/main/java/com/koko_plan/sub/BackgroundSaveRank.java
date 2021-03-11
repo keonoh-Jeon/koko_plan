@@ -55,6 +55,7 @@ public class BackgroundSaveRank extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.e(TAG, "doWork: " + "자정 순위 저장 실행");
             if (firebaseUser != null) {
                 String name = getInputData().getString("name");
                 String todaydate = getInputData().getString("todaydate");
