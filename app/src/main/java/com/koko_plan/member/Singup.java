@@ -125,7 +125,7 @@ public class Singup extends AppCompatActivity {
                     break;
                 case R.id.btn_sign_in_facebook:
                     MySoundPlayer.play(MySoundPlayer.CLICK);
-                    LoginManager.getInstance().logInWithReadPermissions(Singup.this, Arrays.asList("email", "public_profile", "user_friends"));
+                    LoginManager.getInstance().logInWithReadPermissions(Singup.this, Arrays.asList("email", "public_profile"));
                     break;
             }
         }
