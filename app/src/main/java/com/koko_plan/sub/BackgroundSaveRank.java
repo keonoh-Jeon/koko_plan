@@ -8,6 +8,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -26,10 +29,14 @@ import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.MainActivity;
 import com.koko_plan.main.TodoList_Item;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
@@ -40,6 +47,7 @@ public class BackgroundSaveRank extends Worker {
     public static ArrayList<TodoList_Item> todoListItems;
     private int myrank = 0;
     private float eventscore;
+    private String todaydate, name;
 
     public BackgroundSaveRank(
             @NonNull Context context,
@@ -48,17 +56,15 @@ public class BackgroundSaveRank extends Worker {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
-        //        todoListItems.removeAll(todoListItems);
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        Log.e(TAG, "doWork: " + "자정 순위 저장 실행");
+        new Thread(() -> {
             if (firebaseUser != null) {
-                String name = getInputData().getString("name");
-                String todaydate = getInputData().getString("todaydate");
+                name = getInputData().getString("name");
+                todaydate = getInputData().getString("todaydate");
                 long interval = getInputData().getLong("interval", 0);
                 todoListItems = new ArrayList<>();
 
@@ -150,8 +156,10 @@ public class BackgroundSaveRank extends Worker {
                                 }
                             }
                         });
-                MainActivity.setrankavailable = true;
             }
-            return Result.success();
+        }).start();
+
+        MainActivity.setrankavailable = true;
+        return Result.success();
     }
 }

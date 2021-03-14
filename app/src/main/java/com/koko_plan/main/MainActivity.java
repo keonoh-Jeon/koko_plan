@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -20,8 +19,6 @@ import androidx.work.WorkRequest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -31,6 +28,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,7 +47,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -63,7 +60,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
 import com.facebook.login.LoginManager;
 import com.github.mikephil.charting.components.Legend;
 import com.google.android.gms.ads.AdRequest;
@@ -116,7 +112,6 @@ import com.koko_plan.server.goodtext.RandomGoodText;
 import com.koko_plan.server.habbitlist.HabbitList_ViewListener;
 import com.koko_plan.server.ranking.Ranking_list;
 import com.koko_plan.server.totalhabbits.TotalHabbitsList_list;
-import com.koko_plan.sub.AlarmReceiver;
 import com.koko_plan.sub.BackgroundSaveRank;
 import com.koko_plan.sub.BackgroundSetzero;
 import com.koko_plan.sub.DeviceBootReceiver;
@@ -129,7 +124,7 @@ import com.koko_plan.member.Profile_Item;
 import com.koko_plan.member.Singup;
 import com.koko_plan.sub.MySoundPlayer;
 import com.koko_plan.sub.RequestReview;
-import com.koko_plan.sub.SaveProgressReceiver;
+import com.koko_plan.sub.SaveProgress;
 import com.koko_plan.sub.Utils;
 import com.koko_plan.sub.subscribe;
 
@@ -142,6 +137,7 @@ import java.security.MessageDigest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -263,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int adloadcount;
     public static boolean setrankavailable = true;
     public static boolean setzeroavailable = true;
+    public static boolean saveprogressailable = true;
     private boolean goodTextReceiver;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -311,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(ShowCount >= 10) RequestReview.show(this);
 
-        saveProgressAlarm(this);
+        saveProgressManager();
 
         initWorkManagersetzero();
 
@@ -321,16 +318,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //해시 키 확인
         getAppKeyHash();
+
+        Log.e(TAG, "onCreate: " + Arrays.toString(getPackageList()));
     }
 
-    private void initWorkManagersetzero() {
+    @SuppressLint("QueryPermissionsNeeded")
+    public String[] getPackageList()
+    {
+        PackageManager pkgMgr = getApplicationContext().getPackageManager();
+        List<ResolveInfo> mApps;
+        String[] arrayPkgName;
+
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mApps = pkgMgr.queryIntentActivities(mainIntent, 0); // 실행가능한 Package만 추출.
+
+        arrayPkgName = new String[mApps.size()];
+        Collections.sort(mApps, new ResolveInfo.DisplayNameComparator(pkgMgr));
+
+        for (int i = 0; i < mApps.size(); i++)
+        {
+            arrayPkgName[i] = mApps.get(i).activityInfo.packageName;
+        }
+        return arrayPkgName;
+    }
+
+    public void saveProgressManager() {
+
+        if(saveprogressailable){
+            long progress = getTimeUsingInWorkRequest(0,-1,0);
+            WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
+                    .Builder(SaveProgress.class)
+                    .setInitialDelay(progress, TimeUnit.MILLISECONDS)
+                    .addTag("notify_saveprogress")
+                    .build();
+            WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
+        }
+        saveprogressailable = false;
+    }
+
+    public void initWorkManagersetzero() {
 
         if(setzeroavailable){
-            long zero = getTimeUsingInWorkRequest(0, 0,0);
+            long zero = getTimeUsingInWorkRequest(0,0,0);
+            Log.e(TAG, "initWorkManagersetzero:  확인 최초설정" + zero);
             WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
                     .Builder(BackgroundSetzero.class)
                     .setInitialDelay(zero, TimeUnit.MILLISECONDS)
-                    .addTag("notify_day_by_day")
+                    .addTag("notify_setzero")
                     .build();
             WorkManager.getInstance(this).enqueue(setzeroWorkRequest);
         }
@@ -341,11 +376,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initWorkManagersaverank() {
 
         if(setrankavailable){
-            date = new Date();
-            dateformat = new SimpleDateFormat("yyyy-MM-dd"/*, Locale.KOREA*/);
-            todaydate = dateformat.format(date);
             long interval = getTimeUsingInWorkRequest(0,-2,0);
-
             Data myData = new Data.Builder()
                     .putString("name", inputname)
                     .putString("todaydate", todaydate)
@@ -361,17 +392,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             WorkManager.getInstance(this).enqueue(saverankWorkRequest);
         }
+        setrankavailable = false;
     }
 
     private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
 
         //현재 시간을 밀리세컨으로 받음
         Calendar currentDate = Calendar.getInstance();
-        currentDate.setTimeInMillis(System.currentTimeMillis());
 
         //현재 시간, 분, 초로 표기시 사용
         Calendar dueDate = Calendar.getInstance();
-        dueDate.setTimeInMillis(System.currentTimeMillis());
         dueDate.set(Calendar.HOUR_OF_DAY, i);
         dueDate.set(Calendar.MINUTE, i1);
         dueDate.set(Calendar.SECOND, i2);
@@ -379,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24);
         }
-
         return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
 
@@ -1558,7 +1587,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timerTask.cancel();
             timerTask = null;
         }
-
         goodTextReceiver = true;
     }
 
@@ -1609,7 +1637,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(todayitemsize > 1) {
                 tvnewhabbits.setVisibility(View.GONE);
             }
-
             LineChartMaker();
         }
 
@@ -2651,30 +2678,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }).start();
-    }
-
-    //자정마다 실행 (리시버)
-    void saveProgressAlarm(Context context){
-        //알람 매니저 생성
-        AlarmManager saveProgressAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        //리시브 받을 클래스 연결
-        Intent saveProgressIntent = new Intent(context, SaveProgressReceiver.class);
-        PendingIntent resetSender = PendingIntent.getBroadcast(context, 0, saveProgressIntent, 0);
-
-        // 자정 시간
-        Calendar resetCal = Calendar.getInstance();
-        resetCal.setTimeInMillis(System.currentTimeMillis());
-
-        resetCal.set(Calendar.HOUR_OF_DAY, 0);
-        resetCal.set(Calendar.MINUTE, -1);
-        resetCal.set(Calendar.SECOND, 0);
-
-        //다음날 0시에 맞추기 위해 24시간을 뜻하는 상수인 AlarmManager.INTERVAL_DAY를 더해줌.
-        saveProgressAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, resetCal.getTimeInMillis() +AlarmManager.INTERVAL_DAY
-                , AlarmManager.INTERVAL_DAY, resetSender);
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("MM-dd kk:mm:ss");
-        String setResetTime = format.format(new Date(resetCal.getTimeInMillis()+AlarmManager.INTERVAL_DAY));
     }
 
     @Override

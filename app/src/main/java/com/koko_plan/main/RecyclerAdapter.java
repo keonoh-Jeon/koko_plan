@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -357,6 +358,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public void editPlay() {
             MySoundPlayer.play(MySoundPlayer.PLAY);
             showfullad(mContext);
+
             timegap = 0;
             if(isRunning = false){
                 ivPause.setVisibility(View.VISIBLE);
@@ -414,8 +416,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .collection("users").document(firebaseUser.getUid()).collection("total").document(todoListItems.get(i).getHabbittitle())
                             .set(data5, SetOptions.merge());
                 }
+
             }).start();
 
+            if(todoListItems.get(index).getAddon() !=null){
+                Handler mHandler = new Handler();
+                mHandler.postDelayed(new Runnable() {
+                    public void run() {
+                        Intent it = mContext.getPackageManager().getLaunchIntentForPackage(todoListItems.get(index).getAddon());
+                        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(it);
+                    } }, 1000);
+            }
         }
 
         @SuppressLint("SimpleDateFormat")

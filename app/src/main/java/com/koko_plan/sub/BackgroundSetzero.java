@@ -4,6 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -18,8 +21,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.koko_plan.main.MainActivity;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
@@ -106,8 +111,38 @@ public class BackgroundSetzero extends Worker {
             }
         }).start();
 
+        initWorkManagersetzero();
+
         MainActivity.setzeroavailable = true;
         // Indicate whether the work finished successfully with the Result
         return Result.success();
+    }
+
+    private void initWorkManagersetzero() {
+        long zero = getTimeUsingInWorkRequest(0,0,0);
+        Log.e(TAG, "initWorkManagersetzero:  확인 재설정" + zero);
+        WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
+                .Builder(BackgroundSetzero.class)
+                .setInitialDelay(zero, TimeUnit.MILLISECONDS)
+                .addTag("notify_setzero")
+                .build();
+        WorkManager.getInstance(getApplicationContext()).enqueue(setzeroWorkRequest);
+    }
+
+    private long getTimeUsingInWorkRequest(int i, int i1, int i2) {
+
+        //현재 시간을 밀리세컨으로 받음
+        Calendar currentDate = Calendar.getInstance();
+
+        //현재 시간, 분, 초로 표기시 사용
+        Calendar dueDate = Calendar.getInstance();
+        dueDate.set(Calendar.HOUR_OF_DAY, i);
+        dueDate.set(Calendar.MINUTE, i1);
+        dueDate.set(Calendar.SECOND, i2);
+
+        if(dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24);
+        }
+        return dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
     }
 }

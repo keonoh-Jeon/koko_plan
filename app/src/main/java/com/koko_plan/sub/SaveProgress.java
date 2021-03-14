@@ -1,22 +1,22 @@
 package com.koko_plan.sub;
 
-import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -28,44 +28,34 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.ContentValues.TAG;
 import static com.koko_plan.main.MainActivity.firebaseFirestore;
 import static com.koko_plan.main.MainActivity.firebaseUser;
-import static com.koko_plan.main.MainActivity.lastsec;
-import static com.koko_plan.main.MainActivity.name;
 import static com.koko_plan.main.MainActivity.pref;
 import static com.koko_plan.main.MainActivity.todaydate;
-import static com.koko_plan.main.MainActivity.todayitemsize;
-import static com.koko_plan.main.MainActivity.todoListItems;
 
-public class SaveProgressReceiver extends BroadcastReceiver {
+public class SaveProgress extends Worker {
+
+    private static final String TAG = "SaveProgress";
 
     private Calendar calendar = Calendar.getInstance();
-    private PowerManager.WakeLock sCpuWakeLock;
     public static ArrayList<TodoList_Item> todoListItems = null;
     private long today_progress;
 
-    @SuppressLint({"WakelockTimeout", "InvalidWakeLockTag","SimpleDateFormat"})
+    public SaveProgress(
+            @NonNull Context context,
+            @NonNull WorkerParameters params) {
+        super(context, params);
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    @NonNull
     @Override
-    public void onReceive(Context context, Intent intent) {
-
-        if (sCpuWakeLock != null) {
-            return;
-        }
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        sCpuWakeLock = pm.newWakeLock(
-                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
-                        PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                        PowerManager.ON_AFTER_RELEASE, "hi");
-
-        sCpuWakeLock.acquire();
-
-        if (sCpuWakeLock != null) {
-            sCpuWakeLock.release();
-            sCpuWakeLock = null;
-        }
-
+    public Result doWork() {
         new Thread(() -> {
             todoListItems = new ArrayList<>();
             todoListItems.clear();
@@ -208,6 +198,10 @@ public class SaveProgressReceiver extends BroadcastReceiver {
                         });
             }
         }).start();
+
+        MainActivity.saveprogressailable = true;
+        // Indicate whether the work finished successfully with the Result
+        return Result.success();
     }
 
     private String getdayofweek() {

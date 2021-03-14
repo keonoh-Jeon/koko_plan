@@ -12,6 +12,7 @@ public class TodoList_Item
     private String habbittitle;
     private String time;
     private String day;
+    private String addon;
     private int progress;
     private int count;
     private int countsum;
@@ -108,6 +109,15 @@ public class TodoList_Item
     public void setText(String text)
     {
         this.text = text;
+    }
+
+    public String getAddon()
+    {
+        return addon;
+    }
+    public void setAddon(String addon)
+    {
+        this.addon = addon;
     }
 
     public float getAverage()
