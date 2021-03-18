@@ -419,14 +419,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             }).start();
 
-            if(todoListItems.get(index).getAddon() !=null){
+            String addon = todoListItems.get(index).getAddon();
+
+            if(addon != null){
                 Handler mHandler = new Handler();
                 mHandler.postDelayed(new Runnable() {
                     public void run() {
-                        Intent it = mContext.getPackageManager().getLaunchIntentForPackage(todoListItems.get(index).getAddon());
+                        Intent it = mContext.getPackageManager().getLaunchIntentForPackage(addon);
+                        assert it != null;
                         it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(it);
-                    } }, 1000);
+                    } }, 500);
             }
         }
 
