@@ -84,7 +84,7 @@ public class Ranking_list extends AppCompatActivity implements Ranking_ViewListe
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.iv_back) {
-                //MySoundPlayer.play(MySoundPlayer.CLICK);
+                MySoundPlayer.play(MySoundPlayer.CLICK);
                 myStartActivity(MainActivity.class);
             }
         }

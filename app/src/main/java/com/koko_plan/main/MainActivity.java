@@ -104,6 +104,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.koko_plan.AppInfo;
 import com.koko_plan.server.detailhabbit.DetailHabbit;
 import com.koko_plan.server.goodtext.GoodText_Adapter;
 import com.koko_plan.server.goodtext.GoodText_Item;
@@ -316,13 +317,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-6976973682401259/5609646607");
 
-        //해시 키 확인
-        getAppKeyHash();
-
-        Log.e(TAG, "onCreate: " + Arrays.toString(getPackageList()));
+//        Log.e(TAG, "onCreate: " + Arrays.toString(getPackageList()));
     }
 
-    @SuppressLint("QueryPermissionsNeeded")
+
+
+
+    public void onAppButtonClick(View v, String packageName) {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(packageName);
+        startActivity(launchIntent);
+    }
+
+    /*@SuppressLint("QueryPermissionsNeeded")
     public String[] getPackageList()
     {
         PackageManager pkgMgr = getApplicationContext().getPackageManager();
@@ -341,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             arrayPkgName[i] = mApps.get(i).activityInfo.packageName;
         }
         return arrayPkgName;
-    }
+    }*/
 
     public void saveProgressManager() {
 
@@ -361,7 +367,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(setzeroavailable){
             long zero = getTimeUsingInWorkRequest(0,0,0);
-            Log.e(TAG, "initWorkManagersetzero:  확인 최초설정" + zero);
             WorkRequest setzeroWorkRequest = new OneTimeWorkRequest
                     .Builder(BackgroundSetzero.class)
                     .setInitialDelay(zero, TimeUnit.MILLISECONDS)
@@ -2692,23 +2697,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         {
             Toast.makeText(MainActivity.this, "'뒤로'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
             Back_Key_Before_Time = System.currentTimeMillis();
-        }
-    }
-
-    //해시 값 찾기
-    private void getAppKeyHash() {
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md;
-                md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                String something = new String(Base64.encode(md.digest(), 0));
-                Log.e("Hash key", something);
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            Log.e("name not found", e.toString());
         }
     }
 }
